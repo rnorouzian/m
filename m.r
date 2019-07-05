@@ -289,19 +289,19 @@ convolve <- function(dens1, dens2,
   
 funnel.bayesmeta <- function(x,
                              main=deparse(substitute(x)),
-                             xlab=expression("effect size"),
-                             ylab=expression("standard dev."),
+                             xlab=expression("Effect Size"),
+                             ylab=expression("SD"),
                              zero=0.0, FE=FALSE, legend=FE, ...)
 {
-
+  
   stopifnot(is.element("bayesmeta", class(x)))
- 
+  
   yrange <- c(0.0, max(x$sigma))
-
+  
   sevec <- seq(from=0, yrange[2]*1.04, le=27)
-
+  
   intRE <- matrix(NA_real_, nrow=length(sevec), ncol=2,
-                dimnames=list(NULL, c("lower","upper")))
+                  dimnames=list(NULL, c("lower","upper")))
   intRE[1,] <- x$qposterior(theta.p=c(0.025, 0.975), predict=TRUE)
   for (i in 2:length(sevec)){
     conv <- try(convolve(dens1=function(a, log=FALSE){return(x$dposterior(theta=a, predict=TRUE, log=log))},
@@ -312,7 +312,7 @@ funnel.bayesmeta <- function(x,
       intRE[i,] <- conv$quantile(p=c(0.025, 0.975))
     }
   }
-
+  
   intFE <- matrix(NA_real_, nrow=length(sevec), ncol=2,
                   dimnames=list(NULL, c("lower","upper")))
   cm <- x$cond.moment(tau=0)
@@ -321,13 +321,13 @@ funnel.bayesmeta <- function(x,
   }
   FEcol="red3"
   REcol="blue3"
-
+  
   plot(range(intRE), -yrange, type="n",
-       ylab=ylab, xlab=xlab, main=main, axes=FALSE)
-
+       ylab=ylab, xlab=xlab, main=main, axes = FALSE, ...)
+  
   polygon(c(intRE[,1], rev(intRE[,2])), c(-sevec, rev(-sevec)), col="grey90", border=NA)
   if (FE) polygon(c(intFE[,1], rev(intFE[,2])), c(-sevec, rev(-sevec)), col="grey80", border=NA)
-
+  
   lines(c(intRE[1,1], intRE[1,1], NA, intRE[1,2], intRE[1,2]),
         c(0,-max(sevec), NA, 0, -max(sevec)), col="grey75", lty="dashed")
   abline(h=0, col="darkgrey")
@@ -342,11 +342,16 @@ funnel.bayesmeta <- function(x,
   if (is.finite(zero))
     lines(c(zero, zero), c(-1,1)*max(sevec), col="darkgrey", lty="solid")
   # actual points:
-  points(x$y, -x$sigma, pch=21, col="black", bg=grey(0.5, alpha=0.5), cex=1)
+  points(x$y, -x$sigma, pch=21, col="magenta", bg="cyan", cex=1.3)
+ 
+  #points(x$theta[5,], -x$sigma, pch=22, col="gray50", bg="gray50", cex=1.2)
+  
+  text(x$y, -x$sigma, x$labels, cex = .7, font = 2, pos = 3)
+  
   if (FE && legend)
     legend("topleft", c("RE model", "FE model"),
            col=c(REcol, FEcol), lty=c("dashed", "dotted"), bg="white")
-  axis(1); axis(2, at=-yticks, labels=yticks); box()
+  axis(1) ; axis(2, at=-yticks, labels=yticks); box()
   invisible()
 }
   
