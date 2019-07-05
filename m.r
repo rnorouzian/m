@@ -119,8 +119,9 @@ var.d <- function(d, n1, n2 = NA, g = FALSE, r = .37, cont.grp = FALSE){
   v <- if(is.na(n2) & !cont.grp) (1/n1) + ((d^2)/(2*n1)) 
   else if(is.na(n2) & cont.grp) ((2*(1-r))/n1) + ((d^2)/(2*n1)) 
   else ((n1+n2)/(n1*n2)) + ((d^2)/(2*(n1+n2)) )
+  df <- ifelse(is.na(n2), n1 - 1, n1 + n2 - 2)
   
-  if(g)(d.unbias(d, n1, n2)/d)^2 * v else v
+  ifelse(g == TRUE, cfactor(df)^2 * v, v)
 }
   
 #===============================================================================================================================
