@@ -289,8 +289,8 @@ convolve <- function(dens1, dens2,
   
 funnel.bayesmeta <- function(x,
                              main=deparse(substitute(x)),
-                             xlab=expression("effect size "*y[i]),
-                             ylab=expression("standard dev. "*sigma[i]),
+                             xlab=expression("effect size"),
+                             ylab=expression("standard dev."),
                              zero=0.0, FE=FALSE, legend=FE, ...)
 {
 
