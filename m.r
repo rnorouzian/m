@@ -622,9 +622,9 @@ meta.within <- function(..., per.study = NULL, study.name = NA, group.name = NA,
     
     
     if(Short & length(d1) > 1){
-      result1 <- bayesmeta(     y = d1,
-                                sigma = sd1,
-                                labels = NULL, tau.prior = tau.prior)
+      result1 <- bayesmeta(                y = d1,
+                                       sigma = sd1,
+                                      labels = NULL, tau.prior = tau.prior)
       result1$call <- match.call(expand.dots = FALSE)
       
       short <- c(result1$summary["mean","mu"], result1$summary["sd","mu"])
@@ -635,9 +635,9 @@ meta.within <- function(..., per.study = NULL, study.name = NA, group.name = NA,
     if(Short & length(d1) > 1 & Short..2 & length(d1..2) > 1) { 
       
       
-      res1 <- bayesmeta(         y = d1..2,
-                                 sigma = sd1..2,
-                                 labels = NULL, tau.prior = tau.prior)
+      res1 <- bayesmeta(                y = d1..2,
+                                    sigma = sd1..2,
+                                   labels = NULL, tau.prior = tau.prior)
       res1$call <- match.call(expand.dots = FALSE)
       
       
