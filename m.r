@@ -297,10 +297,10 @@ convolve <- function(dens1, dens2,
 
   
 funnel.bayesmeta <- function(x,
-                             main=deparse(substitute(x)),
-                             xlab=expression("Effect Size"),
-                             ylab=expression("SD"),
-                             zero=0.0, FE=FALSE, legend=FE, ...)
+                             main = deparse(substitute(x)),
+                             xlab = "Effect Size",
+                             ylab = "SD",
+                             zero = 0, FE = FALSE, legend = FE, ...)
 {
   
   stopifnot(is.element("bayesmeta", class(x)))
