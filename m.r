@@ -1,6 +1,6 @@
 Break = "\n<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n"
 
-notice = "  A suite of R functions for Modern Meta-Analysis in Second Language Acquisition Research.
+notice = "     \"MMSLR\", A suite of R functions for Modern Meta-Analysis in Second Language Acquisition Research.
     Copyright (C) 2019-present  Reza Norouzian, rnorouzian@gmail.com
 
     This set of programs is free software: you can redistribute it under the 
