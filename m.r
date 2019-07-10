@@ -66,7 +66,7 @@ cfactor <- function(df) exp(lgamma(df/2)-log(sqrt(df/2)) - lgamma((df-1)/2))
 
 #===============================================================================================================================
 
-reget <- function(List, what, omit.last = TRUE){
+reget <- function(List, what, omit.last = FALSE){
   
   s <- substitute(what)  
   
@@ -323,7 +323,7 @@ funnel.bayesmeta <- function(x,
                              main = deparse(substitute(x)),
                              xlab = "Effect Size",
                              ylab = "SD",
-                             zero = 0, FE = FALSE, legend = FE, ...)
+                             zero = 0, FE = FALSE, legend = FE, shrink = FALSE, ...)
 {
   
   stopifnot(is.element("bayesmeta", class(x)))
@@ -365,18 +365,18 @@ funnel.bayesmeta <- function(x,
   abline(h=0, col="darkgrey")
   yticks <- pretty(yrange)
   abline(h=-yticks[yticks>0], col="grey75", lty="15")
-  # funnels (outline):
+  
   matlines(intRE, cbind(-sevec, -sevec), col=REcol, lty="dashed")
   if (FE) matlines(intFE, cbind(-sevec, -sevec), col=FEcol, lty="dotted")
   lines(rep(x$summary["median","theta"], 2), range(-sevec), col=REcol, lty="dashed")
   if (FE) lines(rep(cm[1,"mean"], 2), range(-sevec), col=FEcol, lty="dotted")
-  # zero line:
+  
   if (is.finite(zero))
     lines(c(zero, zero), c(-1,1)*max(sevec), col="darkgrey", lty="solid")
-  # actual points:
+  
   points(x$y, -x$sigma, pch=21, col="magenta", bg="cyan", cex=1.3)
  
-  #points(x$theta[5,], -x$sigma, pch=22, col="gray50", bg="gray50", cex=1.2)
+  if(shrink) points(x$theta[5,], -x$sigma, pch=22, col="gray50", bg="gray50", cex=1.2)
   
   text(x$y, -x$sigma, x$labels, cex = .7, font = 2, pos = 3)
   
@@ -431,7 +431,7 @@ dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim 
     
     m[[1]] <- NULL                          
     
-    if(is.null(reget(m, control, F))) stop("Required 'control' group not found.", call. = FALSE)
+    if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
     
     ar <- head(formalArgs(d.prepos), -1)
     
@@ -465,13 +465,13 @@ dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim 
   G <- function(m, study.name, group.name, n.sim, digits)
   {
     
-    cdel1 <- reget(m, control & post == 2 & outcome == 1, F)
-    cdel2 <- reget(m, control & post == 3 & outcome == 1, F)
-    cs <- reget(m, control & post == 1 & outcome == 1, F)
+    cdel1 <- reget(m, control & post == 2 & outcome == 1)
+    cdel2 <- reget(m, control & post == 3 & outcome == 1)
+    cs <- reget(m, control & post == 1 & outcome == 1)
     
-    tdel1 <- reget(m, !control & post == 2 & outcome == 1, F)
-    tdel2 <- reget(m, !control & post == 3 & outcome == 1, F)
-    ts <- reget(m, !control & post == 1 & outcome == 1, F) 
+    tdel1 <- reget(m, !control & post == 2 & outcome == 1)
+    tdel2 <- reget(m, !control & post == 3 & outcome == 1)
+    ts <- reget(m, !control & post == 1 & outcome == 1) 
     
     if(all(sapply(list(cdel1, cdel2, tdel1, tdel2, ts, cs), is.null))) stop("Either 'control' or 'post' incorrectly coded.", call. = FALSE)
     
@@ -482,13 +482,13 @@ dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim 
     del2 <- all(sapply(list(cdel2, tdel2), function(x) !is.null(x)))
     
     
-    cdel1..2 <- reget(m, control & post == 2 & outcome == 2, F)
-    cdel2..2 <- reget(m, control & post == 3 & outcome == 2, F)
-    cs..2 <- reget(m, control & post == 1 & outcome == 2, F)
+    cdel1..2 <- reget(m, control & post == 2 & outcome == 2)
+    cdel2..2 <- reget(m, control & post == 3 & outcome == 2)
+    cs..2 <- reget(m, control & post == 1 & outcome == 2)
     
-    tdel1..2 <- reget(m, !control & post == 2 & outcome == 2, F)
-    tdel2..2 <- reget(m, !control & post == 3 & outcome == 2, F)
-    ts..2 <- reget(m, !control & post == 1 & outcome == 2, F)
+    tdel1..2 <- reget(m, !control & post == 2 & outcome == 2)
+    tdel2..2 <- reget(m, !control & post == 3 & outcome == 2)
+    ts..2 <- reget(m, !control & post == 1 & outcome == 2)
 
 
     short..2 <- all(sapply(list(cs..2, ts..2), function(x) !is.null(x)))
@@ -914,9 +914,9 @@ if(!is.na(mu[3])) lines(c(2, 2), c(lo[3], hi[3]), col = 2,lwd = 4, lend = 1)
 
 if(!is.null(LO)) k[2] <- "stage"
 
-text(x, .87*hi, paste0("(k = ", k,")"), cex = .8, font = 2, xpd = NA, srt = 90, pos = 2) 
+text(x, .88*hi, paste0("(k = ", k,")"), cex = .7, font = 2, xpd = NA, srt = 90, pos = 2) 
 
-points(x, mu, pch = 22, cex = 6, bg = "cyan", col = "magenta", xpd = NA)
+points(x, mu, pch = 22, cex = 5.5, bg = "cyan", col = "magenta", xpd = NA)
 
 text(x, c(lo, mu, hi), 
      round(c(lo, mu, hi), 3), cex = .8, font = 2, xpd = NA)
