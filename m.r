@@ -374,9 +374,9 @@ funnel.bayesmeta <- function(x,
   if (is.finite(zero))
     lines(c(zero, zero), c(-1,1)*max(sevec), col="darkgrey", lty="solid")
   
-  points(x$y, -x$sigma, pch=21, col="magenta", bg="cyan", cex=1.3)
- 
-  if(shrink) points(x$theta[5,], -x$sigma, pch=21, col="gray50", bg= adjustcolor("gray40", .5), cex=1.15)
+  points(x$y, -x$sigma, pch=21, col="magenta", bg="cyan", cex=1.35)
+  
+  if(shrink) points(x$theta[5,], -x$sigma, pch=21, col=adjustcolor("gray40", .5), bg= adjustcolor("gray40", .5), cex=1.2)
   
   text(x$y, -x$sigma, x$labels, cex = .7, font = 2, pos = 3)
   
