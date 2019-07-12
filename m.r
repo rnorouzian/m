@@ -918,12 +918,13 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
     
     points(x, mu, pch = 22, cex = 5.9, bg = "cyan", col = "magenta", xpd = NA)
     
-    text(x, c(lo, mu, hi), 
+    text(x, c(.97*lo, mu, 1.03*hi), 
          round(c(lo, mu, hi), 3), cex = .8, font = 2, xpd = NA)
   }
   
-  for(i in 1:L) G(m[[i]], main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i]) 
-}             
+  for(i in 1:L) G(m[[i]], main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i])
+  
+}            
                
                
 #===============================================================================================================================
