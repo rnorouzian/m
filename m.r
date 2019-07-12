@@ -127,7 +127,7 @@ pair <- function(j, k){
 #===============================================================================================================================
 
                 
-dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5, digits = 9){
+dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5){
   
   like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
   like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
@@ -140,7 +140,7 @@ dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5, digits = 9){
   Mean <- mean(dif)
   SD <- sd(dif)
   
-  return(round(c(dint = Mean, SD = SD), digits))
+  return(c(dint = Mean, SD = SD))
 })                
                 
                 
@@ -321,7 +321,7 @@ convolve <- function(dens1, dens2,
   
 funnel.bayesmeta <- function(x,
                              main = deparse(substitute(x)),
-                             xlab = "Effect Size",
+                             xlab = "Effect Size (dint)",
                              ylab = "SD",
                              zero = 0, FE = FALSE, legend = FE, shrink = FALSE, ...)
 {
@@ -422,7 +422,7 @@ d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mpre = NA
 #================================================================================================================================
 
 
-dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim = 1e5, digits = 6, by, data = NULL)
+dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim = 1e5, by, data = NULL)
 {
   
   L <- if(!is.null(data)){
@@ -462,7 +462,7 @@ dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim 
     L <- if(length(res) == 0) stop("No study with the requested moderators found.", call. = FALSE) else res
   }
   
-  G <- function(m, study.name, group.name, n.sim, digits)
+  G <- function(m, study.name, group.name, n.sim)
   {
     
     cdel1 <- reget(m, control & post == 2 & outcome == 1)
@@ -505,7 +505,7 @@ dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim 
       dppc1 <- dppcs <- sapply(1:length(dps), function(i) dps[[i]][[1]][1])
       dppt1 <- dppts <- sapply(1:length(dps), function(i) dps[[i]][[1]][2])
      # group.name1 <- unlist(lapply(1:length(dps), function(i) names(dps[[i]])))
-      SHORT <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, digits = digits)))
+      SHORT <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim)))
      # row.names(SHORT) <- group.name1
     }
     
@@ -517,7 +517,7 @@ dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim 
       dppc1 <- sapply(1:length(dps), function(i) dps[[i]][[1]][1])
       dppt1 <- sapply(1:length(dps), function(i) dps[[i]][[1]][2])
       #group.name1 <- unlist(lapply(1:length(dps), function(i) names(dps[[i]])))
-      SHORT..2 <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, digits = digits)))
+      SHORT..2 <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim)))
      # row.names(SHORT..2) <- group.name1
     }
     
@@ -529,7 +529,7 @@ dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim 
       dppc2 <- dppcdel1 <- sapply(1:length(dpdel1), function(i) dpdel1[[i]][[1]][1])
       dppt2 <- dpptdel1 <- sapply(1:length(dpdel1), function(i) dpdel1[[i]][[1]][2])
       #group.name2 <- unlist(lapply(1:length(dpdel1), function(i) names(dpdel1[[i]])))
-      DEL1 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, digits = digits)))
+      DEL1 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim)))
       #row.names(DEL1) <- group.name2
     }
     
@@ -541,7 +541,7 @@ dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim 
       dppc2 <- sapply(1:length(dpdel1), function(i) dpdel1[[i]][[1]][1])
       dppt2 <- sapply(1:length(dpdel1), function(i) dpdel1[[i]][[1]][2])
      # group.name2 <- unlist(lapply(1:length(dpdel1), function(i) names(dpdel1[[i]])))
-      DEL1..2 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, digits = digits)))
+      DEL1..2 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim)))
       #row.names(DEL1..2) <- group.name2
     }
     
@@ -553,7 +553,7 @@ dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim 
       dppc3 <- dppcdel2 <- sapply(1:length(dpdel2), function(i) dpdel2[[i]][[1]][1])
       dppt3 <- dpptdel2 <- sapply(1:length(dpdel2), function(i) dpdel2[[i]][[1]][2])
     #  group.name3 <- unlist(lapply(1:length(dpdel2), function(i) names(dpdel2[[i]])))
-      DEL2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, digits = digits)))
+      DEL2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim)))
       #row.names(DEL2) <- group.name3
     }
     
@@ -564,7 +564,7 @@ dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim 
       dppc3 <- sapply(1:length(dpdel2), function(i) dpdel2[[i]][[1]][1])
       dppt3 <- sapply(1:length(dpdel2), function(i) dpdel2[[i]][[1]][2])
       #group.name3 <- unlist(lapply(1:length(dpdel2), function(i) names(dpdel2[[i]])))
-      DEL2..2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, digits = digits)))
+      DEL2..2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim)))
       #row.names(DEL2..2) <- group.name3
     }
     
@@ -572,7 +572,7 @@ dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim 
     list(SHORT = if(short) SHORT else NULL, SHORT..2 = if(short..2) SHORT..2 else NULL, DEL1 = if(del1) DEL1 else NULL, DEL1..2 = if(del1..2) DEL1..2 else NULL, DEL2 = if(del2) DEL2 else NULL, DEL2..2 = if(del2..2) DEL2..2 else NULL) 
   }
   
-  h <- lapply(1:length(L), function(i) G(m = L[[i]], study.name = study.name, group.name = group.name, n.sim = n.sim, digits = digits))
+  h <- lapply(1:length(L), function(i) G(m = L[[i]], study.name = study.name, group.name = group.name, n.sim = n.sim))
   
   if(!is.null(data)) study.name <- names(L)
   
