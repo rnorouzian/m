@@ -376,7 +376,7 @@ funnel.bayesmeta <- function(x,
   
   points(x$y, -x$sigma, pch=21, col="magenta", bg="cyan", cex=1.3)
  
-  if(shrink) points(x$theta[5,], -x$sigma, pch=22, col="gray50", bg="gray50", cex=1.2)
+  if(shrink) points(x$theta[5,], -x$sigma, pch=22, col="magenta", bg= adjustcolor("gray40", .5), cex=1.2)
   
   text(x$y, -x$sigma, x$labels, cex = .7, font = 2, pos = 3)
   
@@ -908,9 +908,9 @@ plot(x, mu, type = "l", ylim = range(lo, hi), ylab = "Effect Size (dint)", lwd =
        if(!is.na(mu[3]) & is.null(LO)) "Post_3" 
          else NULL)), main = main)
 
-if(!is.na(mu[1])) lines(c(0, 0), c(lo[1], hi[1]), col = 2,lwd = 4, lend = 1)
-if(!is.na(mu[2])) lines(c(1, 1), c(lo[2], hi[2]), col = 2,lwd = 4, lend = 1) 
-if(!is.na(mu[3])) lines(c(2, 2), c(lo[3], hi[3]), col = 2,lwd = 4, lend = 1)
+if(!is.na(mu[1])) lines(c(0, 0), c(lo[1], hi[1]), col = 2, lwd = 4, lend = 1)
+if(!is.na(mu[2])) lines(c(1, 1), c(lo[2], hi[2]), col = 2, lwd = 4, lend = 1) 
+if(!is.na(mu[3])) lines(c(2, 2), c(lo[3], hi[3]), col = 2, lwd = 4, lend = 1)
 
 if(!is.null(LO)) k[2] <- "stage"
 
