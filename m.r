@@ -55,7 +55,7 @@ sdif <- function(n = NA, mpre = NA, mpos = NA, sdpre = NA, sdpos = NA, r = NA, t
 rdif <- function(n = NA, mpre = NA, mpos = NA, sdpre = NA, sdpos = NA, t = NA, F1 = NA, sdif = NA, 
                  sdp = NA) {
   
-  sdif <- ifelse(is.na(sdif), sdif(sdpre = sdpre, sdpos = sdpos, t = t, r = NA, n = n, mpos = mpos, mpre = mpre, F1 = F1, sdp = sdp), sdif)
+  sdif <- ifelse(is.na(sdif), sdif(sdpre = sdpre, sdpos = sdpos, t = t, n = n, mpos = mpos, mpre = mpre, F1 = F1, sdp = sdp), sdif)
   ifelse(!is.na(sdif) & is.na(sdp) & !is.na(sdpre) & !is.na(sdpos), (sdpre^2 + sdpos^2 - sdif^2)/(2*sdpre*sdpos), ifelse(!is.na(sdp) & !is.na(sdif), 1 - (sdif^2/(2*sdp^2)), 
    NA))
 }
@@ -392,7 +392,7 @@ funnel.bayesmeta <- function(x,
 #===============================================================================================================================
               
               
-d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mpre = NA, mpos = NA, sdpre = NA, sdpos = NA, r = NA, rev.sign = FALSE, autoreg = FALSE, t.pair = NA, df = NA, sdif = NA, sdp = NA, post, control, outcome, ...) 
+d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mpre = NA, mpos = NA, sdpre = NA, sdpos = NA, r = NA, rev.sign = FALSE, autoreg = FALSE, t.pair = NA, df = NA, sdif = NA, post, control, outcome, ...) 
 {
   
   if(missing(control) || missing(post) || missing(outcome)) stop("'post', 'outcome' and/or 'control' missing.", call. = FALSE)  
@@ -402,8 +402,8 @@ d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mpre = NA
   n <- ifelse(!is.na(n), n, ifelse(is.na(n) & !is.na(df), df + 1, NA))
   d <- ifelse(!is.na(d), d, ifelse(!is.na(t.pair) & !is.na(n), t2d(t.pair, n), NA))
   mdif <- ifelse(!is.na(mpre) & !is.na(mpre), mpos - mpre, NA)
-  sdif <- ifelse(is.na(sdif), sdif(sdpre = sdpre, sdpos = sdpos, t = t.pair, r = r, n = n, mpos = mpos, mpre = mpre, sdp = sdp), sdif)
-  cor. <- ifelse(is.na(r), rdif(n = n, mpre = mpre, mpos = mpos, sdpre = sdpre, sdpos = sdpos, sdif = sdif, sdp = sdp), r)
+  sdif <- ifelse(is.na(sdif), sdif(sdpre = sdpre, sdpos = sdpos, t = t.pair, r = r, n = n, mpos = mpos, mpre = mpre), sdif)
+  cor. <- ifelse(is.na(r), rdif(n = n, mpre = mpre, mpos = mpos, sdpre = sdpre, sdpos = sdpos, sdif = sdif), r)
   d <- ifelse(!is.na(mdif) & is.na(d) & !is.na(sdif), mdif/sdif, d)
   d <- ifelse(rev.sign == TRUE, -d, d)
   se <- se.d(d, n1 = n, g = TRUE)
