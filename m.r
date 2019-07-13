@@ -323,8 +323,9 @@ funnel.bayesmeta <- function(x,
                              main = deparse(substitute(x)),
                              xlab = "Effect Size (dint)",
                              ylab = "SD",
-                             zero = 0, FE = FALSE, legend = FE, shrink = FALSE, ...)
+                             FE = FALSE, legend = FE, shrink = FALSE, ...)
 {
+  
   
   stopifnot(is.element("bayesmeta", class(x)))
   
@@ -368,17 +369,18 @@ funnel.bayesmeta <- function(x,
   
   matlines(intRE, cbind(-sevec, -sevec), col=REcol, lty="dashed")
   if (FE) matlines(intFE, cbind(-sevec, -sevec), col=FEcol, lty="dotted")
-  lines(rep(x$summary["median","theta"], 2), range(-sevec), col=REcol, lty="dashed")
+  lines(rep(x$summary["mean","mu"], 2), range(-sevec), col= 2, lty= 2)
   if (FE) lines(rep(cm[1,"mean"], 2), range(-sevec), col=FEcol, lty="dotted")
   
-  if (is.finite(zero))
-    lines(c(zero, zero), c(-1,1)*max(sevec), col="darkgrey", lty="solid")
+  text(x$summary["mean","mu"], mean(par('usr')[3:4])*.1, bquote(mu == .(round(x$summary["mean","mu"], 3))), font = 2, col = 2, srt = 90, pos = 2)
+
+  lines(c(0, 0), c(-1,1)*max(sevec), col = "darkgrey")
   
   points(x$y, -x$sigma, pch=21, col="magenta", bg="cyan", cex=1.35)
   
   if(shrink) points(x$theta[5,], -x$sigma, pch=21, col=adjustcolor("gray40", .5), bg= adjustcolor("gray40", .5), cex=1.2)
   
-  text(x$y, -x$sigma, x$labels, cex = .7, font = 2, pos = 3)
+  text(x$y, -x$sigma, x$labels, cex = .65, font = 2, pos = 3)
   
   if (FE && legend)
     legend("topleft", c("RE model", "FE model"),
