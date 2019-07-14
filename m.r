@@ -114,11 +114,21 @@ fuse <- function(..., per.study){
               
 #===============================================================================================================================
                
-pair <- function(j, k){
+pair2 <- function(j, k){
   lapply(seq_along(j), function(i) {x1 <- expand.grid(d1 = j[[i]]$d, d2 = k[[i]]$d); 
   row.names(x1) <- c(outer(row.names(j[[i]]), row.names(k[[i]]), FUN = paste)); 
   setNames(split(as.matrix(x1), row(x1)), paste(names(k[i]), row.names(x1), sep = ""))})
-}                
+} 
+
+#===============================================================================================================================                
+                
+pair <- function(j, k){ 
+  f1 <- function(x, y) {
+    dat <- expand.grid(x, y)
+    split(as.matrix(dat), row(dat))
+  }
+  do.call(Map, c(f = f1, list(lapply(j, `[[`, "d"), lapply(k, `[[`, "d"))))
+}
                 
 #===============================================================================================================================
 
