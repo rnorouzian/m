@@ -66,13 +66,9 @@ cfactor <- function(df) exp(lgamma(df/2)-log(sqrt(df/2)) - lgamma((df-1)/2))
 
 #===============================================================================================================================
 
-reget <- function(List, what, omit.last = FALSE){
+reget <- function(List, what){
   
   s <- substitute(what)  
-  
-  if(omit.last) List[[length(List)]] <- NULL
-  
-  if(class(List)[1] != "list") List <- list(List)
   
   h <- lapply(List, function(x) do.call("subset", list(x, s)))
   
