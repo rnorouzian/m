@@ -430,7 +430,7 @@ d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA
 #================================================================================================================================
 
 
-dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim = 1e5, by, data = NULL)
+dint2 <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim = 1e5, by, data = NULL)
 {
   
   L <- if(!is.null(data)){
@@ -590,7 +590,169 @@ dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim 
   
 }
               
-
+#================================================================================================================================
+              
+              
+dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim = 1e5, by, data = NULL)
+{
+  
+  L <- if(!is.null(data)){
+    
+    m <- split(data, data$study.name)        
+    
+    m[[1]] <- NULL                          
+    
+    if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
+    
+    ar <- head(formalArgs(d.prepos), -1)
+    
+    dot.names <- names(m[[1]])[!names(m[[1]]) %in% ar]
+    
+    args <- lapply(m, function(x) unclass(x[c(ar, dot.names)]))
+    
+    argsT <- setNames(lapply(names(args[[1]]), 
+                             function(i) lapply(args, `[[`, i)), names(args[[1]]))
+    
+    do.call(Map, c(f = d.prepos, argsT))
+    
+  } else { fuse(... = ..., per.study = per.study) }
+  
+  
+  if(!missing(by)){ 
+    
+    s <- substitute(by)
+    k <- as.list(s)
+    
+    if("control" %in% k || "!control" %in% k) stop("'control' can't be a moderating variable either alone or with other variables.", call. = FALSE)
+    
+    H <- lapply(L, function(x) do.call("subset", list(x, s)))
+    
+    H <- Filter(NROW, H)
+    h <- if(length(H) == 0) stop("No study with the requested moderators found.", call. = FALSE) else H
+    
+    g <- lapply(L[names(h)], function(x) subset(x, control))
+    L <- Map(rbind, h, g)   
+  }
+  
+  G <- function(m, study.name, group.name, n.sim)
+  {
+    
+    cdel1 <- reget(m, control & post == 2 & outcome == 1)
+    cdel2 <- reget(m, control & post == 3 & outcome == 1)
+    cs <- reget(m, control & post == 1 & outcome == 1)
+    
+    tdel1 <- reget(m, !control & post == 2 & outcome == 1)
+    tdel2 <- reget(m, !control & post == 3 & outcome == 1)
+    ts <- reget(m, !control & post == 1 & outcome == 1) 
+    
+    if(all(sapply(list(cdel1, cdel2, tdel1, tdel2, ts, cs), is.null))) stop("Either 'control' or 'post' incorrectly coded.", call. = FALSE)
+    
+    short <- all(sapply(list(cs, ts), function(x) !is.null(x)))
+    
+    del1 <- all(sapply(list(cdel1, tdel1), function(x) !is.null(x)))
+    
+    del2 <- all(sapply(list(cdel2, tdel2), function(x) !is.null(x)))
+    
+    
+    cdel1..2 <- reget(m, control & post == 2 & outcome == 2)
+    cdel2..2 <- reget(m, control & post == 3 & outcome == 2)
+    cs..2 <- reget(m, control & post == 1 & outcome == 2)
+    
+    tdel1..2 <- reget(m, !control & post == 2 & outcome == 2)
+    tdel2..2 <- reget(m, !control & post == 3 & outcome == 2)
+    ts..2 <- reget(m, !control & post == 1 & outcome == 2)
+    
+    
+    short..2 <- all(sapply(list(cs..2, ts..2), function(x) !is.null(x)))
+    
+    del1..2 <- all(sapply(list(cdel1..2, tdel1..2), function(x) !is.null(x)))
+    
+    del2..2 <- all(sapply(list(cdel2..2, tdel2..2), function(x) !is.null(x)))
+    
+    
+    if(short){
+      nc1 <- m$n[m$control & m$post == 1 & m$outcome == 1]
+      nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 1]
+      dps <- pair(cs, ts)  
+      dppc1 <- dppcs <- sapply(1:length(dps), function(i) dps[[i]][[1]][1])
+      dppt1 <- dppts <- sapply(1:length(dps), function(i) dps[[i]][[1]][2])
+      # group.name1 <- unlist(lapply(1:length(dps), function(i) names(dps[[i]])))
+      SHORT <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim)))
+      # row.names(SHORT) <- group.name1
+    }
+    
+    
+    if(short..2){
+      nc1 <- m$n[m$control & m$post == 1 & m$outcome == 2]
+      nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 2]
+      dps <- pair(cs..2, ts..2)  
+      dppc1 <- sapply(1:length(dps), function(i) dps[[i]][[1]][1])
+      dppt1 <- sapply(1:length(dps), function(i) dps[[i]][[1]][2])
+      #group.name1 <- unlist(lapply(1:length(dps), function(i) names(dps[[i]])))
+      SHORT..2 <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim)))
+      # row.names(SHORT..2) <- group.name1
+    }
+    
+    
+    if(del1){
+      nc2 <- m$n[m$control & m$post == 2 & m$outcome == 1]
+      nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 1]
+      dpdel1 <- pair(cdel1, tdel1)
+      dppc2 <- dppcdel1 <- sapply(1:length(dpdel1), function(i) dpdel1[[i]][[1]][1])
+      dppt2 <- dpptdel1 <- sapply(1:length(dpdel1), function(i) dpdel1[[i]][[1]][2])
+      #group.name2 <- unlist(lapply(1:length(dpdel1), function(i) names(dpdel1[[i]])))
+      DEL1 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim)))
+      #row.names(DEL1) <- group.name2
+    }
+    
+    
+    if(del1..2){
+      nc2 <- m$n[m$control & m$post == 2 & m$outcome == 2]
+      nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 2]
+      dpdel1 <- pair(cdel1..2, tdel1..2)
+      dppc2 <- sapply(1:length(dpdel1), function(i) dpdel1[[i]][[1]][1])
+      dppt2 <- sapply(1:length(dpdel1), function(i) dpdel1[[i]][[1]][2])
+      # group.name2 <- unlist(lapply(1:length(dpdel1), function(i) names(dpdel1[[i]])))
+      DEL1..2 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim)))
+      #row.names(DEL1..2) <- group.name2
+    }
+    
+    
+    if(del2){
+      nc3 <- m$n[m$control & m$post == 3 & m$outcome == 1]
+      nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 1]
+      dpdel2 <- pair(cdel2, tdel2)
+      dppc3 <- dppcdel2 <- sapply(1:length(dpdel2), function(i) dpdel2[[i]][[1]][1])
+      dppt3 <- dpptdel2 <- sapply(1:length(dpdel2), function(i) dpdel2[[i]][[1]][2])
+      #  group.name3 <- unlist(lapply(1:length(dpdel2), function(i) names(dpdel2[[i]])))
+      DEL2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim)))
+      #row.names(DEL2) <- group.name3
+    }
+    
+    if(del2..2){
+      nc3 <- m$n[m$control & m$post == 3 & m$outcome == 2]
+      nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 2]
+      dpdel2 <- pair(cdel2..2, tdel2..2)
+      dppc3 <- sapply(1:length(dpdel2), function(i) dpdel2[[i]][[1]][1])
+      dppt3 <- sapply(1:length(dpdel2), function(i) dpdel2[[i]][[1]][2])
+      #group.name3 <- unlist(lapply(1:length(dpdel2), function(i) names(dpdel2[[i]])))
+      DEL2..2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim)))
+      #row.names(DEL2..2) <- group.name3
+    }
+    
+    list(SHORT = if(short) SHORT else NULL, SHORT..2 = if(short..2) SHORT..2 else NULL, DEL1 = if(del1) DEL1 else NULL, DEL1..2 = if(del1..2) DEL1..2 else NULL, DEL2 = if(del2) DEL2 else NULL, DEL2..2 = if(del2..2) DEL2..2 else NULL) 
+  }
+  
+  h <- lapply(1:length(L), function(i) G(m = L[[i]], study.name = study.name, group.name = group.name, n.sim = n.sim))
+  
+  if(!is.null(data)) study.name <- names(L)
+  
+  names(h) <- if(anyNA(study.name)) paste0("Study", seq_along(h)) else if(!anyNA(study.name) & length(study.name) == length(h)) study.name else if(!anyNA(study.name) & length(study.name) != length(h)) stop("'study.name' incorrectly specified.", call. = FALSE)
+  
+  return(h) 
+}              
+              
+              
 #================================================================================================================================
               
               
