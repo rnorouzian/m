@@ -69,7 +69,9 @@ cfactor <- function(df) exp(lgamma(df/2)-log(sqrt(df/2)) - lgamma((df-1)/2))
 reget <- function(List, what){
   
   s <- substitute(what)  
-  
+ 
+  if(class(List)[1] != "list") List <- list(List)  
+    
   h <- lapply(List, function(x) do.call("subset", list(x, s)))
   
   res <- Filter(NROW, h)
