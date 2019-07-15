@@ -418,7 +418,7 @@ d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA
   d <- ifelse(rev.sign == TRUE, -d, d)*cfactor(n-1)
   #se <- se.d(d, n1 = n, g = TRUE)
 
-  out <- data.frame(d = d, n = n, sdif = sdif, rpr.po = cor., post, control, measure, ...)
+  out <- data.frame(d = d, n = n, sdif = sdif, rpr.po = cor., post, control, outcome, ...)
   
   #if(!anyNA(group.name) & length(group.name) == nrow(out)) row.names(out) <- as.character(group.name) else if(!anyNA(group.name) & length(group.name) != nrow(out)) stop("'group.name' incorrectly specified.", call. = FALSE)
   
