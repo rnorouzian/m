@@ -1,6 +1,6 @@
 Break = "\n<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n"
 
-notice = "    \"MMSLR\", A suite of R functions for Modern Meta-Analysis in Second Language Research.
+notice = "    \"dint\", A suite of R functions for Modern Meta-Analysis in Second Language Research.
     Copyright (C) 2019-present  Reza Norouzian, rnorouzian@gmail.com
 
     This set of programs is free software: you can redistribute it under the 
@@ -135,7 +135,7 @@ pair2 <- function(j, k){
 #===============================================================================================================================
 
                 
-dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5){
+dit2 <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5){
   
   like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
   like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
@@ -151,7 +151,26 @@ dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5){
   return(c(dint = Mean, SD = SD))
 })                
                 
+#===============================================================================================================================
                 
+                
+dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = NA){
+  
+  like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
+  like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
+  
+  d1 <- AbscontDistribution(d = like1)
+  d2 <- AbscontDistribution(d = like2)
+  
+  like.dif <- function(x) distr::d(d2 - d1)(x)
+  
+  Mean <- dppt - dppc #integrate(function(x) x*like.dif(x), -Inf, Inf)[[1]]
+  SD <- sqrt(integrate(function(x) x^2*like.dif(x), -Inf, Inf)[[1]] - Mean^2)
+  
+  return(c(dint = Mean, SD = SD))
+})       
+             
+             
 #===============================================================================================================================
 
 var.d <- function(d, n1, n2 = NA, g = FALSE, r = .37, cont.grp = FALSE){
@@ -470,7 +489,7 @@ dint2 <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim
     L <- if(length(res) == 0) stop("No study with the requested moderators found.", call. = FALSE) else res
   }
   
-  G <- function(m, study.name, group.name, n.sim)
+  G <- function(m, n.sim)
   {
     
     cdel1 <- reget(m, control & post == 2 & outcome == 1)
@@ -580,7 +599,7 @@ dint2 <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim
     list(SHORT = if(short) SHORT else NULL, SHORT..2 = if(short..2) SHORT..2 else NULL, DEL1 = if(del1) DEL1 else NULL, DEL1..2 = if(del1..2) DEL1..2 else NULL, DEL2 = if(del2) DEL2 else NULL, DEL2..2 = if(del2..2) DEL2..2 else NULL) 
   }
   
-  h <- lapply(1:length(L), function(i) G(m = L[[i]], study.name = study.name, group.name = group.name, n.sim = n.sim))
+  h <- lapply(1:length(L), function(i) G(m = L[[i]], n.sim = n.sim))
   
   if(!is.null(data)) study.name <- names(L)
   
@@ -593,7 +612,7 @@ dint2 <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim
 #================================================================================================================================
               
               
-dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim = 1e5, by, data = NULL)
+dint <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data = NULL)
 {
   
   L <- if(!is.null(data)){
@@ -610,8 +629,7 @@ dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim 
     
     args <- lapply(m, function(x) unclass(x[c(ar, dot.names)]))
     
-    argsT <- setNames(lapply(names(args[[1]]), 
-                             function(i) lapply(args, `[[`, i)), names(args[[1]]))
+    argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
     
     do.call(Map, c(f = d.prepos, argsT))
     
@@ -634,7 +652,7 @@ dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim 
     L <- Map(rbind, h, g)   
   }
   
-  G <- function(m, study.name, group.name, n.sim)
+  G <- function(m, n.sim)
   {
     
     cdel1 <- reget(m, control & post == 2 & outcome == 1)
@@ -743,7 +761,7 @@ dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim 
     list(SHORT = if(short) SHORT else NULL, SHORT..2 = if(short..2) SHORT..2 else NULL, DEL1 = if(del1) DEL1 else NULL, DEL1..2 = if(del1..2) DEL1..2 else NULL, DEL2 = if(del2) DEL2 else NULL, DEL2..2 = if(del2..2) DEL2..2 else NULL) 
   }
   
-  h <- lapply(1:length(L), function(i) G(m = L[[i]], study.name = study.name, group.name = group.name, n.sim = n.sim))
+  h <- lapply(1:length(L), function(i) G(m = L[[i]], n.sim = n.sim))
   
   if(!is.null(data)) study.name <- names(L)
   
@@ -757,9 +775,9 @@ dint <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim 
               
               
               
-meta.within <- function(..., per.study = NULL, study.name = NA, group.name = NA, tau.prior = function(x){dhalfnormal(x)}, by, data = NULL){
+meta.within <- function(..., per.study = NULL, study.name = NA, tau.prior = function(x){dhalfnormal(x)}, by, data = NULL){
   
-  L <- eval(substitute(dint(... = ..., per.study = per.study, group.name = group.name, study.name = study.name, by = by, data = data)))
+  L <- eval(substitute(dint(... = ..., per.study = per.study, study.name = study.name, by = by, data = data)))
   
   study.name <- names(L)
   
@@ -970,11 +988,11 @@ meta.within <- function(..., per.study = NULL, study.name = NA, group.name = NA,
               
               
 
-meta.bayes <- function(..., per.study = NULL, group.name = NA, study.name = NA, tau.prior = function(x){dhalfnormal(x)}, by, long = FALSE, data = NULL)
+meta.bayes <- function(..., per.study = NULL, study.name = NA, tau.prior = function(x){dhalfnormal(x)}, by, long = FALSE, data = NULL)
 {
   
 
-j <- eval(substitute(meta.within(... = ..., per.study = per.study, group.name = group.name, study.name = study.name, tau.prior = tau.prior, by = by, data = data)))
+j <- eval(substitute(meta.within(... = ..., per.study = per.study, study.name = study.name, tau.prior = tau.prior, by = by, data = data)))
   
 if(!is.null(data)) study.name <- names(j)
 
