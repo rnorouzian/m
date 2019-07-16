@@ -135,7 +135,7 @@ pair2 <- function(j, k){
 #===============================================================================================================================
 
                 
-dit2 <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5){
+dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5){
   
   like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
   like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
@@ -145,16 +145,16 @@ dit2 <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5){
   
   dif <- distr::r(d2 - d1)(n.sim)
   
-  Mean <- mean(dif)
-  SD <- sd(dif)
+  din <- dppt - dppc
+   SD <- sd(dif)
   
-  return(c(dint = Mean, SD = SD))
-})                
+  return(c(dint = din, SD = SD))
+})                      
                 
 #===============================================================================================================================
                 
                 
-dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = NA){
+dit2 <- Vectorize(function(dppc, dppt, nc, nt, n.sim = NA){
   
   like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
   like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
@@ -164,10 +164,10 @@ dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = NA){
   
   like.dif <- function(x) distr::d(d2 - d1)(x)
   
-  Mean <- dppt - dppc #integrate(function(x) x*like.dif(x), -Inf, Inf)[[1]]
+  Mean <- integrate(function(x) x*like.dif(x), -Inf, Inf)[[1]]
   SD <- sqrt(integrate(function(x) x^2*like.dif(x), -Inf, Inf)[[1]] - Mean^2)
   
-  return(c(dint = Mean, SD = SD))
+  return(c(dint = dppt - dppc, SD = SD))
 })       
              
              
