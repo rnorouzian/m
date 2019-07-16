@@ -396,7 +396,7 @@ funnel.bayesmeta <- function(x,
   
   matlines(intRE, cbind(-sevec, -sevec), col=REcol, lty="dashed")
   if (FE) matlines(intFE, cbind(-sevec, -sevec), col=FEcol, lty="dotted")
-  lines(rep(x$summary["median","mu"], 2), range(-sevec), col= 2, lty= 2)
+  lines(rep(x$summary["median","mu"], 2), range(-sevec), col= REcol, lty= 2)
   if (FE) lines(rep(cm[1,"mean"], 2), range(-sevec), col=FEcol, lty="dotted")
   
   text(x$summary["median","mu"], mean(par('usr')[3:4])*.1, bquote(mu == .(round(x$summary["median","mu"], 3))), font = 2, col = 2, srt = 90, pos = 2)
