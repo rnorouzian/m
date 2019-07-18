@@ -135,7 +135,7 @@ pair2 <- function(j, k){
 #===============================================================================================================================
 
                 
-dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5){
+dit1 <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5){
   
   like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
   like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
@@ -170,6 +170,33 @@ dit2 <- Vectorize(function(dppc, dppt, nc, nt, n.sim = NA){
   return(c(dint = dppt - dppc, SD = SD))
 })       
              
+#===============================================================================================================================
+             
+dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5, rev.sign = FALSE){
+  
+  like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
+  like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
+  
+  d1 <- AbscontDistribution(d = like1)
+  d2 <- AbscontDistribution(d = like2)
+  
+  dif <- distr::r(d2 - d1)(n.sim)
+  
+  a <- dppc
+  b <- dppt
+  
+  din <- b - a 
+  
+  di <- ifelse(!rev.sign || rev.sign & b < 0 & a < 0 & abs(b) < abs(a), din, -din)
+  
+  SD <- sd(dif)
+  
+  return(c(dint = di, SD = SD))
+})                     
+
+#===============================================================================================================================
+             
+pairup <- function(rv){ rv[1:(length(rv)/2)] }             
              
 #===============================================================================================================================
 
@@ -421,7 +448,7 @@ funnel.bayesmeta <- function(x,
 #===============================================================================================================================
               
               
-d.prepos2 <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA, mpre = NA, mpos = NA, sdpre = NA, sdpos = NA, r = NA, rev.sign = FALSE, autoreg = FALSE, t.pair = NA, df = NA, sdif = NA, post, control, outcome, ...) 
+d.prepos1 <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA, mpre = NA, mpos = NA, sdpre = NA, sdpos = NA, r = NA, rev.sign = FALSE, autoreg = FALSE, t.pair = NA, df = NA, sdif = NA, post, control, outcome, ...) 
 {
   
   if(missing(control) || missing(post) || missing(outcome)) stop("'post', 'outcome' and/or 'control' missing in the EXCEL sheet.", call. = FALSE)  
@@ -450,7 +477,7 @@ d.prepos2 <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = N
 #================================================================================================================================
              
              
-d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA, mpre = NA, mpos = NA, sdpre = NA, sdpos = NA, r = NA, rev.sign = FALSE, autoreg = FALSE, t.pair = NA, df = NA, sdif = NA, post, control, outcome, ...) 
+d.prepos2 <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA, mpre = NA, mpos = NA, sdpre = NA, sdpos = NA, r = NA, rev.sign = FALSE, autoreg = FALSE, t.pair = NA, df = NA, sdif = NA, post, control, outcome, ...) 
 {
   
   if(missing(control) || missing(post) || missing(outcome)) stop("'post', 'outcome' and/or 'control' missing in the EXCEL sheet.", call. = FALSE)  
@@ -472,11 +499,37 @@ d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA
   return(out) 
 }             
              
+#================================================================================================================================
+             
+ 
+d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA, mpre = NA, mpos = NA, sdpre = NA, sdpos = NA, r = NA, rev.sign = FALSE, rev.sign.gr = FALSE, autoreg = FALSE, t.pair = NA, df = NA, sdif = NA, post, control, outcome, ...) 
+{
+  
+  if(missing(control) || missing(post) || missing(outcome)) stop("'post', 'outcome' and/or 'control' missing in the EXCEL sheet.", call. = FALSE)  
+  
+  r <- ifelse(autoreg == TRUE & !is.na(r), autoreg(max(post, na.rm = TRUE), r)[,1][-1][post], r)
+  
+  n <- ifelse(!is.na(n), n, ifelse(is.na(n) & !is.na(df), df + 1, NA))
+  d <- ifelse(!is.na(d), d, ifelse(!is.na(t.pair) & !is.na(n), t2d(t.pair, n), NA))
+  mdif <- ifelse(!is.na(mdif), mdif, ifelse(!is.na(mpre) & !is.na(mpre) & is.na(mdif), mpos - mpre, NA))
+  sdif <- ifelse(is.na(sdif), sdif(sdpre = sdpre, sdpos = sdpos, t = t.pair, r = r, n = n, mpos = mpos, mpre = mpre), sdif)
+  r <- ifelse(is.na(r), rdif(n = n, mpre = mpre, mpos = mpos, sdpre = sdpre, sdpos = sdpos, sdif = sdif), r)
+  d <- ifelse(!is.na(mdif) & is.na(d) & !is.na(sdif), mdif/sdif, d)*cfactor(n-1)
+  if(anyNA(d) & anyNA(r)) stop("'r' must be defined. If none available, we suggest '.6'.", call. = FALSE)
+  d <- ifelse(rev.sign.gr, -d, d)
+  
+  out <- data.frame(d, n, sdif, r, rev.sign, post, control, outcome, ...)
+  
+  if(all(is.na(out$d))) stop("\ninsufficient info. to calculate effect size(s).", call. = FALSE)
+  
+  return(out) 
+}                          
+             
              
 #================================================================================================================================
 
 
-dint2 <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim = 1e5, by, data = NULL)
+dint1 <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim = 1e5, by, data = NULL)
 {
   
   L <- if(!is.null(data)){
@@ -639,7 +692,7 @@ dint2 <- function(..., per.study = NULL, study.name = NA, group.name = NA, n.sim
 #================================================================================================================================
               
               
-dint <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data = NULL)
+dint2 <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data = NULL)
 {
   
   L <- if(!is.null(data)){
@@ -796,6 +849,168 @@ dint <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data =
   
   return(h) 
 }              
+              
+#================================================================================================================================
+              
+              
+dint <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data = NULL)
+{
+  
+  L <- if(!is.null(data)){
+    
+    m <- split(data, data$study.name)        
+    
+    m[[1]] <- NULL                          
+    
+    if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
+    
+    ar <- head(formalArgs(d.prepos), -1)
+    
+    dot.names <- names(m[[1]])[!names(m[[1]]) %in% ar]
+    
+    args <- lapply(m, function(x) unclass(x[c(ar, dot.names)]))
+    
+    argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
+    
+    do.call(Map, c(f = d.prepos, argsT))
+    
+  } else { fuse(... = ..., per.study = per.study) }
+  
+  
+  if(!missing(by)){ 
+    
+    s <- substitute(by)
+    k <- as.list(s)
+    
+    if("control" %in% k || "!control" %in% k) stop("'control' can't be a moderating variable either alone or with other variables.", call. = FALSE)
+    
+    H <- lapply(L, function(x) do.call("subset", list(x, s)))
+    
+    H <- Filter(NROW, H)
+    h <- if(length(H) == 0) stop("No study with the requested moderators found.", call. = FALSE) else H
+    
+    g <- lapply(L[names(h)], function(x) subset(x, control))
+    L <- Map(rbind, h, g)   
+  }
+  
+  G <- function(m, n.sim)
+  {
+    
+    cdel1 <- reget(m, control & post == 2 & outcome == 1)
+    cdel2 <- reget(m, control & post == 3 & outcome == 1)
+    cs <- reget(m, control & post == 1 & outcome == 1)
+    
+    tdel1 <- reget(m, !control & post == 2 & outcome == 1)
+    tdel2 <- reget(m, !control & post == 3 & outcome == 1)
+    ts <- reget(m, !control & post == 1 & outcome == 1) 
+    
+    if(all(sapply(list(cdel1, cdel2, tdel1, tdel2, ts, cs), is.null))) stop("Either 'control' or 'post' incorrectly coded.", call. = FALSE)
+    
+    short <- all(sapply(list(cs, ts), function(x) !is.null(x)))
+    
+    del1 <- all(sapply(list(cdel1, tdel1), function(x) !is.null(x)))
+    
+    del2 <- all(sapply(list(cdel2, tdel2), function(x) !is.null(x)))
+    
+    
+    cdel1..2 <- reget(m, control & post == 2 & outcome == 2)
+    cdel2..2 <- reget(m, control & post == 3 & outcome == 2)
+    cs..2 <- reget(m, control & post == 1 & outcome == 2)
+    
+    tdel1..2 <- reget(m, !control & post == 2 & outcome == 2)
+    tdel2..2 <- reget(m, !control & post == 3 & outcome == 2)
+    ts..2 <- reget(m, !control & post == 1 & outcome == 2)
+    
+    
+    short..2 <- all(sapply(list(cs..2, ts..2), function(x) !is.null(x)))
+    
+    del1..2 <- all(sapply(list(cdel1..2, tdel1..2), function(x) !is.null(x)))
+    
+    del2..2 <- all(sapply(list(cdel2..2, tdel2..2), function(x) !is.null(x)))
+    
+    
+    if(short){
+      nc1 <- m$n[m$control & m$post == 1 & m$outcome == 1]
+      nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 1]
+      dps <- pair(cs, ts)  
+      dppc1 <- sapply(1:length(dps), function(i) dps[[i]][[1]][1])
+      dppt1 <- sapply(1:length(dps), function(i) dps[[i]][[1]][2])
+      rv <- m$rev.sign[m$post == 1 & m$outcome == 1]
+      
+      SHORT <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
+      
+    }
+    
+    
+    if(short..2){
+      nc1 <- m$n[m$control & m$post == 1 & m$outcome == 2]
+      nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 2]
+      dps <- pair(cs..2, ts..2)  
+      dppc1 <- sapply(1:length(dps), function(i) dps[[i]][[1]][1])
+      dppt1 <- sapply(1:length(dps), function(i) dps[[i]][[1]][2])
+      rv <- m$rev.sign[m$post == 1 & m$outcome == 2]
+      
+      SHORT..2 <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
+    }
+    
+    
+    if(del1){
+      nc2 <- m$n[m$control & m$post == 2 & m$outcome == 1]
+      nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 1]
+      dpdel1 <- pair(cdel1, tdel1)
+      dppc2 <- dppcdel1 <- sapply(1:length(dpdel1), function(i) dpdel1[[i]][[1]][1])
+      dppt2 <- dpptdel1 <- sapply(1:length(dpdel1), function(i) dpdel1[[i]][[1]][2])
+      rv <- m$rev.sign[m$post == 2 & m$outcome == 1]
+      
+      DEL1 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, rev.sign = pairup(rv))))
+    }
+    
+    
+    if(del1..2){
+      nc2 <- m$n[m$control & m$post == 2 & m$outcome == 2]
+      nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 2]
+      dpdel1 <- pair(cdel1..2, tdel1..2)
+      dppc2 <- sapply(1:length(dpdel1), function(i) dpdel1[[i]][[1]][1])
+      dppt2 <- sapply(1:length(dpdel1), function(i) dpdel1[[i]][[1]][2])
+      rv <- m$rev.sign[m$post == 2 & m$outcome == 2]
+      
+      DEL1..2 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, rev.sign = pairup(rv))))
+    }
+    
+    
+    if(del2){
+      nc3 <- m$n[m$control & m$post == 3 & m$outcome == 1]
+      nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 1]
+      dpdel2 <- pair(cdel2, tdel2)
+      dppc3 <- dppcdel2 <- sapply(1:length(dpdel2), function(i) dpdel2[[i]][[1]][1])
+      dppt3 <- dpptdel2 <- sapply(1:length(dpdel2), function(i) dpdel2[[i]][[1]][2])
+      rv <- m$rev.sign[m$post == 3 & m$outcome == 1]
+      
+      DEL2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
+    }
+    
+    if(del2..2){
+      nc3 <- m$n[m$control & m$post == 3 & m$outcome == 2]
+      nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 2]
+      dpdel2 <- pair(cdel2..2, tdel2..2)
+      dppc3 <- sapply(1:length(dpdel2), function(i) dpdel2[[i]][[1]][1])
+      dppt3 <- sapply(1:length(dpdel2), function(i) dpdel2[[i]][[1]][2])
+      rv <- m$rev.sign[m$post == 3 & m$outcome == 2]
+      
+      DEL2..2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
+    }
+    
+    list(SHORT = if(short) SHORT else NULL, SHORT..2 = if(short..2) SHORT..2 else NULL, DEL1 = if(del1) DEL1 else NULL, DEL1..2 = if(del1..2) DEL1..2 else NULL, DEL2 = if(del2) DEL2 else NULL, DEL2..2 = if(del2..2) DEL2..2 else NULL) 
+  }
+  
+  h <- lapply(1:length(L), function(i) G(m = L[[i]], n.sim = n.sim))
+  
+  if(!is.null(data)) study.name <- names(L)
+  
+  names(h) <- if(anyNA(study.name)) paste0("Study", seq_along(h)) else if(!anyNA(study.name) & length(study.name) == length(h)) study.name else if(!anyNA(study.name) & length(study.name) != length(h)) stop("'study.name' incorrectly specified.", call. = FALSE)
+  
+  return(h) 
+}               
               
               
 #================================================================================================================================
