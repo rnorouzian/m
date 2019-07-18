@@ -502,7 +502,7 @@ d.prepos2 <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = N
 #================================================================================================================================
              
  
-d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA, mpre = NA, mpos = NA, sdpre = NA, sdpos = NA, r = NA, rev.sign = FALSE, rev.sign.gr = FALSE, autoreg = FALSE, t.pair = NA, df = NA, sdif = NA, post, control, outcome, ...) 
+d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA, mpre = NA, mpos = NA, sdpre = NA, sdpos = NA, r = NA, rev.sign = FALSE, rev.group = FALSE, autoreg = FALSE, t.pair = NA, df = NA, sdif = NA, post, control, outcome, ...) 
 {
   
   if(missing(control) || missing(post) || missing(outcome)) stop("'post', 'outcome' and/or 'control' missing in the EXCEL sheet.", call. = FALSE)  
@@ -516,7 +516,7 @@ d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA
   r <- ifelse(is.na(r), rdif(n = n, mpre = mpre, mpos = mpos, sdpre = sdpre, sdpos = sdpos, sdif = sdif), r)
   d <- ifelse(!is.na(mdif) & is.na(d) & !is.na(sdif), mdif/sdif, d)*cfactor(n-1)
   if(anyNA(d) & anyNA(r)) stop("'r' must be defined. If none available, we suggest '.6'.", call. = FALSE)
-  d <- ifelse(rev.sign.gr, -d, d)
+  d <- ifelse(rev.group, -d, d)
   
   out <- data.frame(d, n, sdif, r, rev.sign, post, control, outcome, ...)
   
