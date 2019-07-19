@@ -897,6 +897,17 @@ dint <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data =
     
     if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
     
+    ar <- formalArgs(rdif)[c(-7, -9)]
+
+    args <- lapply(m, function(x) unclass(x[ar]))
+
+    argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
+
+    f <- do.call(Map, c(f = rdif, argsT))
+
+    m <- Map(function(x, y) transform(x, r = na.locf0(y)), m, f) 
+      
+      
     ar <- head(formalArgs(d.prepos), -1)
     
     dot.names <- names(m[[1]])[!names(m[[1]]) %in% ar]
@@ -1392,7 +1403,7 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
                
 #===============================================================================================================================
                
-need <- c("bayesmeta", "distr")
+need <- c("bayesmeta", "distr", "zoo")
 have <- need %in% rownames(installed.packages())
 if(any(!have)){ install.packages( need[!have] ) }
  
@@ -1400,6 +1411,7 @@ options(warn = -1)
 suppressMessages({ 
     library("distr")
     library("bayesmeta")
+    library("zoo")
 })               
                
               
