@@ -433,7 +433,12 @@ funnel.bayesmeta <- function(x,
   points(x$y, -x$sigma, pch=21, col="magenta", bg="cyan", cex=1.35)
   
   if(shrink) points(x$theta[5,], -x$sigma, pch=21, col=adjustcolor("gray40", .5), bg= adjustcolor("gray40", .5), cex=1.2)
-  
+  #if(shrink) {
+   # segments(x$y, -x$sigma, x$theta[5,], -x$sigma, col="gray40", lty = 3)
+   # points(x$theta[5,], -x$sigma, pch=21, col="gray60", bg= "gray60", cex=1.2)
+  #}
+    
+    
   text(x$y, -x$sigma, x$labels, cex = .65, font = 2, pos = 3)
   
   if (FE && legend)
