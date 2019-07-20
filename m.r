@@ -905,7 +905,9 @@ dint <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data =
 
     f <- do.call(Map, c(f = rdif, argsT))
 
-    m <- Map(function(x, y) transform(x, r = na.locf0(y)), m, f) 
+    f <- lapply(f, na.locf0)
+                             
+    m <- Map(function(x, y) transform(x, r = na.locf0(y, fromLast = TRUE)), m, f) 
       
       
     ar <- head(formalArgs(d.prepos), -1)
