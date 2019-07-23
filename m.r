@@ -887,7 +887,7 @@ dint2 <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data 
 #================================================================================================================================
               
               
-dint <- function(data = NULL, by, n.sim = 1e5)
+dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
 {   
     m <- split(data, data$study.name)        
     
@@ -895,18 +895,19 @@ dint <- function(data = NULL, by, n.sim = 1e5)
     
     if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
     
-    #ar <- formalArgs(rdif)[c(-7, -9)]
+ if(impute) {  
+    ar <- formalArgs(rdif)[c(-7, -9)]
 
-   # args <- lapply(m, function(x) unclass(x[ar]))
+   args <- lapply(m, function(x) unclass(x[ar]))
 
-    #argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
+   argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
 
-   # f <- do.call(Map, c(f = rdif, argsT))
+   f <- do.call(Map, c(f = rdif, argsT))
 
-    #f <- lapply(f, na.locf0)
+   f <- lapply(f, na.locf0)
                              
-    #m <- Map(function(x, y) transform(x, r = na.locf0(y, fromLast = TRUE)), m, f) 
-      
+   m <- Map(function(x, y) transform(x, r = na.locf0(y, fromLast = TRUE)), m, f) 
+   }   
       
     ar <- head(formalArgs(d.prepos), -1)
     
@@ -1060,9 +1061,9 @@ dint <- function(data = NULL, by, n.sim = 1e5)
               
               
               
-meta.within <- function(data = NULL, by,  tau.prior = function(x){dhalfnormal(x)}, n.sim = 1e5){
+meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, n.sim = 1e5){
   
-  L <- eval(substitute(dint(data = data, by = by, n.sim = n.sim)))
+  L <- eval(substitute(dint(data = data, by = by, impute = impute, n.sim = n.sim)))
   
   study.name <- names(L)
   
@@ -1273,11 +1274,11 @@ meta.within <- function(data = NULL, by,  tau.prior = function(x){dhalfnormal(x)
               
               
 
-meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, long = FALSE, n.sim = 1e5)
+meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, long = FALSE, impute = FALSE, n.sim = 1e5)
 {
   
 
-j <- eval(substitute(meta.within(data = data, by = by, tau.prior = tau.prior, n.sim = n.sim)))
+j <- eval(substitute(meta.within(data = data, by = by, tau.prior = tau.prior, impute = impute, n.sim = n.sim)))
   
 study.name <- names(j)
 
@@ -1398,7 +1399,7 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
                
 #===============================================================================================================================
                
-need <- c("bayesmeta", "distr") # , "zoo"
+need <- c("bayesmeta", "distr", "zoo") 
 have <- need %in% rownames(installed.packages())
 if(any(!have)){ install.packages( need[!have] ) }
  
@@ -1406,7 +1407,7 @@ options(warn = -1)
 suppressMessages({ 
     library("distr")
     library("bayesmeta")
-    #library("zoo")
+    library("zoo")
 })               
                
               
