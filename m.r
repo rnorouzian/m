@@ -887,11 +887,8 @@ dint2 <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data 
 #================================================================================================================================
               
               
-dint <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data = NULL)
-{
-  
-  L <- if(!is.null(data)){
-    
+dint <- function(data = NULL, by, n.sim = 1e5)
+{   
     m <- split(data, data$study.name)        
     
     m[[1]] <- NULL                          
@@ -919,9 +916,8 @@ dint <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data =
     
     argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
     
-    do.call(Map, c(f = d.prepos, argsT))
+  L <- do.call(Map, c(f = d.prepos, argsT))
     
-  } else { fuse(... = ..., per.study = per.study) }
   
   
   if(!missing(by)){ 
@@ -1064,9 +1060,9 @@ dint <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data =
               
               
               
-meta.within <- function(..., per.study = NULL, study.name = NA, tau.prior = function(x){dhalfnormal(x)}, by, data = NULL){
+meta.within <- function(data = NULL, by,  tau.prior = function(x){dhalfnormal(x)}, n.sim = 1e5){
   
-  L <- eval(substitute(dint(... = ..., per.study = per.study, study.name = study.name, by = by, data = data)))
+  L <- eval(substitute(dint(data = data, by = by, n.sim = n.sim)))
   
   study.name <- names(L)
   
@@ -1277,16 +1273,13 @@ meta.within <- function(..., per.study = NULL, study.name = NA, tau.prior = func
               
               
 
-meta.bayes <- function(..., per.study = NULL, study.name = NA, tau.prior = function(x){dhalfnormal(x)}, by, long = FALSE, data = NULL)
+meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, long = FALSE, n.sim = 1e5)
 {
   
 
-j <- eval(substitute(meta.within(... = ..., per.study = per.study, study.name = study.name, tau.prior = tau.prior, by = by, data = data)))
+j <- eval(substitute(meta.within(data = data, by = by, tau.prior = tau.prior, n.sim = n.sim)))
   
-if(!is.null(data)) study.name <- names(j)
-
-if(anyNA(study.name)) study.name <- NULL
-
+study.name <- names(j)
 
 L <- lapply(c('Mean.dint.short', 'SD.dint.short', 'Mean.dint.del1', 'SD.dint.del1', 'Mean.dint.del2',
               'SD.dint.del2'), function(i) {V <- unlist(sapply(j, `[[`, i)); V[!is.na(V)]})
