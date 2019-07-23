@@ -806,8 +806,8 @@ dint2 <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data 
       nc1 <- m$n[m$control & m$post == 1 & m$outcome == 1]
       nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 1]
       dps <- pair(cs, ts)  
-      dppc1 <- dppcs <- sapply(1:length(dps), function(i) dps[[i]][[1]][1])
-      dppt1 <- dppts <- sapply(1:length(dps), function(i) dps[[i]][[1]][2])
+      dppc1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][1])
+      dppt1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][2])
       # group.name1 <- unlist(lapply(1:length(dps), function(i) names(dps[[i]])))
       SHORT <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim)))
       # row.names(SHORT) <- group.name1
@@ -818,8 +818,8 @@ dint2 <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data 
       nc1 <- m$n[m$control & m$post == 1 & m$outcome == 2]
       nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 2]
       dps <- pair(cs..2, ts..2)  
-      dppc1 <- sapply(1:length(dps), function(i) dps[[i]][[1]][1])
-      dppt1 <- sapply(1:length(dps), function(i) dps[[i]][[1]][2])
+      dppc1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][1])
+      dppt1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][2])
       #group.name1 <- unlist(lapply(1:length(dps), function(i) names(dps[[i]])))
       SHORT..2 <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim)))
       # row.names(SHORT..2) <- group.name1
@@ -980,8 +980,8 @@ dint <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data =
       nc1 <- m$n[m$control & m$post == 1 & m$outcome == 1]
       nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 1]
       dps <- pair(cs, ts)  
-      dppc1 <- sapply(1:length(dps), function(i) dps[[i]][[1]][1])
-      dppt1 <- sapply(1:length(dps), function(i) dps[[i]][[1]][2])
+      dppc1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][1])
+      dppt1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][2])
       rv <- m$rev.sign[m$post == 1 & m$outcome == 1]
       
       SHORT <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
@@ -993,8 +993,8 @@ dint <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data =
       nc1 <- m$n[m$control & m$post == 1 & m$outcome == 2]
       nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 2]
       dps <- pair(cs..2, ts..2)  
-      dppc1 <- sapply(1:length(dps), function(i) dps[[i]][[1]][1])
-      dppt1 <- sapply(1:length(dps), function(i) dps[[i]][[1]][2])
+      dppc1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][1])
+      dppt1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][2])
       rv <- m$rev.sign[m$post == 1 & m$outcome == 2]
       
       SHORT..2 <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
@@ -1005,8 +1005,8 @@ dint <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data =
       nc2 <- m$n[m$control & m$post == 2 & m$outcome == 1]
       nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 1]
       dpdel1 <- pair(cdel1, tdel1)
-      dppc2 <- dppcdel1 <- sapply(1:length(dpdel1), function(i) dpdel1[[i]][[1]][1])
-      dppt2 <- dpptdel1 <- sapply(1:length(dpdel1), function(i) dpdel1[[i]][[1]][2])
+      dppc2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][1])
+      dppt2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][2])
       rv <- m$rev.sign[m$post == 2 & m$outcome == 1]
       
       DEL1 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, rev.sign = pairup(rv))))
@@ -1017,8 +1017,8 @@ dint <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data =
       nc2 <- m$n[m$control & m$post == 2 & m$outcome == 2]
       nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 2]
       dpdel1 <- pair(cdel1..2, tdel1..2)
-      dppc2 <- sapply(1:length(dpdel1), function(i) dpdel1[[i]][[1]][1])
-      dppt2 <- sapply(1:length(dpdel1), function(i) dpdel1[[i]][[1]][2])
+      dppc2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][1])
+      dppt2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][2])
       rv <- m$rev.sign[m$post == 2 & m$outcome == 2]
       
       DEL1..2 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, rev.sign = pairup(rv))))
@@ -1029,8 +1029,8 @@ dint <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data =
       nc3 <- m$n[m$control & m$post == 3 & m$outcome == 1]
       nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 1]
       dpdel2 <- pair(cdel2, tdel2)
-      dppc3 <- dppcdel2 <- sapply(1:length(dpdel2), function(i) dpdel2[[i]][[1]][1])
-      dppt3 <- dpptdel2 <- sapply(1:length(dpdel2), function(i) dpdel2[[i]][[1]][2])
+      dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
+      dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
       rv <- m$rev.sign[m$post == 3 & m$outcome == 1]
       
       DEL2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
@@ -1040,8 +1040,8 @@ dint <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data =
       nc3 <- m$n[m$control & m$post == 3 & m$outcome == 2]
       nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 2]
       dpdel2 <- pair(cdel2..2, tdel2..2)
-      dppc3 <- sapply(1:length(dpdel2), function(i) dpdel2[[i]][[1]][1])
-      dppt3 <- sapply(1:length(dpdel2), function(i) dpdel2[[i]][[1]][2])
+      dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
+      dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
       rv <- m$rev.sign[m$post == 3 & m$outcome == 2]
       
       DEL2..2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
