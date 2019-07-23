@@ -887,7 +887,7 @@ dint2 <- function(..., per.study = NULL, study.name = NA, n.sim = 1e5, by, data 
 #================================================================================================================================
               
               
-dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
+dinti <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
 {   
     m <- split(data, data$study.name)        
     
@@ -1061,9 +1061,9 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
               
               
               
-meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, n.sim = 1e5){
+meta.withini <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, n.sim = 1e5){
   
-  L <- eval(substitute(dint(data = data, by = by, impute = impute, n.sim = n.sim)))
+  L <- eval(substitute(dinti(data = data, by = by, impute = impute, n.sim = n.sim)))
   
   study.name <- names(L)
   
@@ -1274,11 +1274,11 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
               
               
 
-meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, long = FALSE, impute = FALSE, n.sim = 1e5)
+meta.bayesi <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, long = FALSE, impute = FALSE, n.sim = 1e5)
 {
   
 
-j <- eval(substitute(meta.within(data = data, by = by, tau.prior = tau.prior, impute = impute, n.sim = n.sim)))
+j <- eval(substitute(meta.withini(data = data, by = by, tau.prior = tau.prior, impute = impute, n.sim = n.sim)))
   
 study.name <- names(j)
 
@@ -1396,7 +1396,897 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
   for(i in 1:L) G(m[[i]], main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i])
 }         
                
-               
+#===============================================================================================================================
+                  
+                  
+dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
+{
+
+    out <- max(data$outcome, na.rm = TRUE)
+  
+    m <- split(data, data$study.name)        
+    
+    m[[1]] <- NULL  
+    
+    if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
+    
+    
+    if(impute) {  
+      
+      ar <- formalArgs(rdif)[c(-7, -9)]
+      
+      args <- lapply(m, function(x) unclass(x[ar]))
+      
+      argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
+      
+      f <- do.call(Map, c(f = rdif, argsT))
+      
+      f <- lapply(f, na.locf0)
+      
+      m <- Map(function(x, y) transform(x, r = na.locf0(y, fromLast = TRUE)), m, f) 
+    }
+    
+    
+    ar <- head(formalArgs(d.prepos), -1)
+    
+    dot.names <- names(m[[1]])[!names(m[[1]]) %in% ar]
+    
+    args <- lapply(m, function(x) unclass(x[c(ar, dot.names)]))
+    
+    argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
+    
+    L <- do.call(Map, c(f = d.prepos, argsT))
+
+  
+  if(!missing(by)){ 
+    
+    s <- substitute(by)
+    k <- as.list(s)
+    
+    if("control" %in% k || "!control" %in% k) stop("'control' can't be a moderating variable either alone or with other variables.", call. = FALSE)
+    
+    H <- lapply(L, function(x) do.call("subset", list(x, s)))
+    
+    H <- Filter(NROW, H)
+    h <- if(length(H) == 0) stop("No study with the requested moderators found.", call. = FALSE) else H
+    
+    g <- lapply(L[names(h)], function(x) subset(x, control))
+    L <- Map(rbind, h, g)   
+  }
+  
+  study.name <- names(L)
+    
+  G <- function(m, n.sim)
+  {
+    
+  
+    cdel1 <- reget(m, control & post == 2 & outcome == 1)
+    cdel2 <- reget(m, control & post == 3 & outcome == 1)
+    cs <- reget(m, control & post == 1 & outcome == 1)
+    
+    tdel1 <- reget(m, !control & post == 2 & outcome == 1)
+    tdel2 <- reget(m, !control & post == 3 & outcome == 1)
+    ts <- reget(m, !control & post == 1 & outcome == 1) 
+    
+    if(all(sapply(list(cdel1, cdel2, tdel1, tdel2, ts, cs), is.null))) stop("Either 'control' or 'post' incorrectly coded.", call. = FALSE)
+    
+    short <- all(sapply(list(cs, ts), function(x) !is.null(x)))
+    
+    del1 <- all(sapply(list(cdel1, tdel1), function(x) !is.null(x)))
+    
+    del2 <- all(sapply(list(cdel2, tdel2), function(x) !is.null(x)))
+
+  
+if(out >= 2){ 
+  
+    cdel1..2 <- reget(m, control & post == 2 & outcome == 2)
+    cdel2..2 <- reget(m, control & post == 3 & outcome == 2)
+    cs..2 <- reget(m, control & post == 1 & outcome == 2)
+    
+    tdel1..2 <- reget(m, !control & post == 2 & outcome == 2)
+    tdel2..2 <- reget(m, !control & post == 3 & outcome == 2)
+    ts..2 <- reget(m, !control & post == 1 & outcome == 2)
+    
+    
+    short..2 <- all(sapply(list(cs..2, ts..2), function(x) !is.null(x)))
+    
+    del1..2 <- all(sapply(list(cdel1..2, tdel1..2), function(x) !is.null(x)))
+    
+    del2..2 <- all(sapply(list(cdel2..2, tdel2..2), function(x) !is.null(x)))
+}   
+   
+    
+if(out >= 3){ 
+      
+    cdel1..3 <- reget(m, control & post == 2 & outcome == 3)
+    cdel2..3 <- reget(m, control & post == 3 & outcome == 3)
+    cs..3 <- reget(m, control & post == 1 & outcome == 3)
+    
+    tdel1..3 <- reget(m, !control & post == 2 & outcome == 3)
+    tdel2..3 <- reget(m, !control & post == 3 & outcome == 3)
+    ts..3 <- reget(m, !control & post == 1 & outcome == 3)
+    
+    short..3 <- all(sapply(list(cs..3, ts..3), function(x) !is.null(x)))
+    
+    del1..3 <- all(sapply(list(cdel1..3, tdel1..3), function(x) !is.null(x)))
+    
+    del2..3 <- all(sapply(list(cdel2..3, tdel2..3), function(x) !is.null(x))) 
+    }   
+    
+    
+if(out == 4){ 
+      
+    cdel1..4 <- reget(m, control & post == 2 & outcome == 4)
+    cdel2..4 <- reget(m, control & post == 3 & outcome == 4)
+    cs..4 <- reget(m, control & post == 1 & outcome == 4)
+    
+    tdel1..4 <- reget(m, !control & post == 2 & outcome == 4)
+    tdel2..4 <- reget(m, !control & post == 3 & outcome == 4)
+    ts..4 <- reget(m, !control & post == 1 & outcome == 4)
+
+    short..4 <- all(sapply(list(cs..4, ts..4), function(x) !is.null(x)))
+    
+    del1..4 <- all(sapply(list(cdel1..4, tdel1..4), function(x) !is.null(x)))
+    
+    del2..4 <- all(sapply(list(cdel2..4, tdel2..4), function(x) !is.null(x)))         
+}    
+    
+    if(short){
+      nc1 <- m$n[m$control & m$post == 1 & m$outcome == 1]
+      nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 1]
+      dps <- pair(cs, ts)  
+      dppc1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][1])
+      dppt1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][2])
+      rv <- m$rev.sign[m$post == 1 & m$outcome == 1]
+      
+      SHORT <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
+      
+    }
+    
+    
+    if(out >=2 && short..2){
+      nc1 <- m$n[m$control & m$post == 1 & m$outcome == 2]
+      nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 2]
+      dps <- pair(cs..2, ts..2)  
+      dppc1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][1])
+      dppt1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][2])
+      rv <- m$rev.sign[m$post == 1 & m$outcome == 2]
+      
+      SHORT..2 <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
+    }
+    
+    
+    if(out >= 3 && short..3){
+      nc1 <- m$n[m$control & m$post == 1 & m$outcome == 3]
+      nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 3]
+      dps <- pair(cs..3, ts..3)  
+      dppc1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][1])
+      dppt1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][2])
+      rv <- m$rev.sign[m$post == 1 & m$outcome == 3]
+      
+      SHORT..3 <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
+    }
+    
+    
+    if(out == 4 && short..4){
+      nc1 <- m$n[m$control & m$post == 1 & m$outcome == 4]
+      nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 4]
+      dps <- pair(cs..4, ts..4)  
+      dppc1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][1])
+      dppt1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][2])
+      rv <- m$rev.sign[m$post == 1 & m$outcome == 4]
+      
+      SHORT..4 <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
+    }
+    
+    
+    if(del1){
+      nc2 <- m$n[m$control & m$post == 2 & m$outcome == 1]
+      nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 1]
+      dpdel1 <- pair(cdel1, tdel1)
+      dppc2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][1])
+      dppt2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][2])
+      rv <- m$rev.sign[m$post == 2 & m$outcome == 1]
+      
+      DEL1 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, rev.sign = pairup(rv))))
+    }
+    
+    
+    if(out >=2 && del1..2){
+      nc2 <- m$n[m$control & m$post == 2 & m$outcome == 2]
+      nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 2]
+      dpdel1 <- pair(cdel1..2, tdel1..2)
+      dppc2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][1])
+      dppt2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][2])
+      rv <- m$rev.sign[m$post == 2 & m$outcome == 2]
+      
+      DEL1..2 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, rev.sign = pairup(rv))))
+    }
+    
+    
+    if(out >= 3 && del1..3){
+      nc2 <- m$n[m$control & m$post == 2 & m$outcome == 3]
+      nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 3]
+      dpdel1 <- pair(cdel1..3, tdel1..3)
+      dppc2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][1])
+      dppt2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][2])
+      rv <- m$rev.sign[m$post == 2 & m$outcome == 3]
+      
+      DEL1..3 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, rev.sign = pairup(rv))))
+    }
+    
+    
+    if(out == 4 && del1..4){
+      nc2 <- m$n[m$control & m$post == 2 & m$outcome == 4]
+      nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 4]
+      dpdel1 <- pair(cdel1..4, tdel1..4)
+      dppc2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][1])
+      dppt2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][2])
+      rv <- m$rev.sign[m$post == 2 & m$outcome == 4]
+      
+      DEL1..4 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, rev.sign = pairup(rv))))
+    }
+    
+    
+    if(del2){
+      nc3 <- m$n[m$control & m$post == 3 & m$outcome == 1]
+      nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 1]
+      dpdel2 <- pair(cdel2, tdel2)
+      dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
+      dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
+      rv <- m$rev.sign[m$post == 3 & m$outcome == 1]
+      
+      DEL2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
+    }
+    
+    if(out >=2 && del2..2){
+      nc3 <- m$n[m$control & m$post == 3 & m$outcome == 2]
+      nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 2]
+      dpdel2 <- pair(cdel2..2, tdel2..2)
+      dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
+      dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
+      rv <- m$rev.sign[m$post == 3 & m$outcome == 2]
+      
+      DEL2..2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
+    }
+    
+    
+    if(out >= 3 && del2..3){
+      nc3 <- m$n[m$control & m$post == 3 & m$outcome == 3]
+      nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 3]
+      dpdel2 <- pair(cdel2..3, tdel2..3)
+      dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
+      dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
+      rv <- m$rev.sign[m$post == 3 & m$outcome == 3]
+      
+      DEL2..3 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
+    }
+    
+    
+    if(out == 4 && del2..4){
+      nc3 <- m$n[m$control & m$post == 3 & m$outcome == 4]
+      nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 4]
+      dpdel2 <- pair(cdel2..4, tdel2..4)
+      dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
+      dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
+      rv <- m$rev.sign[m$post == 3 & m$outcome == 4]
+      
+      DEL2..4 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
+    }
+    
+    
+    list(SHORT = if(short) SHORT else NULL, SHORT..2 = if(out >=2 && short..2) SHORT..2 else NULL, SHORT..3 = if(out >= 3 && short..3) SHORT..3 else NULL, SHORT..4 = if(out == 4 && short..4) SHORT..4 else NULL,
+          DEL1 = if(del1) DEL1 else NULL, DEL1..2 = if(out == 2 && del1..2) DEL1..2 else NULL, DEL1..3 = if(out == 3 && del1..3) DEL1..3 else NULL, DEL1..4 = if(out == 4 && del1..4) DEL1..4 else NULL, 
+          DEL2 = if(del2) DEL2 else NULL, DEL2..2 = if(out == 2 && del2..2) DEL2..2 else NULL, DEL2..3 = if(out == 3 && del2..3) DEL2..3 else NULL, DEL2..4 = if(out == 4 && del2..4) DEL2..4 else NULL) 
+  }
+  
+  h <- lapply(1:length(L), function(i) G(m = L[[i]], n.sim = n.sim))
+  
+  names(h) <- study.name
+  
+  return(h) 
+}               
+
+
+
+#=======================================================================================================================================
+
+
+              
+meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, n.sim = 1e5){
+  
+  L <- eval(substitute(dint(data = data, by = by, impute = impute, n.sim = n.sim)))
+  
+  study.name <- names(L)
+  
+  G <- function(m, tau.prior)
+  {
+    
+    d1 <- m$SHORT$dint
+    d1..2 <- m$SHORT..2$dint
+    d1..3 <- m$SHORT..3$dint
+    d1..4 <- m$SHORT..4$dint
+    
+    sd1 <- m$SHORT$SD
+    sd1..2 <- m$SHORT..2$SD
+    sd1..3 <- m$SHORT..3$SD
+    sd1..4 <- m$SHORT..4$SD
+    
+    d2 <- m$DEL1$dint
+    d2..2 <- m$DEL1..2$dint
+    d2..3 <- m$DEL1..3$dint
+    d2..4 <- m$DEL1..4$dint
+    
+    sd2 <- m$DEL1$SD
+    sd2..2 <- m$DEL1..2$SD
+    sd2..3 <- m$DEL1..3$SD
+    sd2..4 <- m$DEL1..4$SD
+    
+    d3 <- m$DEL2$dint
+    d3..2 <- m$DEL2..2$dint
+    d3..3 <- m$DEL2..3$dint
+    d3..4 <- m$DEL2..4$dint
+    
+    sd3 <- m$DEL2$SD
+    sd3..2 <- m$DEL2..2$SD
+    sd3..3 <- m$DEL2..3$SD
+    sd3..4 <- m$DEL2..4$SD
+    
+    Short <- all(sapply(list(d1), function(x) !is.null(x)))
+    
+    Del1 <- all(sapply(list(d2), function(x) !is.null(x)))
+    
+    Del2 <- all(sapply(list(d3), function(x) !is.null(x)))
+    
+    Short..2 <- all(sapply(list(d1..2), function(x) !is.null(x)))
+    
+    Del1..2 <- all(sapply(list(d2..2), function(x) !is.null(x)))
+    
+    Del2..2 <- all(sapply(list(d3..2), function(x) !is.null(x)))
+    
+    Short..3 <- all(sapply(list(d1..3), function(x) !is.null(x)))
+    
+    Del1..3 <- all(sapply(list(d2..3), function(x) !is.null(x)))
+    
+    Del2..3 <- all(sapply(list(d3..3), function(x) !is.null(x)))
+    
+    Short..4 <- all(sapply(list(d1..4), function(x) !is.null(x)))
+    
+    Del1..4 <- all(sapply(list(d2..4), function(x) !is.null(x)))
+    
+    Del2..4 <- all(sapply(list(d3..4), function(x) !is.null(x)))
+    
+    
+    if(Short & length(d1) == 1 & !Short..2 & !Short..3 & !Short..4) { 
+      
+      short <- c(Mean.dint.short = d1, SD.dint.short = sd1)
+    }
+    
+    
+    if(Short & length(d1) == 1 & Short..2 & length(d1..2) == 1 & !Short..3 & !Short..4) {
+      
+      res1 <- bayesmeta(                  y = c(d1, d1..2),
+                                      sigma = c(sd1, sd1..2),
+                                     labels = NULL, tau.prior = tau.prior)
+        res1$call <- match.call(expand.dots = FALSE)
+        
+      short <- c(Mean.dint.short = res1$summary["mean","mu"], SD.dint.short = res1$summary["sd","mu"])
+    }
+    
+    
+    if(Short & length(d1) == 1 & Short..2 & length(d1..2) == 1 & Short..3 & length(d1..3) == 1 & !Short..4) { 
+      
+      res1 <- bayesmeta(                   y = c(d1, d1..2, d1..3),
+                                       sigma = c(sd1, sd1..2, sd1..3),
+                                      labels = NULL, tau.prior = tau.prior)
+         res1$call <- match.call(expand.dots = FALSE)
+         
+      short <- c(Mean.dint.short = res1$summary["mean","mu"], SD.dint.short = res1$summary["sd","mu"])
+      
+    }
+    
+  
+    if(Short & length(d1) == 1 & Short..2 & length(d1..2) == 1 & Short..3 & length(d1..3) == 1 & Short..4 & length(d1..4) == 1) { 
+      
+      
+      res1 <- bayesmeta(                     y = c(d1, d1..2, d1..3, d1..4),
+                                         sigma = c(sd1, sd1..2, sd1..3, sd1..4),
+                                        labels = NULL, tau.prior = tau.prior)
+           res1$call <- match.call(expand.dots = FALSE)
+           
+      short <- c(Mean.dint.short = res1$summary["mean","mu"], SD.dint.short = res1$summary["sd","mu"])
+    }
+      
+    
+    
+    if(Short & length(d1) > 1){
+      res1 <- bayesmeta(                        y = d1,
+                                            sigma = sd1,
+                                           labels = NULL, tau.prior = tau.prior)
+              res1$call <- match.call(expand.dots = FALSE)
+      
+      short1 <- c(res1$summary["mean","mu"], res1$summary["sd","mu"])
+      
+    }
+    
+    
+   if(Short..2 & length(d1..2) > 1){
+      
+            res2 <- bayesmeta(                y = d1..2,
+                                          sigma = sd1..2,
+                                         labels = NULL, tau.prior = tau.prior)
+            res2$call <- match.call(expand.dots = FALSE)
+    
+     short2 <- c(res2$summary["mean","mu"], res2$summary["sd","mu"])
+    
+  }
+    
+    
+    if(Short..3 & length(d1..3) > 1){
+      
+      res3 <- bayesmeta(                     y = d1..3,
+                                         sigma = sd1..3,
+                                        labels = NULL, tau.prior = tau.prior)
+           res3$call <- match.call(expand.dots = FALSE)
+      
+      short3 <- c(res3$summary["mean","mu"], res3$summary["sd","mu"])
+      
+    }   
+    
+    
+    
+    if(Short..4 & length(d1..4) > 1){
+      
+      res4 <- bayesmeta(                    y = d1..4,
+                                        sigma = sd1..4,
+                                       labels = NULL, tau.prior = tau.prior)
+          res4$call <- match.call(expand.dots = FALSE)
+      
+      short4 <- c(res4$summary["mean","mu"], res4$summary["sd","mu"])
+      
+    }   
+    
+    
+    if(Short & length(d1) > 1 & !Short..2 & !Short..3 & !Short..4) {
+      
+      short <- c(Mean.dint.short = short1[1], SD.dint.short = short1[2])
+      
+    }
+    
+    
+    if(Short & length(d1) > 1 & Short..2 & length(d1..2) > 1 & !Short..3 & !Short..4) {
+      
+      
+      ds <- c(short1[1], short2[1])
+      sds <- c(short1[2], short2[2])
+      
+      resi1 <- bayesmeta(                     y = ds,
+                                          sigma = sds,
+                                         labels = NULL, tau.prior = tau.prior)
+           resi1$call <- match.call(expand.dots = FALSE)
+      
+      short <- c(Mean.dint.short = resi1$summary["mean","mu"], SD.dint.short = resi1$summary["sd","mu"])
+      
+    }
+    
+    
+    if(Short & length(d1) > 1 & Short..2 & length(d1..2) > 1 & Short..3 & length(d1..3) > 1 & !Short..4) {
+      
+      
+      ds <- c(short1[1], short2[1], short3[1])
+      sds <- c(short1[2], short2[2], short3[2])
+      
+      resi1 <- bayesmeta(                     y = ds,
+                                          sigma = sds,
+                                         labels = NULL, tau.prior = tau.prior)
+           resi1$call <- match.call(expand.dots = FALSE)
+      
+      short <- c(Mean.dint.short = resi1$summary["mean","mu"], SD.dint.short = resi1$summary["sd","mu"])
+      
+    }
+
+    
+    
+    if(Short & length(d1) > 1 & Short..2 & length(d1..2) > 1 & Short..3 & length(d1..3) > 1 & Short..4 & length(d1..4) > 1 ) {
+      
+      
+      ds <- c(short1[1], short2[1], short3[1], short4[1])
+      sds <- c(short1[2], short2[2], short3[2], short4[2])
+      
+      resi1 <- bayesmeta(                     y = ds,
+                                          sigma = sds,
+                                         labels = NULL, tau.prior = tau.prior)
+           resi1$call <- match.call(expand.dots = FALSE)
+      
+      short <- c(Mean.dint.short = resi1$summary["mean","mu"], SD.dint.short = resi1$summary["sd","mu"])
+      
+    }
+    
+    #####
+    
+    
+    if(Del1 & length(d2) == 1 & !Del1..2 & !Del1..3 & !Del1..4) { 
+      
+      del1 <- c(Mean.dint.del1 = d2, SD.dint.del1 = sd2)
+    }
+    
+    
+    if(Del1 & length(d2) == 1 & Del1..2 & length(d2..2) == 1 & !Del1..3 & !Del1..4) {
+      
+      res1 <- bayesmeta(                       y = c(d2, d2..2),
+                                           sigma = c(sd2, sd2..2),
+                                          labels = NULL, tau.prior = tau.prior)
+             res1$call <- match.call(expand.dots = FALSE)
+      
+      del1  <- c(Mean.dint.del1 = res1$summary["mean","mu"], SD.dint.del1 = res1$summary["sd","mu"])
+    }
+    
+    
+    if(Del1 & length(d2) == 1 & Del1..2 & length(d2..2) == 1 & Del1..3 & length(d2..3) == 1 & !Del1..4) { 
+      
+      res1 <- bayesmeta(                        y = c(d2, d2..2, d2..3),
+                                            sigma = c(sd2, sd2..2, sd2..3),
+                                           labels = NULL, tau.prior = tau.prior)
+              res1$call <- match.call(expand.dots = FALSE)
+      
+      del1 <- c(Mean.dint.del1 = res1$summary["mean","mu"], SD.dint.del1 = res1$summary["sd","mu"])
+      
+    }
+    
+    
+    if(Del1 & length(d2) == 1 & Del1..2 & length(d2..2) == 1 & Del1..3 & length(d2..3) == 1 & Del1..4 & length(d2..4) == 1) { 
+      
+      
+      res1 <- bayesmeta(                          y = c(d2, d2..2, d2..3, d2..4),
+                                              sigma = c(sd2, sd2..2, sd2..3, sd2..4),
+                                             labels = NULL, tau.prior = tau.prior)
+                res1$call <- match.call(expand.dots = FALSE)
+      
+      del1 <- c(Mean.dint.del1 = res1$summary["mean","mu"], SD.dint.del1 = res1$summary["sd","mu"])
+    }
+    
+    
+    
+    if(Del1 & length(d2) > 1){
+      
+      res1 <- bayesmeta(                        y = d2,
+                                            sigma = sd2,
+                                           labels = NULL, tau.prior = tau.prior)
+              res1$call <- match.call(expand.dots = FALSE)
+      
+       del11 <- c(res1$summary["mean","mu"], res1$summary["sd","mu"])
+      
+    }
+    
+    
+    if(Del1..2 & length(d2..2) > 1){
+      
+      res2 <- bayesmeta(                     y = d2..2,
+                                         sigma = sd2..2,
+                                        labels = NULL, tau.prior = tau.prior)
+           res2$call <- match.call(expand.dots = FALSE)
+      
+      del12 <- c(res2$summary["mean","mu"], res2$summary["sd","mu"])
+      
+    }
+    
+    
+    if(Del1..3 & length(d2..3) > 1){
+      
+      res3 <- bayesmeta(                     y = d2..3,
+                                         sigma = sd2..3,
+                                        labels = NULL, tau.prior = tau.prior)
+           res3$call <- match.call(expand.dots = FALSE)
+      
+     del13 <- c(res3$summary["mean","mu"], res3$summary["sd","mu"])
+      
+    }   
+    
+    
+    
+    if(Del1..4 & length(d2..4) > 1){
+      
+      res4 <- bayesmeta(                    y = d2..4,
+                                        sigma = sd2..4,
+                                       labels = NULL, tau.prior = tau.prior)
+          res4$call <- match.call(expand.dots = FALSE)
+      
+     del14 <- c(res4$summary["mean","mu"], res4$summary["sd","mu"])
+      
+    }   
+    
+    
+    if(Del1 & length(d2) > 1 & !Del1..2 & !Del1..3 & !Del1..4) {
+      
+      del1 <- c(Mean.dint.del1 = del11[1], SD.dint.del1 = del11[2])
+      
+    }
+    
+    
+    if(Del1 & length(d2) > 1 & Del1..2 & length(d2..2) > 1 & !Del1..3 & !Del1..4) {
+      
+      
+      ds <- c(del11[1], del12[1])
+      sds <- c(del11[2], del12[2])
+      
+      resi1 <- bayesmeta(                         y = ds,
+                                              sigma = sds,
+                                             labels = NULL, tau.prior = tau.prior)
+               resi1$call <- match.call(expand.dots = FALSE)
+      
+      del1 <- c(Mean.dint.del1 = resi1$summary["mean","mu"], SD.dint.del1 = resi1$summary["sd","mu"])
+      
+    }
+    
+    
+    if(Del1 & length(d2) > 1 & Del1..2 & length(d2..2) > 1 & Del1..3 & length(d2..3) > 1 & !Del1..4) {
+      
+      
+      ds <- c(del11[1], del12[1], del13[1])
+      sds <- c(del11[2], del12[2], del13[2])
+      
+      resi1 <- bayesmeta(                          y = ds,
+                                               sigma = sds,
+                                              labels = NULL, tau.prior = tau.prior)
+                resi1$call <- match.call(expand.dots = FALSE)
+      
+      del1 <- c(Mean.dint.del1 = resi1$summary["mean","mu"], SD.dint.del1 = resi1$summary["sd","mu"])
+      
+    }
+    
+    
+    
+    if(Del1 & length(d2) > 1 & Del1..2 & length(d2..2) > 1 & Del1..3 & length(d2..3) > 1 & Del1..4 & length(Del1..4) > 1 ) {
+      
+      
+      ds <- c(del11[1], del12[1], del13[1], del14[1])
+      sds <- c(del11[2], del12[2], del13[2], del14[2])
+      
+      resi1 <- bayesmeta(                          y = ds,
+                                               sigma = sds,
+                                              labels = NULL, tau.prior = tau.prior)
+                resi1$call <- match.call(expand.dots = FALSE)
+      
+      del1 <- c(Mean.dint.del1 = resi1$summary["mean","mu"], SD.dint.del1 = resi1$summary["sd","mu"])
+      
+    }
+    
+    
+    ####
+    
+    if(Del2 & length(d3) == 1 & !Del2..2 & !Del2..3 & !Del2..4) { 
+      
+      del2 <- c(Mean.dint.del2 = d3, SD.dint.del2 = sd3)
+    }
+    
+    
+    if(Del2 & length(d3) == 1 & Del2..2 & length(d3..2) == 1 & !Del2..3 & !Del2..4) {
+      
+      res1 <- bayesmeta(                            y = c(d3, d3..2),
+                                                sigma = c(sd3, sd3..2),
+                                               labels = NULL, tau.prior = tau.prior)
+                  res1$call <- match.call(expand.dots = FALSE)
+      
+      del2  <- c(Mean.dint.del2 = res1$summary["mean","mu"], SD.dint.del2 = res1$summary["sd","mu"])
+    }
+    
+    
+    if(Del2 & length(d3) == 1 & Del2..2 & length(d3..2) == 1 & Del2..3 & length(d3..3) == 1 & !Del2..4) { 
+      
+      res1 <- bayesmeta(                             y = c(d3, d3..2, d3..3),
+                                                 sigma = c(sd3, sd3..2, sd3..3),
+                                                labels = NULL, tau.prior = tau.prior)
+                   res1$call <- match.call(expand.dots = FALSE)
+      
+      del2 <- c(Mean.dint.del2 = res1$summary["mean","mu"], SD.dint.del2 = res1$summary["sd","mu"])
+      
+    }
+    
+    
+    if(Del2 & length(d3) == 1 & Del2..2 & length(d3..2) == 1 & Del2..3 & length(d3..3) == 1 & Del2..4 & length(d3..4) == 1) { 
+      
+      
+      res1 <- bayesmeta(                               y = c(d3, d3..2, d3..3, d3..4),
+                                                   sigma = c(sd3, sd3..2, sd3..3, sd3..4),
+                                                  labels = NULL, tau.prior = tau.prior)
+                     res1$call <- match.call(expand.dots = FALSE)
+      
+      del2 <- c(Mean.dint.del2 = res1$summary["mean","mu"], SD.dint.del2 = res1$summary["sd","mu"])
+    }
+    
+    
+    
+    if(Del2 & length(d3) > 1){
+      res1 <- bayesmeta(                             y = d3,
+                                                 sigma = sd3,
+                                                labels = NULL, tau.prior = tau.prior)
+                   res1$call <- match.call(expand.dots = FALSE)
+      
+      del21 <- c(res1$summary["mean","mu"], res1$summary["sd","mu"])
+      
+    }
+    
+    
+    if(Del2..2 & length(d3..2) > 1){
+      
+      res2 <- bayesmeta(                          y = d3..2,
+                                              sigma = sd3..2,
+                                             labels = NULL, tau.prior = tau.prior)
+                res2$call <- match.call(expand.dots = FALSE)
+      
+      del22 <- c(res2$summary["mean","mu"], res2$summary["sd","mu"])
+      
+    }
+    
+    
+    if(Del2..3 & length(d3..3) > 1){
+      
+      res3 <- bayesmeta(                          y = d3..3,
+                                              sigma = sd3..3,
+                                             labels = NULL, tau.prior = tau.prior)
+                res3$call <- match.call(expand.dots = FALSE)
+      
+      del23 <- c(res3$summary["mean","mu"], res3$summary["sd","mu"])
+      
+    }   
+    
+    
+    
+    if(Del2..4 & length(d3..4) > 1){
+      
+      res4 <- bayesmeta(                        y = d3..4,
+                                            sigma = sd3..4,
+                                           labels = NULL, tau.prior = tau.prior)
+              res4$call <- match.call(expand.dots = FALSE)
+      
+      del24 <- c(res4$summary["mean","mu"], res4$summary["sd","mu"])
+      
+    }   
+    
+    
+    if(Del2 & length(d3) > 1 & !Del2..2 & !Del2..3 & !Del2..4) {
+      
+      del2 <- c(Mean.dint.del2 = del21[1], SD.dint.del2 = del21[2])
+      
+    }
+    
+    
+    if(Del2 & length(d3) > 1 & Del2..2 & length(d3..2) > 1 & !Del2..3 & !Del2..4) {  ##### START HERE change "del1" or "Del1" to "del2" or "Del2".
+      
+      
+      ds <- c(del21[1], del22[1])
+      sds <- c(del21[2], del22[2])
+      
+      resi1 <- bayesmeta(                              y = ds,
+                                                   sigma = sds,
+                                                  labels = NULL, tau.prior = tau.prior)
+                    resi1$call <- match.call(expand.dots = FALSE)
+      
+      del2 <- c(Mean.dint.del2 = resi1$summary["mean","mu"], SD.dint.del2 = resi1$summary["sd","mu"])
+      
+    }
+    
+    
+    if(Del2 & length(d3) > 1 & Del2..2 & length(d3..2) > 1 & Del2..3 & length(d3..3) > 1 & !Del2..4) {
+      
+      
+      ds <- c(del21[1], del22[1], del23[1])
+      sds <- c(del21[2], del22[2], del23[2])
+      
+      resi1 <- bayesmeta(                          y = ds,
+                                                   sigma = sds,
+                                                   labels = NULL, tau.prior = tau.prior)
+      resi1$call <- match.call(expand.dots = FALSE)
+      
+      del2 <- c(Mean.dint.del2 = resi1$summary["mean","mu"], SD.dint.del2 = resi1$summary["sd","mu"])
+      
+    }
+    
+    
+    if(Del2 & length(d3) > 1 & Del2..2 & length(d3..2) > 1 & Del2..3 & length(d3..3) > 1 & Del2..4 & length(Del2..4) > 1 ) {
+      
+      
+      ds <- c(del21[1], del22[1], del23[1], del24[1])
+      sds <- c(del21[2], del22[2], del23[2], del24[2])
+      
+      resi1 <- bayesmeta(                          y = ds,
+                                                   sigma = sds,
+                                                   labels = NULL, tau.prior = tau.prior)
+      resi1$call <- match.call(expand.dots = FALSE)
+      
+      del2 <- c(Mean.dint.del2 = resi1$summary["mean","mu"], SD.dint.del2 = resi1$summary["sd","mu"])
+      
+    }
+###
+    
+    out <- data.frame(Mean.dint.short = if(Short)short[1] else NA, SD.dint.short = if(Short) short[2]else NA, Mean.dint.del1 = if(Del1)del1[1]else NA, SD.dint.del1 = if(Del1)del1[2]else NA, Mean.dint.del2 = if(Del2)del2[1]else NA, SD.dint.del2 = if(Del2)del2[2]else NA, row.names = NULL) 
+    return(out)
+  }             
+  
+  h <- lapply(1:length(L), function(i) G(m = L[[i]], tau.prior = tau.prior))
+  names(h) <- study.name
+  
+  return(h)
+}              
+
+
+#=======================================================================================================================================
+
+
+meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, long = FALSE, n.sim = 1e5)
+{
+  
+  
+  j <- eval(substitute(meta.within(data = data, by = by, tau.prior = tau.prior, impute = impute, n.sim = n.sim)))
+  
+  study.name <- names(j)
+  
+  
+  L <- lapply(c('Mean.dint.short', 'SD.dint.short', 'Mean.dint.del1', 'SD.dint.del1', 'Mean.dint.del2',
+                'SD.dint.del2'), function(i) {V <- unlist(sapply(j, `[[`, i)); V[!is.na(V)]})
+  
+  d <- list(L[[1]], L[[3]], L[[5]])
+  
+  ds <- Filter(NROW, d)
+  sds <- Filter(NROW, list(L[[2]], L[[4]], L[[6]]))
+  
+  test <- sapply(d, function(x) length(x) >= 2)
+  
+  if(all(!test)) stop("Insufficient studies to meta-analyze either 'short-' or 'long-term' effects.", call. = FALSE)
+  
+  
+  if(test[1]) { result1 <- bayesmeta(     y = ds[[1]],
+                                          sigma = sds[[1]],
+                                          labels = names(ds[[1]]), tau.prior = tau.prior)
+  result1$call <- match.call(expand.dots = FALSE)
+  } 
+  
+  
+  if(test[2]) { result2 <- bayesmeta(     y = ds[[2]],
+                                          sigma = sds[[2]],
+                                          labels = names(ds[[2]]), tau.prior = tau.prior)
+  result2$call <- match.call(expand.dots = FALSE)
+  }  
+  
+  
+  if(test[3]) { result3 <- bayesmeta(     y = ds[[3]],
+                                          sigma = sds[[3]],
+                                          labels = names(ds[[3]]), tau.prior = tau.prior)
+  result3$call <- match.call(expand.dots = FALSE)
+  }  
+  
+  
+  if(test[2] & test[3] & long){
+    
+    ddelys <- c(result2$summary["mean","mu"], result3$summary["mean","mu"])
+    sdelys <- c(result2$summary["sd","mu"], result3$summary["sd","mu"])
+    
+    result4 <- bayesmeta(      y = ddelys,
+                               sigma = sdelys,
+                               labels = c("Delay1", "Delay2"), tau.prior = tau.prior)
+    result4$call <- match.call(expand.dots = FALSE)
+    
+    if(test[1])return(list(SHORT = result1, LONG = result4))
+    if(!test[1])return(list(LONG = result4))
+  }
+  
+  if(!test[1]) message("NOTE: No or insufficient studies to meta-analyze 'short-term' effects.")
+  if(!test[2]) message("NOTE: No or insufficient studies to meta-analyze 'delayed 1' effects.")
+  if(!test[3]) message("NOTE: No or insufficient studies to meta-analyze 'delayed 2' effects.")
+  
+  
+  if(!long || long & !test[2] || long & !test[3]){ 
+    
+    if(all(test)) return(list(SHORT = result1, DEL1 = result2, DEL2 = result3))
+    if(test[1] & test[2] & !test[3]) return(list(SHORT = result1, DEL1 = result2))
+    if(test[1] & !test[2] & !test[3]) return(list(SHORT = result1))
+    if(!test[1] & test[2] & !test[3]) return(list(DEL1 = result2))
+    if(!test[1] & !test[2] & test[3]) return(list(DEL2 = result3))
+    if(!test[1] & test[2] & test[3]) return(list(DEL1 = result2, DEL2 = result3))
+  }             
+}                  
+                  
+                  
 #===============================================================================================================================
                
 need <- c("bayesmeta", "distr", "zoo") 
