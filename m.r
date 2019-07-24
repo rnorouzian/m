@@ -1546,7 +1546,7 @@ if(out == 4){
     }
     
     
-    if(out >=2 && short..2){
+    if(out >=2 || short..2){
       nc1 <- m$n[m$control & m$post == 1 & m$outcome == 2]
       nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 2]
       dps <- pair(cs..2, ts..2)  
