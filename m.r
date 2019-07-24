@@ -1403,42 +1403,42 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
                   
 dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
 {
-
-    out <- max(data$outcome, na.rm = TRUE)
   
-    m <- split(data, data$study.name)        
+#  out <- max(data$outcome, na.rm = TRUE)
+  
+  m <- split(data, data$study.name)        
+  
+  m[[1]] <- NULL  
+  
+  if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
+  
+  
+  if(impute) {  
     
-    m[[1]] <- NULL  
+    ar <- formalArgs(rdif)[c(-7, -9)]
     
-    if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
-    
-    
-    if(impute) {  
-      
-      ar <- formalArgs(rdif)[c(-7, -9)]
-      
-      args <- lapply(m, function(x) unclass(x[ar]))
-      
-      argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
-      
-      f <- do.call(Map, c(f = rdif, argsT))
-      
-      f <- lapply(f, na.locf0)
-      
-      m <- Map(function(x, y) transform(x, r = na.locf0(y, fromLast = TRUE)), m, f) 
-    }
-    
-    
-    ar <- head(formalArgs(d.prepos), -1)
-    
-    dot.names <- names(m[[1]])[!names(m[[1]]) %in% ar]
-    
-    args <- lapply(m, function(x) unclass(x[c(ar, dot.names)]))
+    args <- lapply(m, function(x) unclass(x[ar]))
     
     argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
     
-    L <- do.call(Map, c(f = d.prepos, argsT))
-
+    f <- do.call(Map, c(f = rdif, argsT))
+    
+    f <- lapply(f, na.locf0)
+    
+    m <- Map(function(x, y) transform(x, r = na.locf0(y, fromLast = TRUE)), m, f) 
+  }
+  
+  
+  ar <- head(formalArgs(d.prepos), -1)
+  
+  dot.names <- names(m[[1]])[!names(m[[1]]) %in% ar]
+  
+  args <- lapply(m, function(x) unclass(x[c(ar, dot.names)]))
+  
+  argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
+  
+  L <- do.call(Map, c(f = d.prepos, argsT))
+  
   
   if(!missing(by)){ 
     
@@ -1457,11 +1457,11 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
   }
   
   study.name <- names(L)
-    
+  
   G <- function(m, n.sim)
   {
     
-  
+    
     cdel1 <- reget(m, control & post == 2 & outcome == 1)
     cdel2 <- reget(m, control & post == 3 & outcome == 1)
     cs <- reget(m, control & post == 1 & outcome == 1)
@@ -1477,61 +1477,61 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
     del1 <- all(sapply(list(cdel1, tdel1), function(x) !is.null(x)))
     
     del2 <- all(sapply(list(cdel2, tdel2), function(x) !is.null(x)))
-
-  
-if(out >= 2){ 
-  
-    cdel1..2 <- reget(m, control & post == 2 & outcome == 2)
-    cdel2..2 <- reget(m, control & post == 3 & outcome == 2)
-    cs..2 <- reget(m, control & post == 1 & outcome == 2)
-    
-    tdel1..2 <- reget(m, !control & post == 2 & outcome == 2)
-    tdel2..2 <- reget(m, !control & post == 3 & outcome == 2)
-    ts..2 <- reget(m, !control & post == 1 & outcome == 2)
     
     
-    short..2 <- all(sapply(list(cs..2, ts..2), function(x) !is.null(x)))
-    
-    del1..2 <- all(sapply(list(cdel1..2, tdel1..2), function(x) !is.null(x)))
-    
-    del2..2 <- all(sapply(list(cdel2..2, tdel2..2), function(x) !is.null(x)))
-}   
-   
-    
-if(out >= 3){ 
+ #   if(out >= 2){ 
       
-    cdel1..3 <- reget(m, control & post == 2 & outcome == 3)
-    cdel2..3 <- reget(m, control & post == 3 & outcome == 3)
-    cs..3 <- reget(m, control & post == 1 & outcome == 3)
-    
-    tdel1..3 <- reget(m, !control & post == 2 & outcome == 3)
-    tdel2..3 <- reget(m, !control & post == 3 & outcome == 3)
-    ts..3 <- reget(m, !control & post == 1 & outcome == 3)
-    
-    short..3 <- all(sapply(list(cs..3, ts..3), function(x) !is.null(x)))
-    
-    del1..3 <- all(sapply(list(cdel1..3, tdel1..3), function(x) !is.null(x)))
-    
-    del2..3 <- all(sapply(list(cdel2..3, tdel2..3), function(x) !is.null(x))) 
-    }   
-    
-    
-if(out == 4){ 
+      cdel1..2 <- reget(m, control & post == 2 & outcome == 2)
+      cdel2..2 <- reget(m, control & post == 3 & outcome == 2)
+      cs..2 <- reget(m, control & post == 1 & outcome == 2)
       
-    cdel1..4 <- reget(m, control & post == 2 & outcome == 4)
-    cdel2..4 <- reget(m, control & post == 3 & outcome == 4)
-    cs..4 <- reget(m, control & post == 1 & outcome == 4)
+      tdel1..2 <- reget(m, !control & post == 2 & outcome == 2)
+      tdel2..2 <- reget(m, !control & post == 3 & outcome == 2)
+      ts..2 <- reget(m, !control & post == 1 & outcome == 2)
+      
+      
+      short..2 <- all(sapply(list(cs..2, ts..2), function(x) !is.null(x)))
+      
+      del1..2 <- all(sapply(list(cdel1..2, tdel1..2), function(x) !is.null(x)))
+      
+      del2..2 <- all(sapply(list(cdel2..2, tdel2..2), function(x) !is.null(x)))
+ #   }   
     
-    tdel1..4 <- reget(m, !control & post == 2 & outcome == 4)
-    tdel2..4 <- reget(m, !control & post == 3 & outcome == 4)
-    ts..4 <- reget(m, !control & post == 1 & outcome == 4)
-
-    short..4 <- all(sapply(list(cs..4, ts..4), function(x) !is.null(x)))
     
-    del1..4 <- all(sapply(list(cdel1..4, tdel1..4), function(x) !is.null(x)))
+#    if(out >= 3){ 
+      
+      cdel1..3 <- reget(m, control & post == 2 & outcome == 3)
+      cdel2..3 <- reget(m, control & post == 3 & outcome == 3)
+      cs..3 <- reget(m, control & post == 1 & outcome == 3)
+      
+      tdel1..3 <- reget(m, !control & post == 2 & outcome == 3)
+      tdel2..3 <- reget(m, !control & post == 3 & outcome == 3)
+      ts..3 <- reget(m, !control & post == 1 & outcome == 3)
+      
+      short..3 <- all(sapply(list(cs..3, ts..3), function(x) !is.null(x)))
+      
+      del1..3 <- all(sapply(list(cdel1..3, tdel1..3), function(x) !is.null(x)))
+      
+      del2..3 <- all(sapply(list(cdel2..3, tdel2..3), function(x) !is.null(x))) 
+#    }   
     
-    del2..4 <- all(sapply(list(cdel2..4, tdel2..4), function(x) !is.null(x)))         
-}    
+    
+ #   if(out == 4){ 
+      
+      cdel1..4 <- reget(m, control & post == 2 & outcome == 4)
+      cdel2..4 <- reget(m, control & post == 3 & outcome == 4)
+      cs..4 <- reget(m, control & post == 1 & outcome == 4)
+      
+      tdel1..4 <- reget(m, !control & post == 2 & outcome == 4)
+      tdel2..4 <- reget(m, !control & post == 3 & outcome == 4)
+      ts..4 <- reget(m, !control & post == 1 & outcome == 4)
+      
+      short..4 <- all(sapply(list(cs..4, ts..4), function(x) !is.null(x)))
+      
+      del1..4 <- all(sapply(list(cdel1..4, tdel1..4), function(x) !is.null(x)))
+      
+      del2..4 <- all(sapply(list(cdel2..4, tdel2..4), function(x) !is.null(x)))         
+ #   }    
     
     if(short){
       nc1 <- m$n[m$control & m$post == 1 & m$outcome == 1]
@@ -1546,7 +1546,7 @@ if(out == 4){
     }
     
     
-    if(out >=2 || short..2){
+    if(short..2){
       nc1 <- m$n[m$control & m$post == 1 & m$outcome == 2]
       nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 2]
       dps <- pair(cs..2, ts..2)  
@@ -1558,7 +1558,7 @@ if(out == 4){
     }
     
     
-    if(out >= 3 && short..3){
+    if(short..3){
       nc1 <- m$n[m$control & m$post == 1 & m$outcome == 3]
       nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 3]
       dps <- pair(cs..3, ts..3)  
@@ -1570,7 +1570,7 @@ if(out == 4){
     }
     
     
-    if(out == 4 && short..4){
+    if(short..4){
       nc1 <- m$n[m$control & m$post == 1 & m$outcome == 4]
       nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 4]
       dps <- pair(cs..4, ts..4)  
@@ -1594,7 +1594,7 @@ if(out == 4){
     }
     
     
-    if(out >=2 && del1..2){
+    if(del1..2){
       nc2 <- m$n[m$control & m$post == 2 & m$outcome == 2]
       nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 2]
       dpdel1 <- pair(cdel1..2, tdel1..2)
@@ -1606,7 +1606,7 @@ if(out == 4){
     }
     
     
-    if(out >= 3 && del1..3){
+    if(del1..3){
       nc2 <- m$n[m$control & m$post == 2 & m$outcome == 3]
       nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 3]
       dpdel1 <- pair(cdel1..3, tdel1..3)
@@ -1618,7 +1618,7 @@ if(out == 4){
     }
     
     
-    if(out == 4 && del1..4){
+    if(del1..4){
       nc2 <- m$n[m$control & m$post == 2 & m$outcome == 4]
       nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 4]
       dpdel1 <- pair(cdel1..4, tdel1..4)
@@ -1641,7 +1641,7 @@ if(out == 4){
       DEL2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
     }
     
-    if(out >=2 && del2..2){
+    if(del2..2){
       nc3 <- m$n[m$control & m$post == 3 & m$outcome == 2]
       nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 2]
       dpdel2 <- pair(cdel2..2, tdel2..2)
@@ -1653,7 +1653,7 @@ if(out == 4){
     }
     
     
-    if(out >= 3 && del2..3){
+    if(del2..3){
       nc3 <- m$n[m$control & m$post == 3 & m$outcome == 3]
       nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 3]
       dpdel2 <- pair(cdel2..3, tdel2..3)
@@ -1665,7 +1665,7 @@ if(out == 4){
     }
     
     
-    if(out == 4 && del2..4){
+    if(del2..4){
       nc3 <- m$n[m$control & m$post == 3 & m$outcome == 4]
       nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 4]
       dpdel2 <- pair(cdel2..4, tdel2..4)
@@ -1677,9 +1677,9 @@ if(out == 4){
     }
     
     
-    list(SHORT = if(short) SHORT else NULL, SHORT..2 = if(out >=2 && short..2) SHORT..2 else NULL, SHORT..3 = if(out >= 3 && short..3) SHORT..3 else NULL, SHORT..4 = if(out == 4 && short..4) SHORT..4 else NULL,
-          DEL1 = if(del1) DEL1 else NULL, DEL1..2 = if(out == 2 && del1..2) DEL1..2 else NULL, DEL1..3 = if(out == 3 && del1..3) DEL1..3 else NULL, DEL1..4 = if(out == 4 && del1..4) DEL1..4 else NULL, 
-          DEL2 = if(del2) DEL2 else NULL, DEL2..2 = if(out == 2 && del2..2) DEL2..2 else NULL, DEL2..3 = if(out == 3 && del2..3) DEL2..3 else NULL, DEL2..4 = if(out == 4 && del2..4) DEL2..4 else NULL) 
+    list(SHORT = if(short) SHORT else NULL, SHORT..2 = if(short..2) SHORT..2 else NULL, SHORT..3 = if(short..3) SHORT..3 else NULL, SHORT..4 = if(short..4) SHORT..4 else NULL,
+         DEL1 = if(del1) DEL1 else NULL, DEL1..2 = if(del1..2) DEL1..2 else NULL, DEL1..3 = if(del1..3) DEL1..3 else NULL, DEL1..4 = if(del1..4) DEL1..4 else NULL, 
+         DEL2 = if(del2) DEL2 else NULL, DEL2..2 = if(del2..2) DEL2..2 else NULL, DEL2..3 = if(del2..3) DEL2..3 else NULL, DEL2..4 = if(del2..4) DEL2..4 else NULL) 
   }
   
   h <- lapply(1:length(L), function(i) G(m = L[[i]], n.sim = n.sim))
@@ -1687,7 +1687,7 @@ if(out == 4){
   names(h) <- study.name
   
   return(h) 
-}               
+}                              
 
 
 
@@ -1734,11 +1734,36 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
     sd3..3 <- m$DEL2..3$SD
     sd3..4 <- m$DEL2..4$SD
     
-   Short <- !is.null(d1)    ; Del1 <- !is.null(d2)       ; Del2 <- !is.null(d3)
-Short..2 <- !is.null(d1..2) ; Del1..2 <- !is.null(d2..2) ; Del2..2 <- !is.null(d3..2)
-Short..3 <- !is.null(d1..3) ; Del1..3 <- !is.null(d2..3) ; Del2..3 <- !is.null(d3..3)
-Short..4 <- !is.null(d1..4) ; Del1..4 <- !is.null(d2..4) ; Del2..4 <- !is.null(d3..4)
+#   Short <- !is.null(d1)    ; Del1 <- !is.null(d2)       ; Del2 <- !is.null(d3)
+#Short..2 <- !is.null(d1..2) ; Del1..2 <- !is.null(d2..2) ; Del2..2 <- !is.null(d3..2)
+#Short..3 <- !is.null(d1..3) ; Del1..3 <- !is.null(d2..3) ; Del2..3 <- !is.null(d3..3)
+#Short..4 <- !is.null(d1..4) ; Del1..4 <- !is.null(d2..4) ; Del2..4 <- !is.null(d3..4)
     
+      ####
+    Short <- all(sapply(list(d1), function(x) !is.null(x)))
+    
+    Del1 <- all(sapply(list(d2), function(x) !is.null(x)))
+    
+    Del2 <- all(sapply(list(d3), function(x) !is.null(x)))
+    
+    Short..2 <- all(sapply(list(d1..2), function(x) !is.null(x)))
+    
+    Del1..2 <- all(sapply(list(d2..2), function(x) !is.null(x)))
+    
+    Del2..2 <- all(sapply(list(d3..2), function(x) !is.null(x)))
+    
+    Short..3 <- all(sapply(list(d1..3), function(x) !is.null(x)))
+    
+    Del1..3 <- all(sapply(list(d2..3), function(x) !is.null(x)))
+    
+    Del2..3 <- all(sapply(list(d3..3), function(x) !is.null(x)))
+    
+    Short..4 <- all(sapply(list(d1..4), function(x) !is.null(x)))
+    
+    Del1..4 <- all(sapply(list(d2..4), function(x) !is.null(x)))
+    
+    Del2..4 <- all(sapply(list(d3..4), function(x) !is.null(x)))
+      ####
     
     if(Short & length(d1) == 1 & !Short..2 & !Short..3 & !Short..4) { 
       
