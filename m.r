@@ -1734,36 +1734,11 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
     sd3..3 <- m$DEL2..3$SD
     sd3..4 <- m$DEL2..4$SD
     
-#   Short <- !is.null(d1)    ; Del1 <- !is.null(d2)       ; Del2 <- !is.null(d3)
-#Short..2 <- !is.null(d1..2) ; Del1..2 <- !is.null(d2..2) ; Del2..2 <- !is.null(d3..2)
-#Short..3 <- !is.null(d1..3) ; Del1..3 <- !is.null(d2..3) ; Del2..3 <- !is.null(d3..3)
-#Short..4 <- !is.null(d1..4) ; Del1..4 <- !is.null(d2..4) ; Del2..4 <- !is.null(d3..4)
+Short <- !is.null(d1)    ; Del1 <- !is.null(d2)       ; Del2 <- !is.null(d3)
+Short..2 <- !is.null(d1..2) ; Del1..2 <- !is.null(d2..2) ; Del2..2 <- !is.null(d3..2)
+Short..3 <- !is.null(d1..3) ; Del1..3 <- !is.null(d2..3) ; Del2..3 <- !is.null(d3..3)
+Short..4 <- !is.null(d1..4) ; Del1..4 <- !is.null(d2..4) ; Del2..4 <- !is.null(d3..4)
     
-      ####
-    Short <- all(sapply(list(d1), function(x) !is.null(x)))
-    
-    Del1 <- all(sapply(list(d2), function(x) !is.null(x)))
-    
-    Del2 <- all(sapply(list(d3), function(x) !is.null(x)))
-    
-    Short..2 <- all(sapply(list(d1..2), function(x) !is.null(x)))
-    
-    Del1..2 <- all(sapply(list(d2..2), function(x) !is.null(x)))
-    
-    Del2..2 <- all(sapply(list(d3..2), function(x) !is.null(x)))
-    
-    Short..3 <- all(sapply(list(d1..3), function(x) !is.null(x)))
-    
-    Del1..3 <- all(sapply(list(d2..3), function(x) !is.null(x)))
-    
-    Del2..3 <- all(sapply(list(d3..3), function(x) !is.null(x)))
-    
-    Short..4 <- all(sapply(list(d1..4), function(x) !is.null(x)))
-    
-    Del1..4 <- all(sapply(list(d2..4), function(x) !is.null(x)))
-    
-    Del2..4 <- all(sapply(list(d3..4), function(x) !is.null(x)))
-      ####
     
     if(Short & length(d1) == 1 & !Short..2 & !Short..3 & !Short..4) { 
       
