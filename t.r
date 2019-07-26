@@ -70,4 +70,7 @@ funnel(u$SHORT)                            # discover publication bias (short-te
 funnel(u$DEL1)                             # discover publication bias (long-term effects)
 
 
-dint.plot(p, s, u)                         # compare the short- and long-term meta-analystic results with general and specific meta-nanalytic results above
+dint.plot(p, s, u)                         # compare the short- and long-term meta-analystic results with general and specific 
+                                           # meta-nanalytic results above
+
+
