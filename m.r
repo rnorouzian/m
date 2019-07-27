@@ -1389,7 +1389,7 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
     
     text(x, .88*hi, paste0("(k = ", k,")"), cex = .75, font = 2, xpd = NA, srt = 90, pos = 2) 
     
-    points(x, mu, pch = 22, cex = 6, bg = "cyan", col = "magenta", xpd = NA)
+    points(x, mu, pch = 22, cex = 6.1, bg = "cyan", col = "magenta", xpd = NA)
     
     text(x, c(.97*lo, mu, 1.03*hi), 
          round(c(lo, mu, hi), 3), cex = .85, font = 2, xpd = NA)
