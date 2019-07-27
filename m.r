@@ -380,7 +380,7 @@ convolve <- function(dens1, dens2,
 funnel.bayesmeta <- function(x,
                              main = deparse(substitute(x)),
                              xlab = "Effect Size (dint)",
-                             ylab = "SD",
+                             ylab = "SD", study.name = TRUE,
                              FE = FALSE, legend = FE, shrink = FALSE, show.mu = TRUE, ...)
 {
   
@@ -441,9 +441,8 @@ funnel.bayesmeta <- function(x,
    # segments(x$y, -x$sigma, x$theta[5,], -x$sigma, col="gray40", lty = 3)
    # points(x$theta[5,], -x$sigma, pch=21, col="gray60", bg= "gray60", cex=1.2)
   #}
-    
-    
-  text(x$y, -x$sigma, x$labels, cex = .65, font = 2, pos = 3)
+     
+  if(study.name)text(x$y, -x$sigma, x$labels, cex = .65, font = 2, pos = 3)
   
   if (FE && legend)
     legend("topleft", c("RE model", "FE model"),
