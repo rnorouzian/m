@@ -2,7 +2,7 @@
 
 Break = "\n<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n"
 
-notice = "    \"newmeta\", A suite of R functions for Modern Meta-Analysis in Second Language Research.
+notice = "    \"metaling\", A suite of R functions for Modern Meta-Analysis in Second Language Research.
     Copyright (C) 2019-present  Reza Norouzian, rnorouzian@gmail.com
 
     This set of programs is free software: you can redistribute it under the 
