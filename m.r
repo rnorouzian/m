@@ -2267,7 +2267,7 @@ Short..4 <- !is.null(d1..4) ; Del1..4 <- !is.null(d2..4) ; Del2..4 <- !is.null(d
 
 #=======================================================================================================================================
               
-meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, n.sim = 1e5, option = 1){
+meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, n.sim = 1e5, option = 2, r = .5){
   
   L <- eval(substitute(dint(data = data, by = by, impute = impute, n.sim = n.sim)))
   
@@ -2325,14 +2325,14 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        res <- option2(c(d1, d1..2), c(sd1, sd1..2))
+        res <- option2(c(d1, d1..2), c(sd1, sd1..2), r = r)
         
         short <- c(Mean.dint.short = res[1], SD.dint.short = res[2])
       }
       
       if(option == 1){
         
-        res <- option1(c(d1, d1..2), c(sd1, sd1..2))
+        res <- option1(c(d1, d1..2), c(sd1, sd1..2), r = r)
         
         short <- c(Mean.dint.short = res[1], SD.dint.short = res[2])
       }
@@ -2354,7 +2354,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        res1 <- option2(c(d1, d1..2, d1..3), c(sd1, sd1..2, sd1..3))
+        res1 <- option2(c(d1, d1..2, d1..3), c(sd1, sd1..2, sd1..3), r = r)
         
         short <- c(Mean.dint.short = res1[1], SD.dint.short = res1[2])
         
@@ -2362,7 +2362,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res1 <- option1(c(d1, d1..2, d1..3), c(sd1, sd1..2, sd1..3))
+        res1 <- option1(c(d1, d1..2, d1..3), c(sd1, sd1..2, sd1..3), r = r)
         
         short <- c(Mean.dint.short = res1[1], SD.dint.short = res1[2])
       }
@@ -2386,14 +2386,14 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
   
       if(option == 2){
         
-        res1 <- option2(ds, sds)
+        res1 <- option2(ds, sds, r = r)
         
         short <- c(Mean.dint.short = res1[1], SD.dint.short = res1[2])
       }
       
       if(option == 1){
         
-        res1 <- option1(ds, sds)
+        res1 <- option1(ds, sds, r = r)
         
         short <- c(Mean.dint.short = res1[1], SD.dint.short = res1[2])
       }
@@ -2416,7 +2416,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        res1 <- option2(d1, sd1)
+        res1 <- option2(d1, sd1, r = r)
         
         short1 <- c(res1[1], res1[2])
         
@@ -2424,7 +2424,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res1 <- option1(d1, sd1)
+        res1 <- option1(d1, sd1, r = r)
         
         short1 <- c(res1[1], res1[2])
         
@@ -2445,7 +2445,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        res2 <- option2(d1..2, sd1..2)
+        res2 <- option2(d1..2, sd1..2, r = r)
         
         short2 <- c(res2[1], res2[2])
         
@@ -2453,7 +2453,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res2 <- option1(d1..2, sd1..2)
+        res2 <- option1(d1..2, sd1..2, r = r)
         
         short2 <- c(res2[1], res2[2])
         
@@ -2476,7 +2476,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        res3 <- option2(d1..3, sd1..3)
+        res3 <- option2(d1..3, sd1..3, r = r)
         
         short3 <- c(res3[1], res3[2])
         
@@ -2484,7 +2484,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res3 <- option1(d1..3, sd1..3)
+        res3 <- option1(d1..3, sd1..3, r = r)
         
         short3 <- c(res3[1], res3[2])
         
@@ -2508,7 +2508,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        res4 <- option2(d1..4, sd1..4)
+        res4 <- option2(d1..4, sd1..4, r = r)
         
         short4 <- c(res4[1], res4[2])
         
@@ -2516,7 +2516,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res4 <- option1(d1..4, sd1..4)
+        res4 <- option1(d1..4, sd1..4, r = r)
         
         short4 <- c(res4[1], res4[2])
       }
@@ -2548,7 +2548,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        resi1 <- option2(ds, sds)
+        resi1 <- option2(ds, sds, r = r)
         
         short <- c(Mean.dint.short = resi1[1], SD.dint.short = resi1[2])
         
@@ -2556,7 +2556,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        resi1 <- option1(ds, sds)
+        resi1 <- option1(ds, sds, r = r)
         
         short <- c(Mean.dint.short = resi1[1], SD.dint.short = resi1[2])
         
@@ -2583,7 +2583,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        resi1 <- option2(ds, sds)
+        resi1 <- option2(ds, sds, r = r)
         
         short <- c(Mean.dint.short = resi1[1], SD.dint.short = resi1[2])
         
@@ -2591,7 +2591,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        resi1 <- option1(ds, sds)
+        resi1 <- option1(ds, sds, r = r)
         
         short <- c(Mean.dint.short = resi1[1], SD.dint.short = resi1[2])
       }
@@ -2617,7 +2617,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        resi1 <- option2(ds, sds)
+        resi1 <- option2(ds, sds, r = r)
         
         short <- c(Mean.dint.short = resi1[1], SD.dint.short = resi1[2])
         
@@ -2625,7 +2625,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        resi1 <- option1(ds, sds)
+        resi1 <- option1(ds, sds, r = r)
         
         short <- c(Mean.dint.short = resi1[1], SD.dint.short = resi1[2])
         
@@ -2656,7 +2656,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        res1 <- option2(c(d2, d2..2), c(sd2, sd2..2))
+        res1 <- option2(c(d2, d2..2), c(sd2, sd2..2), r = r)
         
         del1  <- c(Mean.dint.del1 = res1[1], SD.dint.del1 = res1[2])
         
@@ -2664,7 +2664,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res1 <- option1(c(d2, d2..2), c(sd2, sd2..2))
+        res1 <- option1(c(d2, d2..2), c(sd2, sd2..2), r = r)
         
         del1  <- c(Mean.dint.del1 = res1[1], SD.dint.del1 = res1[2])
       }
@@ -2688,10 +2688,9 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       sds <- c(sd2, sd2..2, sd2..3)
       
       
-      
       if(option == 2){
         
-        res1 <- option2(ds, sds)
+        res1 <- option2(ds, sds, r = r)
         
         del1 <- c(Mean.dint.del1 = res1[1], SD.dint.del1 = res1[2])
         
@@ -2699,7 +2698,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res1 <- option1(ds, sds)
+        res1 <- option1(ds, sds, r = r)
         
         del1 <- c(Mean.dint.del1 = res1[1], SD.dint.del1 = res1[2])
       }
@@ -2725,14 +2724,14 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        res1 <- option2(ds, sds)
+        res1 <- option2(ds, sds, r = r)
         
         del1 <- c(Mean.dint.del1 = res1[1], SD.dint.del1 = res1[2])
       }
       
       if(option == 1){
         
-        res1 <- option1(ds, sds)
+        res1 <- option1(ds, sds, r = r)
         
         del1 <- c(Mean.dint.del1 = res1[1], SD.dint.del1 = res1[2])
       }
@@ -2751,7 +2750,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        res1 <- option2(d2, sd2)
+        res1 <- option2(d2, sd2, r = r)
         
         del11 <- c(res1[1], res1[2])
         
@@ -2759,7 +2758,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res1 <- option1(d2, sd2)
+        res1 <- option1(d2, sd2, r = r)
         
         del11 <- c(res1[1], res1[2])
       }
@@ -2780,7 +2779,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        res2 <- option2(d2..2, sd2..2)
+        res2 <- option2(d2..2, sd2..2, r = r)
         
         del12 <- c(res2[1], res2[2])
         
@@ -2788,7 +2787,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res2 <- option1(d2..2, sd2..2)
+        res2 <- option1(d2..2, sd2..2, r = r)
         
         del12 <- c(res2[1], res2[2])
         
@@ -2812,7 +2811,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        res3 <- option2(d2..3, sd2..3)
+        res3 <- option2(d2..3, sd2..3, r = r)
         
         del13 <- c(res3[1], res3[2])
         
@@ -2820,7 +2819,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res3 <- option1(d2..3, sd2..3)
+        res3 <- option1(d2..3, sd2..3, r = r)
         
         del13 <- c(res3[1], res3[2])
       }
@@ -2842,7 +2841,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        res4 <- option2(d2..4, sd2..4)
+        res4 <- option2(d2..4, sd2..4, r = r)
         
         del14 <- c(res4[1], res4[2])
         
@@ -2850,10 +2849,11 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res4 <- option1(d2..4, sd2..4)
+        res4 <- option1(d2..4, sd2..4, r = r)
         
         del14 <- c(res4[1], res4[2])
       }
+      
       if(option == 3){
       res4 <- bayesmeta(                    y = d2..4,
                                             sigma = sd2..4,
@@ -2880,7 +2880,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
 
       if(option == 2){
         
-        resi1 <- option2(ds, sds)
+        resi1 <- option2(ds, sds, r = r)
         
         del1 <- c(Mean.dint.del1 = resi1[1], SD.dint.del1 = resi1[2])
         
@@ -2888,7 +2888,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        resi1 <- option1(ds, sds)
+        resi1 <- option1(ds, sds, r = r)
         
         del1 <- c(Mean.dint.del1 = resi1[1], SD.dint.del1 = resi1[2])
       } 
@@ -2913,7 +2913,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
  
       if(option == 2){
         
-        resi1 <- option2(ds, sds)
+        resi1 <- option2(ds, sds, r = r)
         
         del1 <- c(Mean.dint.del1 = resi1[1], SD.dint.del1 = resi1[2])
         
@@ -2921,7 +2921,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        resi1 <- option1(ds, sds)
+        resi1 <- option1(ds, sds, r = r)
         
         del1 <- c(Mean.dint.del1 = resi1[1], SD.dint.del1 = resi1[2])
       } 
@@ -2947,7 +2947,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        resi1 <- option2(ds, sds)
+        resi1 <- option2(ds, sds, r = r)
         
         del1 <- c(Mean.dint.del1 = resi1[1], SD.dint.del1 = resi1[2])
         
@@ -2955,7 +2955,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        resi1 <- option1(ds, sds)
+        resi1 <- option1(ds, sds, r = r)
         
         del1 <- c(Mean.dint.del1 = resi1[1], SD.dint.del1 = resi1[2])
       }
@@ -2983,7 +2983,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        res1 <- option2(c(d3, d3..2), c(sd3, sd3..2))
+        res1 <- option2(c(d3, d3..2), c(sd3, sd3..2), r = r)
         
         del2  <- c(Mean.dint.del2 = res1[1], SD.dint.del2 = res1[2])
         
@@ -2991,7 +2991,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res1 <- option1(c(d3, d3..2), c(sd3, sd3..2))
+        res1 <- option1(c(d3, d3..2), c(sd3, sd3..2), r = r)
         
         del2  <- c(Mean.dint.del2 = res1[1], SD.dint.del2 = res1[2])
       }
@@ -3016,7 +3016,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        res1 <- option2(ds, sds)
+        res1 <- option2(ds, sds, r = r)
         
         del2  <- c(Mean.dint.del2 = res1[1], SD.dint.del2 = res1[2])
         
@@ -3024,7 +3024,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res1 <- option1(ds, sds)
+        res1 <- option1(ds, sds, r = r)
         
         del2  <- c(Mean.dint.del2 = res1[1], SD.dint.del2 = res1[2])
       }
@@ -3049,14 +3049,14 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 2){
         
-        res1 <- option2(ds, sds)
+        res1 <- option2(ds, sds, r = r)
         
         del2  <- c(Mean.dint.del2 = res1[1], SD.dint.del2 = res1[2])
       }
       
       if(option == 1){
         
-        res1 <- option1(ds, sds)
+        res1 <- option1(ds, sds, r = r)
         
         del2  <- c(Mean.dint.del2 = res1[1], SD.dint.del2 = res1[2])
       }
@@ -3077,14 +3077,14 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res1 <- option1(d3, sd3)
+        res1 <- option1(d3, sd3, r = r)
         
         del21 <- c(res1[1], res1[2])
       }
       
       if(option == 2){
         
-        res1 <- option2(d3, sd3)
+        res1 <- option2(d3, sd3, r = r)
         
         del21 <- c(res1[1], res1[2])
       }
@@ -3104,14 +3104,14 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res2 <- option1(d3..2, sd3..2)
+        res2 <- option1(d3..2, sd3..2, r = r)
         
         del22 <- c(res2[1], res2[2])
       }
       
       if(option == 2){
         
-        res2 <- option2(d3..2, sd3..2)
+        res2 <- option2(d3..2, sd3..2, r = r)
         
         del22 <- c(res2[1], res2[2])
       }
@@ -3132,14 +3132,14 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res3 <- option1(d3..3, sd3..3)
+        res3 <- option1(d3..3, sd3..3, r = r)
         
         del23 <- c(res3[1], res3[2])
       }
       
       if(option == 2){
         
-        res3 <- option2(d3..3, sd3..3)
+        res3 <- option2(d3..3, sd3..3, r = r)
         
         del23 <- c(res3[1], res3[2])
       }
@@ -3162,14 +3162,14 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        res4 <- option1(d3..4, sd3..4)
+        res4 <- option1(d3..4, sd3..4, r = r)
         
         del24 <- c(res4[1], res4[2])
       }
       
       if(option == 2){
         
-        res4 <- option2(d3..4, sd3..4)
+        res4 <- option2(d3..4, sd3..4, r = r)
         
         del24 <- c(res4[1], res4[2])
         
@@ -3202,14 +3202,14 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        resi1 <- option1(ds, sds)
+        resi1 <- option1(ds, sds, r = r)
         
         del2 <- c(Mean.dint.del2 = resi1[1], SD.dint.del2 = resi1[2])
       }
       
       if(option == 2){
         
-        resi1 <- option2(ds, sds)
+        resi1 <- option2(ds, sds, r = r)
         
         del2 <- c(Mean.dint.del2 = resi1[1], SD.dint.del2 = resi1[2])
         
@@ -3234,14 +3234,14 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        resi1 <- option1(ds, sds)
+        resi1 <- option1(ds, sds, r = r)
         
         del2 <- c(Mean.dint.del2 = resi1[1], SD.dint.del2 = resi1[2])
       }
       
       if(option == 2){
         
-        resi1 <- option2(ds, sds)
+        resi1 <- option2(ds, sds, r = r)
         
         del2 <- c(Mean.dint.del2 = resi1[1], SD.dint.del2 = resi1[2])
         
@@ -3267,14 +3267,14 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
       
       if(option == 1){
         
-        resi1 <- option1(ds, sds)
+        resi1 <- option1(ds, sds, r = r)
         
         del2 <- c(Mean.dint.del2 = resi1[1], SD.dint.del2 = resi1[2])
       }
       
       if(option == 2){
         
-        resi1 <- option2(ds, sds)
+        resi1 <- option2(ds, sds, r = r)
         
         del2 <- c(Mean.dint.del2 = resi1[1], SD.dint.del2 = resi1[2])
         
@@ -3299,17 +3299,17 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
   names(h) <- study.name
   
   return(h)
-}              
+}             
               
               
 #=======================================================================================================================================
 
 
-meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, long = FALSE, option = 1, n.sim = 1e5)
+meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, long = FALSE, option = 2, r = .5, n.sim = 1e5)
 {
   
   
-  j <- eval(substitute(meta.within(data = data, by = by, tau.prior = tau.prior, impute = impute, n.sim = n.sim, option = option)))
+  j <- eval(substitute(meta.within(data = data, by = by, tau.prior = tau.prior, impute = impute, n.sim = n.sim, option = option, r = r)))
   
   study.name <- names(j)
   
