@@ -93,6 +93,62 @@ cor.mat <- function(r, dim) {
   m
 }              
               
+#===============================================================================================================================
+              
+option1 <- function(ds, sds, r = .5){ 
+  
+V <- sds^2  
+ 
+m <- length(V)
+
+r <- cor.mat(r, m)
+
+SD <- sqrt((1/m)^2 * sum(sqrt(outer(V, V)) * r))
+
+D <- mean(ds)
+
+return(c(D, SD))
+}
+
+              
+#===============================================================================================================================
+              
+cov.dint <- function(sds, r = .5, no.names = TRUE){
+
+m <- length(sds) 
+
+r <- cor.mat(r, m)
+
+D <- diag(sds)
+
+m <- D%*%r%*%D
+
+if(!no.names) rownames(m) <- colnames(m) <- paste0("d", 1:length(sds))
+return(m)
+}              
+
+              
+#===============================================================================================================================
+              
+option2 <- function(d, sds, r = .8){
+    
+    d <- matrix(d)
+    
+    r <- cor.mat(r, length(d))
+    
+    e <- matrix(rep(1, length(d)))
+    
+    A <- cov.dint(sds, r)
+    
+    w <- t((solve(A)%*%e)%*%solve((t(e)%*%solve(A)%*%e)))
+
+    se <- as.vector(sqrt(solve(t(e)%*%solve(A)%*%e)))
+  
+    ave.d <- as.vector(w%*%d)
+    
+    return(c(ave.d, se))
+}              
+              
               
 #===============================================================================================================================
               
