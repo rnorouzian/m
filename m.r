@@ -3365,7 +3365,7 @@ meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)},
                                labels = names(ds), tau.prior = tau.prior)
    res$call <- match.call(expand.dots = FALSE)
    
-   return(list(Dif = res))
+   return(res)
    
  } else {
   
