@@ -3326,14 +3326,13 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
 #=======================================================================================================================================
 
 
-meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, long = FALSE, option = 2, r = .5, n.sim = 1e5)
+meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, long = FALSE, option = 2, r = .5, dif = TRUE, n.sim = 1e5)
 {
   
   
   j <- eval(substitute(meta.within(data = data, by = by, tau.prior = tau.prior, impute = impute, n.sim = n.sim, option = option, r = r)))
   
   study.name <- names(j)
-  
   
   L <- lapply(c('Mean.dint.short', 'SD.dint.short', 'Mean.dint.del1', 'SD.dint.del1', 'Mean.dint.del2',
                 'SD.dint.del2'), function(i) {V <- unlist(sapply(j, `[[`, i)); V[!is.na(V)]})
@@ -3347,6 +3346,28 @@ meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)},
   
   if(all(!test)) stop("Insufficient studies to meta-analyze either 'short-' or 'long-term' effects.", call. = FALSE)
   
+  
+ if(dif){
+   
+   ds <- one.rm(ds)
+   sds <- one.rm(sds)
+   
+   out <- aggregate(values ~ ind, do.call(rbind, lapply(ds[intersect(seq_along(ds), 2:3)], stack)), mean)
+   Ds <- list(ds[[1]], setNames(out$values, out$ind))
+   ds <- Ds[[1]] - Ds[[2]]
+   
+   out <- aggregate(values ~ ind, do.call(rbind, lapply(sds[intersect(seq_along(sds), 2:3)], stack)), opt1, r = r)
+   Sds <- list(sds[[1]], setNames(out$values, out$ind))
+   sds <- sdif(sdpre = Sds[[1]], sdpos = Sds[[2]], r = r)
+   
+   res <- bayesmeta(                y = ds,
+                                sigma = sds,
+                               labels = names(ds), tau.prior = tau.prior)
+   res$call <- match.call(expand.dots = FALSE)
+   
+   return(list(Dif = res))
+   
+ } else {
   
   if(test[1]) { result1 <- bayesmeta(     y = ds[[1]],
                                           sigma = sds[[1]],
@@ -3396,7 +3417,8 @@ meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)},
     if(!test[1] & test[2] & !test[3]) return(list(DEL1 = result2))
     if(!test[1] & !test[2] & test[3]) return(list(DEL2 = result3))
     if(!test[1] & test[2] & test[3]) return(list(DEL1 = result2, DEL2 = result3))
-  }             
+     }             
+   }                  
 }                  
                   
                   
