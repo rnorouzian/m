@@ -345,11 +345,63 @@ opt1 <- function(sds, r = .5){
 
 #===============================================================================================================================
              
+             
+denscurve <- function(..., adjust = 1, na.rm = TRUE, n = 1e4, hdi = FALSE, level = .95, xlab = "x", ylim = NA, xlim = NA, labels = NA, bottom = 1, top = 1, scale = 1){
+  
+  L <- if(all(sapply(list(...), inherits, "data.frame"))) as.list(...) else list(...)
+  lab <- if(all(sapply(list(...), inherits, "data.frame"))) names(L) else substitute(...())
+
+  if(all(sapply(list(...), inherits, "bayesmeta"))) lab <- L[[1]]$labels
+  
+  L <- if(all(sapply(list(...), inherits, "bayesmeta"))) lapply(lapply(1:L[[1]]$k, function(x) L[[1]]$rposterior(1e4, tau.sample = F, ind = x)), as.vector)
+  
+  loop <- length(L)
+  soop <- seq_len(loop)
+  
+  a <- lapply(L, function(x) density(x, adjust = adjust, na.rm = na.rm, n = n))
+  
+  from <- numeric(loop)
+  to <- numeric(loop)
+  hi <- numeric(loop)
+  if(hdi) CI <- matrix(NA, loop, 2)
+  mode <- numeric(loop)
+  
+  for(i in soop){
+    from[i] <- min(a[[i]]$x)
+    to[i] <- max(a[[i]]$x)
+    hi[i] <- max(a[[i]]$y)
+    if(hdi) CI[i,] <- hdir(L[[i]], level = level)
+    mode[i] <- a[[i]]$x[which.max(a[[i]]$y)]
+  }
+  
+  f = hi + soop
+  m = scale*hi + soop
+  
+  plot(rep(soop, 2), rep(soop, 2), type = "n", xlim = if(is.na(xlim)) c(min(from), max(to)) else xlim, ylim = if(is.na(ylim)) c(bottom*1, top*max(f)) else ylim, ylab = NA, yaxt = "n", xlab = xlab, mgp = c(2, .3, 0))
+  axis(2, at = soop, labels = if(is.na(labels)) lab else labels, font = 2, las = 1, cex.axis = .8, tck = -.012, mgp = c(2, .3, 0), padj = rep(.35, loop))
+  abline(h = soop, col = 8, lty = 3)
+  
+  for(i in soop){
+    polygon(x = a[[i]]$x, y = scale*a[[i]]$y +i, col = adjustcolor(i, .4), border = NA, xpd = NA)
+  }
+  
+  if(hdi){   
+    segments(CI[, 1], soop, CI[, 2], soop, lend = 1, lwd = 4, col = soop, xpd = NA)                            
+    segments(mode, soop, mode, m, lty = 3, xpd = NA, lend = 1)  
+    points(mode, soop, pch = 21, bg = "cyan", cex = 1.3, col = "magenta", xpd = NA)
+    I = decimal(CI, 2); o = decimal(mode, 2)
+    text(c(CI[,1], o, CI[,2]), soop, c(I[,1], o, I[,2]), pos = 3, font = 2, cex = .8, xpd = NA)
+  }  
+  return(invisible(a))
+}             
+             
+#===============================================================================================================================
+             
 one.rm <- function(List){
   
 nms <- unlist(lapply(List, names))  
 keep <- nms[duplicated(nms)]
-lapply(List, function(x) x[names(x) %in% keep] )
+lapply(List, function(x) x[names(x) %in% keep])
 
 }             
              
