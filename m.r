@@ -2272,9 +2272,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
   L <- eval(substitute(dint(data = data, by = by, impute = impute, n.sim = n.sim)))
   
   study.name <- names(L)
-  
-  
-  
+
   G <- function(m, tau.prior)
   {
     
