@@ -404,7 +404,27 @@ keep <- nms[duplicated(nms)]
 lapply(List, function(x) x[names(x) %in% keep])
 
 }             
-             
+
+#===============================================================================================================================
+       
+comb.dif.mean <- function(List, na.rm = TRUE){
+
+pt <- unlist(List[2:3])
+List[[2]] <- tapply(pt, names(pt), FUN = mean, na.rm = na.rm)
+List[[3]] <- NULL
+List[[1]] - List[[2]]
+}       
+
+#===============================================================================================================================
+       
+comb.dif.sd <- function(List, r = .5){
+  
+  pt <- unlist(List[2:3])
+  List[[2]] <- tapply(pt, names(pt), FUN = opt1, r = r)
+  List[[3]] <- NULL
+  sdif(sdpre = List[[1]], sdpos = List[[2]], r = r)
+}       
+       
 #===============================================================================================================================              
 
 convolve <- function(dens1, dens2,
@@ -3380,8 +3400,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
 
 meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, long = FALSE, option = 2, r = .5, dif = TRUE, n.sim = 1e5)
 {
-  
-  
+   
   j <- eval(substitute(meta.within(data = data, by = by, tau.prior = tau.prior, impute = impute, n.sim = n.sim, option = option, r = r)))
   
   study.name <- names(j)
@@ -3403,14 +3422,8 @@ meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)},
    
    ds <- one.rm(ds)
    sds <- one.rm(sds)
-   
-   out <- aggregate(values ~ ind, do.call(rbind, lapply(ds[intersect(seq_along(ds), 2:3)], stack)), mean)
-   Ds <- list(ds[[1]], setNames(out$values, out$ind))
-   ds <- Ds[[1]] - Ds[[2]]
-   
-   out <- aggregate(values ~ ind, do.call(rbind, lapply(sds[intersect(seq_along(sds), 2:3)], stack)), opt1, r = r)
-   Sds <- list(sds[[1]], setNames(out$values, out$ind))
-   sds <- sdif(sdpre = Sds[[1]], sdpos = Sds[[2]], r = r)
+   ds <- comb.dif.mean(ds)
+   sds <- comb.dif.sd(sds, r = r)
    
    res <- bayesmeta(                y = ds,
                                 sigma = sds,
