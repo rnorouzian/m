@@ -344,6 +344,23 @@ opt1 <- function(sds, r = .5){
 }
 
 #===============================================================================================================================
+ 
+hdir <- function(sample, level = .95){
+  
+  if(1 <= level || level <= 0) stop("Error: 'level' must be between '0' and '1'.")
+  sorted <- sort(sample)
+  index <- ceiling(level*length(sorted))
+  n <- length(sorted)- index
+  width <- numeric(n)
+  for(i in 1:n){
+    width[i] <- sorted[i+ index]- sorted[i]
+  }
+  lower <- sorted[which.min(width)]
+  upper <- sorted[which.min(width)+ index]
+  return(c(lower, upper))
+}
+             
+#===============================================================================================================================
              
              
 denscurve <- function(..., adjust = 1, na.rm = TRUE, n = 1e4, hdi = FALSE, level = .95, xlab = "x", ylim = NA, xlim = NA, labels = NA, bottom = 1, top = 1, scale = 1){
