@@ -83,6 +83,47 @@ reget <- function(List, what){
   if(length(res) == 0) NULL else res
 }
 
+              
+#===============================================================================================================================
+              
+get.uni <- function(data, what){
+
+  m <- split(data, data$study.name)
+  m[[1]] <- NULL
+  
+G <- substitute(what)
+E <- quote(x$x)
+E[[3]] <- G[[2]]
+G[[2]] <- E
+
+f <- sapply(m, function(x) sum(eval(G)) == nrow(x))
+
+h <- m[names(f)[f]]
+
+res <- Filter(NROW, h)
+
+if(length(res) == 0) NULL else res
+}
+
+
+#===============================================================================================================================
+            
+            
+get.gen <- function(data, what){
+  
+  s <- substitute(what)  
+  
+  m <- split(data, data$study.name)
+  m[[1]] <- NULL
+  
+  h <- lapply(m, function(x) do.call("subset", list(x, s)))
+  
+  res <- Filter(NROW, h)
+  
+  if(length(res) == 0) NULL else res
+}
+              
+              
 #===============================================================================================================================
               
               
