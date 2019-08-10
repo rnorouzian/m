@@ -3459,7 +3459,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
 #=======================================================================================================================================
 
 
-meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, long = FALSE, option = 2, r = .5, dif = FALSE, n.sim = 1e5)
+meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, long = FALSE, option = 2, r = .5, dif = TRUE, n.sim = 1e5)
 {
    
   j <- eval(substitute(meta.within(data = data, by = by, tau.prior = tau.prior, impute = impute, n.sim = n.sim, option = option, r = r)))
