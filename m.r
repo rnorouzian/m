@@ -389,7 +389,7 @@ opt1 <- function(sds, r = .5){
 
 #===============================================================================================================================
  
-hdir <- function(sample, level = .95){
+hdir <- function(sample, level = .95, digits = 1e2){
   
   if(1 <= level || level <= 0) stop("Error: 'level' must be between '0' and '1'.")
   sorted <- sort(sample)
@@ -401,7 +401,7 @@ hdir <- function(sample, level = .95){
   }
   lower <- sorted[which.min(width)]
   upper <- sorted[which.min(width)+ index]
-  return(c(lower, upper))
+  return(round(c(lower, upper), digits))
 }
              
 #===============================================================================================================================
