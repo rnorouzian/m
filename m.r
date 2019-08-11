@@ -407,14 +407,11 @@ hdir <- function(sample, level = .95, digits = 1e2){
 #===============================================================================================================================
              
              
-denscurve <- function(..., adjust = 1, na.rm = TRUE, n = 1e4, hdi = FALSE, level = .95, xlab = "x", ylim = NA, xlim = NA, labels = NA, bottom = 1, top = 1, scale = 1){
+study.plot <- function(fit, adjust = 1, na.rm = TRUE, n = 1e4, hdi = FALSE, level = .95, xlab = "dint (short-long)", ylim = NA, xlim = NA, labels = NA, bottom = 1, top = 1, scale = 1){
   
-  L <- if(all(sapply(list(...), inherits, "data.frame"))) as.list(...) else list(...)
-  lab <- if(all(sapply(list(...), inherits, "data.frame"))) names(L) else substitute(...())
-
-  if(all(sapply(list(...), inherits, "bayesmeta"))) lab <- L[[1]]$labels
+  lab <- fit$labels
   
-  L <- if(all(sapply(list(...), inherits, "bayesmeta"))) lapply(lapply(1:L[[1]]$k, function(x) L[[1]]$rposterior(1e4, tau.sample = F, ind = x)), as.vector)
+  L <- lapply(1:fit$k, function(x) fit$rposterior(1e4, tau.sample = FALSE, ind = x))
   
   loop <- length(L)
   soop <- seq_len(loop)
@@ -449,7 +446,7 @@ denscurve <- function(..., adjust = 1, na.rm = TRUE, n = 1e4, hdi = FALSE, level
   if(hdi){   
     segments(CI[, 1], soop, CI[, 2], soop, lend = 1, lwd = 4, col = soop, xpd = NA)                            
     segments(mode, soop, mode, m, lty = 3, xpd = NA, lend = 1)  
-    points(mode, soop, pch = 21, bg = "cyan", cex = 1.3, col = "magenta", xpd = NA)
+    points(mode, soop, pch = 22, bg = "cyan", cex = 1.3, col = "magenta", xpd = NA)
     I = decimal(CI, 2); o = decimal(mode, 2)
     text(c(CI[,1], o, CI[,2]), soop, c(I[,1], o, I[,2]), pos = 3, font = 2, cex = .8, xpd = NA)
   }  
