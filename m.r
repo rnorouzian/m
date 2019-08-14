@@ -3544,7 +3544,45 @@ meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)},
    }                  
 }                  
                   
-                  
+#===============================================================================================================================
+          
+                 
+meta.robust <- function(f = NULL, data){
+
+g <- dint(data)
+
+L <- setNames(lapply(1:length(g), 
+                     function(i) 
+                       Filter(Negate(is.null), 
+                              g[[i]])), names(g))
+
+d <- do.call(rbind, Map(cbind, lapply(L, function(i) 
+                                          do.call(rbind, Map(cbind, i, 
+                                          es.type = sub("\\.+\\d+$", "", 
+                                          names(i))))), id = seq_along(L)))
+
+ar <- head(formalArgs(d.prepos), -1)
+
+mod.names <- names(data)[!names(data) %in% ar]
+
+mods <- subset(data[order(data$study.name), ], !control, select = mod.names) #pre <- data[order(data$study.name), ]
+
+d <- cbind(d, mods)                                                          #na.omit(pre[!pre$control, mod.names])
+
+mods <- if(is.null(f)) { formula(~es.type) } else {
+
+f[[2]] <- f[[3]]
+f[[3]] <- NULL
+
+update(f, ~es.type +.)
+}
+
+res <- metafor::robust(rma.uni(yi = dint, sei = SD, data = d, mods = mods), cluster = d$id)
+
+return(res)
+}                 
+    
+                                      
 #===============================================================================================================================
                
 need <- c("bayesmeta", "distr", "zoo") 
