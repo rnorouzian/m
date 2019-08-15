@@ -3565,10 +3565,10 @@ ar <- head(formalArgs(d.prepos), -1)
 
 mod.names <- names(data)[!names(data) %in% ar]
 
-mods <- subset(data[order(data$study.name), ], !control, select = mod.names) #pre <- data[order(data$study.name), ]
+mods <- subset(data[order(data$study.name), ], !control, select = mod.names) #pre <- data[order(data$study.name), ]  #na.omit(pre[!pre$control, mod.names])
 
-d <- cbind(d, mods)                                                          #na.omit(pre[!pre$control, mod.names])
-
+d <- cbind(study.name = gsub("\\.[0-9]$", "", rownames(d)), d, mods)
+                                      
 mods <- if(is.null(f)) { formula(~es.type) } else {
 
 f[[2]] <- f[[3]]
@@ -3577,7 +3577,7 @@ f[[3]] <- NULL
 update(f, ~es.type +.)
 }
 
-res <- metafor::robust(rma.uni(yi = dint, sei = SD, data = d, mods = mods), cluster = d$id)
+res <- metafor::robust(rma.uni(yi = dint, sei = SD, data = d, mods = mods, slab = d$study.name), cluster = d$id)
 
 return(res)
 }                 
