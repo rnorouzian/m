@@ -3568,6 +3568,7 @@ mod.names <- names(data)[!names(data) %in% ar]
 mods <- subset(data[order(data$study.name), ], !control, select = mod.names) #pre <- data[order(data$study.name), ]  #na.omit(pre[!pre$control, mod.names])
 
 d <- cbind(study.name = gsub("\\.[0-9]$", "", rownames(d)), d, mods)
+rownames(d) <- NULL                                      
                                       
 mods <- if(is.null(f)) { formula(~es.type) } else {
 
