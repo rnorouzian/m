@@ -3547,7 +3547,7 @@ meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)},
 #===============================================================================================================================
           
                  
-meta.robust <- function(f = NULL, data){
+meta.robust <- function(f = NULL, data, small = TRUE){
 
 g <- dint(data)
 
@@ -3578,7 +3578,7 @@ f[[3]] <- NULL
 update(f, ~es.type +.)
 }
 
-res <- metafor::robust(rma.uni(yi = dint, sei = SD, data = d, mods = mods, slab = d$study.name), cluster = d$id)
+res <- metafor::robust(rma.uni(yi = dint, sei = SD, data = d, mods = mods, slab = d$study.name), cluster = d$id, adjust = small)
 
 return(res)
 }                 
