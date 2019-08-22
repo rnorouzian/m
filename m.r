@@ -3491,7 +3491,7 @@ meta.within <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}
 #=======================================================================================================================================
 
 
-meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, long = FALSE, option = 2, r = .5, dif = TRUE, n.sim = 1e5)
+meta.bayesii <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, long = FALSE, option = 2, r = .5, dif = TRUE, n.sim = 1e5)
 {
    
   j <- eval(substitute(meta.within(data = data, by = by, tau.prior = tau.prior, impute = impute, n.sim = n.sim, option = option, r = r)))
@@ -3578,7 +3578,121 @@ meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)},
      }             
    }                  
 }                  
-                  
+
+                 
+#===============================================================================================================================
+                 
+                 
+meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, long = FALSE, option = 2, r = .5, dif = TRUE, n.sim = 1e5, time = TRUE)
+{
+  
+  j <- eval(substitute(meta.within(data = data, by = by, tau.prior = tau.prior, impute = impute, n.sim = n.sim, option = option, r = r)))
+  
+  study.name <- names(j)
+  
+  L <- lapply(c('Mean.dint.short', 'SD.dint.short', 'Mean.dint.del1', 'SD.dint.del1', 'Mean.dint.del2',
+                'SD.dint.del2'), function(i) {V <- unlist(sapply(j, `[[`, i)); V[!is.na(V)]})
+  
+  d <- list(L[[1]], L[[3]], L[[5]])
+  
+  ds <- Filter(NROW, d)
+  sds <- Filter(NROW, list(L[[2]], L[[4]], L[[6]]))
+  
+  test <- sapply(d, function(x) length(x) >= 2)
+  
+  if(all(!test)) stop("Insufficient studies to meta-analyze either 'short-' or 'long-term' effects.", call. = FALSE)
+  
+  
+if(time){
+    
+  pt <- unlist(ds)
+  ds <- tapply(pt, names(pt), FUN = mean)
+  
+  pt <- unlist(sds)
+  sds <- tapply(pt, names(pt), FUN = opt1, r = r)
+  
+  
+    res <- bayesmeta(                y = ds,
+                                 sigma = sds,
+                                labels = names(ds), tau.prior = tau.prior)
+    res$call <- match.call(expand.dots = FALSE)
+    
+    return(res)
+}
+  
+  
+if(!time){  
+  
+  if(dif){
+    
+    ds <- one.rm(ds)
+    sds <- one.rm(sds)
+    ds <- comb.dif.mean(ds)
+    sds <- comb.dif.sd(sds, r = r)
+    
+    res <- bayesmeta(                y = ds,
+                                 sigma = sds,
+                                labels = names(ds), tau.prior = tau.prior)
+    res$call <- match.call(expand.dots = FALSE)
+    
+    return(res)
+    
+  } else {
+    
+    if(test[1]) { result1 <- bayesmeta(          y = ds[[1]],
+                                             sigma = sds[[1]],
+                                            labels = names(ds[[1]]), tau.prior = tau.prior)
+            result1$call <- match.call(expand.dots = FALSE)
+    } 
+    
+    
+    if(test[2]) { result2 <- bayesmeta(          y = ds[[2]],
+                                             sigma = sds[[2]],
+                                            labels = names(ds[[2]]), tau.prior = tau.prior)
+    result2$call <- match.call(expand.dots = FALSE)
+    }  
+    
+    
+    if(test[3]) { result3 <- bayesmeta(     y = ds[[3]],
+                                            sigma = sds[[3]],
+                                            labels = names(ds[[3]]), tau.prior = tau.prior)
+    result3$call <- match.call(expand.dots = FALSE)
+    }  
+    
+    
+    if(test[2] & test[3] & long){
+      
+      ddelys <- c(result2$summary["mean","mu"], result3$summary["mean","mu"])
+      sdelys <- c(result2$summary["sd","mu"], result3$summary["sd","mu"])
+      
+      result4 <- bayesmeta(      y = ddelys,
+                                 sigma = sdelys,
+                                 labels = c("Delay1", "Delay2"), tau.prior = tau.prior)
+      result4$call <- match.call(expand.dots = FALSE)
+      
+      if(test[1])return(list(SHORT = result1, LONG = result4))
+      if(!test[1])return(list(LONG = result4))
+    }
+    
+    if(!test[1]) message("NOTE: No or insufficient studies to meta-analyze 'short-term' effects.")
+    if(!test[2]) message("NOTE: No or insufficient studies to meta-analyze 'delayed 1' effects.")
+    if(!test[3]) message("NOTE: No or insufficient studies to meta-analyze 'delayed 2' effects.")
+    
+    
+    if(!long || long & !test[2] || long & !test[3]){ 
+      
+      if(all(test)) return(list(SHORT = result1, DEL1 = result2, DEL2 = result3))
+      if(test[1] & test[2] & !test[3]) return(list(SHORT = result1, DEL1 = result2))
+      if(test[1] & !test[2] & !test[3]) return(list(SHORT = result1))
+      if(!test[1] & test[2] & !test[3]) return(list(DEL1 = result2))
+      if(!test[1] & !test[2] & test[3]) return(list(DEL2 = result3))
+      if(!test[1] & test[2] & test[3]) return(list(DEL1 = result2, DEL2 = result3))
+      }             
+    }
+  }
+}                  
+                 
+                 
 #===============================================================================================================================
           
                  
