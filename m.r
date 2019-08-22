@@ -797,6 +797,10 @@ d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA
   
   if(missing(control) || missing(post) || missing(outcome)) stop("'post', 'outcome' and/or 'control' missing in the EXCEL sheet.", call. = FALSE)
   
+  rev.sign <- ifelse(is.na(rev.sign), FALSE, rev.sign)
+  rev.group <- ifelse(is.na(rev.group), FALSE, rev.group)
+  autoreg <- ifelse(is.na(autoreg), FALSE, autoreg)
+  
   r <- ifelse(autoreg == TRUE, autoreg(max(post, na.rm = TRUE), r)[,1][-1][post], r)
   
   n <- ifelse(!is.na(n), n, ifelse(is.na(n) & !is.na(df), df + 1, NA))
@@ -816,6 +820,7 @@ d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA
   
   return(out) 
 }
+
        
        
 #================================================================================================================================
