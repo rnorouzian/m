@@ -1,4 +1,4 @@
-study.name,group.name,n,d,t.pair,df,mdif,sdif,mpre,sdpre,mpos,sdpos,r,rev.sign,rev.group,autoreg,post,control,outcome,ESL,prof,scope,type
+study.name,group.name,n,d,t.pair,df,mdif,sdif,mpre,sdpre,mpos,sdpos,r,rev.sign,rev.group,autoreg,post,control,outcome,ESL,prof,scope,type,stder
 Shin.Ellis,ME.short,13,NA,NA,NA,NA,NA,0.34,0.37,0.72,0.34,NA,FALSE,FALSE,FALSE,1,FALSE,1,1,2,1,1
 Shin.Ellis,ME.long,13,NA,NA,NA,NA,NA,0.34,0.37,0.39,0.36,NA,FALSE,FALSE,FALSE,2,FALSE,1,1,2,1,1
 Shin.Ellis,DCF.short,15,NA,NA,NA,NA,NA,0.37,0.38,0.54,0.36,NA,FALSE,FALSE,FALSE,1,FALSE,1,1,2,1,2
