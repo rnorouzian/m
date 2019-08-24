@@ -407,7 +407,7 @@ hdir <- function(sample, level = .95, digits = 1e2){
 #===============================================================================================================================
              
              
-study.plot <- function(fit, adjust = 1, na.rm = TRUE, n = 1e4, hdi = FALSE, level = .95, xlab = "dint (short-long)", ylim = NA, xlim = NA, labels = NA, bottom = 1, top = 1, scale = 1){
+study.plot <- function(fit, adjust = 1, na.rm = TRUE, n = 1e4, hdi = TRUE, level = .95, xlab = "dint (short-long)", ylim = NA, xlim = NA, labels = NA, bottom = 1, top = 1, scale = 1){
   
   lab <- fit$labels
   
