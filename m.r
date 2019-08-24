@@ -178,6 +178,8 @@ option2 <- function(d, sds, r = .5){
     
     d <- matrix(d)
     
+    if(length(d) == 1) { return(c(d, sds)) }
+    
     r <- cor.mat(r, length(d))
     
     e <- matrix(rep(1, length(d)))
