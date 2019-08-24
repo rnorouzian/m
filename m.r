@@ -800,7 +800,8 @@ d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA
   rev.sign <- ifelse(is.na(rev.sign), FALSE, rev.sign)
   rev.group <- ifelse(is.na(rev.group), FALSE, rev.group)
   autoreg <- ifelse(is.na(autoreg), FALSE, autoreg)
-  
+  control <- ifelse(is.na(control), FALSE, control)
+    
   r <- ifelse(autoreg == TRUE, autoreg(max(post, na.rm = TRUE), r)[,1][-1][post], r)
   
   n <- ifelse(!is.na(n), n, ifelse(is.na(n) & !is.na(df), df + 1, NA))
