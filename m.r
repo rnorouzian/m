@@ -459,10 +459,10 @@ study.plot <- function(fit, adjust = 1, na.rm = TRUE, n = 1e4, hdi = TRUE, level
              
 one.rm <- function(List){
   
-nms <- unlist(lapply(List, names))  
-keep <- nms[duplicated(nms)]
-lapply(List, function(x) x[names(x) %in% keep])
-
+  nms <- unlist(lapply(List, names))  
+  keep <- nms[duplicated(nms)]
+  res <- lapply(List, function(x) x[names(x) %in% keep])
+  Filter(NROW, res)
 }             
 
 #===============================================================================================================================
