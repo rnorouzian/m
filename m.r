@@ -3589,7 +3589,7 @@ meta.bayesii <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)
 meta.bayesiii <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, long = FALSE, option = 2, r = .5, dif = TRUE, n.sim = 1e5, time = TRUE)
 {
   
-  j <- eval(substitute(meta.within(data = data, by = by, tau.prior = tau.prior, impute = impute, n.sim = n.sim, option = option, r = r)))
+  j <- eval(substitute(meta.withiniii(data = data, by = by, tau.prior = tau.prior, impute = impute, n.sim = n.sim, option = option, r = r)))
   
   study.name <- names(j)
   
