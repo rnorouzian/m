@@ -3761,6 +3761,60 @@ group.mean <- function (var, grp)
   var <- as.numeric(var)
   return(tapply(var, grp, mean, na.rm = TRUE)[grp])
 }                                      
+
+#===============================================================================================================================
+          
+                                      
+kappa <- function (x, weights = c("eq.space", "fleiss.cohen"), level = .95)
+{
+  if (is.character(weights))
+    weights <- match.arg(weights)
+  
+  d  <- diag(x)
+  n  <- sum(x)
+  nc <- ncol(x)
+  colFreqs <- colSums(x)/n
+  rowFreqs <- rowSums(x)/n
+  
+  kappa <- function (po, pc)
+    (po - pc) / (1 - pc)
+  std  <- function (p, pc, kw, W = diag(1, ncol = nc, nrow = nc)) {
+    sqrt((sum(p * sweep(sweep(W, 1, W %*% colSums(p) * (1 - kw)), 2, W %*% rowSums(p) * (1 - kw)) ^ 2) - (kw - pc * (1 - kw)) ^ 2) / crossprod(1 - pc) / n)
+  }
+  
+  po <- sum(d) / n
+  pc <- crossprod(colFreqs, rowFreqs)[1]
+  k <- kappa(po, pc)
+  s <- std(x / n, pc, k)
+  
+  W <- if (is.matrix(weights))
+    weights
+  else if (weights == "eq.space")
+    1 - abs(outer(1:nc, 1:nc, "-")) / (nc - 1)
+  else
+    1 - (abs(outer(1:nc, 1:nc, "-")) / (nc - 1))^2
+  pow <- sum(W * x) / n
+  pcw <- sum(W * colFreqs %o% rowFreqs)
+  kw <- kappa(pow, pcw)
+  sw <- std(x / n, pcw, kw, W)
+  
+  p <- (1 + level) / 2
+  q <- qnorm(p)
+  
+list(Unweighted = c(
+    KAPPA = k,
+    lower = k - q*s,
+    upper = k + q*s
+  ),
+  Weighted = c(
+    KAPPA = kw,
+    lower = kw - q*sw,
+    upper = kw + q*sw
+  ),
+  Weights = W
+  )  
+}                                      
+                                      
                                       
 #===============================================================================================================================
                
