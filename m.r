@@ -3763,9 +3763,8 @@ group.mean <- function (var, grp)
 }                                      
 
 #===============================================================================================================================
-          
-                                      
-kappa <- function (x, weights = c("eq.space", "fleiss.cohen"), level = .95)
+
+kap <- function (x, weights = c("eq.space", "fleiss.cohen"), level)
 {
   if (is.character(weights))
     weights <- match.arg(weights)
@@ -3801,20 +3800,28 @@ kappa <- function (x, weights = c("eq.space", "fleiss.cohen"), level = .95)
   p <- (1 + level) / 2
   q <- qnorm(p)
   
-list(Unweighted = c(
+return(c(
     KAPPA = k,
     lower = k - q*s,
-    upper = k + q*s
-  ),
-  Weighted = c(
-    KAPPA = kw,
-    lower = kw - q*sw,
-    upper = kw + q*sw
-  ),
-  Weights = W
-  )  
-}                                      
+    upper = k + q*s,
+    conf.level = level))
+}                                     
+  
+#===============================================================================================================================                                      
                                       
+kappa <- function(X, Y, weights = c("eq.space", "fleiss.cohen"), level = .95, raw.sheet = TRUE){
+ 
+if(raw.sheet){
+  
+  ar <- head(formalArgs(d.prepos), -1)
+  dot.names <- names(X)[!names(X) %in% ar]
+  X <- X[dot.names]
+}
+
+L <- Map(table, X, Y[names(X)])
+
+lapply(L, kap, weights = weights, level = level)
+}    
                                       
 #===============================================================================================================================
                
