@@ -3764,10 +3764,8 @@ group.mean <- function (var, grp)
 
 #===============================================================================================================================
 
-kap <- function (x, weights = c("eq.space", "fleiss.cohen"), level)
+kap <- function (x, level = .95)
 {
-  if (is.character(weights))
-    weights <- match.arg(weights)
   
   d  <- diag(x)
   n  <- sum(x)
@@ -3786,41 +3784,30 @@ kap <- function (x, weights = c("eq.space", "fleiss.cohen"), level)
   k <- kappa(po, pc)
   s <- std(x / n, pc, k)
   
-  W <- if (is.matrix(weights))
-    weights
-  else if (weights == "eq.space")
-    1 - abs(outer(1:nc, 1:nc, "-")) / (nc - 1)
-  else
-    1 - (abs(outer(1:nc, 1:nc, "-")) / (nc - 1))^2
-  pow <- sum(W * x) / n
-  pcw <- sum(W * colFreqs %o% rowFreqs)
-  kw <- kappa(pow, pcw)
-  sw <- std(x / n, pcw, kw, W)
-  
   p <- (1 + level) / 2
   q <- qnorm(p)
   
-return(c(
+  return(c(
     KAPPA = k,
     lower = k - q*s,
     upper = k + q*s,
     conf.level = level))
-}                                     
+}                                                  
   
 #===============================================================================================================================                                      
                                       
-kappa <- function(X, Y, weights = c("eq.space", "fleiss.cohen"), level = .95, raw.sheet = TRUE){
- 
-if(raw.sheet){
+kappa <- function(X, Y, level = .95, raw.sheet = TRUE){
   
-  ar <- head(formalArgs(d.prepos), -1)
-  dot.names <- names(X)[!names(X) %in% ar]
-  X <- X[dot.names]
-}
-
-L <- Map(table, X, Y[names(X)])
-
-lapply(L, kap, weights = weights, level = level)
+  if(raw.sheet){
+    
+    ar <- head(formalArgs(d.prepos), -1)
+    dot.names <- names(X)[!names(X) %in% ar]
+    X <- X[dot.names]
+  }
+  
+  L <- Map(table, X, Y[names(X)])
+  
+  lapply(L, kap, level = level)
 }    
                                       
 #===============================================================================================================================
