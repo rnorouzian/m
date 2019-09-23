@@ -3773,8 +3773,8 @@ kap <- function (x, level = .95)
   colFreqs <- colSums(x)/n
   rowFreqs <- rowSums(x)/n
   
-  kappa <- function (po, pc)
-    (po - pc) / (1 - pc)
+  kappa <- function (po, pc) (po - pc) / (1 - pc)
+    
   std  <- function (p, pc, kw, W = diag(1, ncol = nc, nrow = nc)) {
     sqrt((sum(p * sweep(sweep(W, 1, W %*% colSums(p) * (1 - kw)), 2, W %*% rowSums(p) * (1 - kw)) ^ 2) - (kw - pc * (1 - kw)) ^ 2) / crossprod(1 - pc) / n)
   }
