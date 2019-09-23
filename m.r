@@ -3774,7 +3774,7 @@ kap <- function (x, level = .95)
   rowFreqs <- rowSums(x)/n
   
   kappa <- function (po, pc) (po - pc) / (1 - pc)
-    
+  
   std  <- function (p, pc, kw, W = diag(1, ncol = nc, nrow = nc)) {
     sqrt((sum(p * sweep(sweep(W, 1, W %*% colSums(p) * (1 - kw)), 2, W %*% rowSums(p) * (1 - kw)) ^ 2) - (kw - pc * (1 - kw)) ^ 2) / crossprod(1 - pc) / n)
   }
@@ -3784,15 +3784,16 @@ kap <- function (x, level = .95)
   k <- kappa(po, pc)
   s <- std(x / n, pc, k)
   
-  p <- (1 + level) / 2
-  q <- qnorm(p)
+  p <- (1 - level) / 2
+  q <- qnorm(c(p, 1-p))
+  ci <- k + q*s
   
   return(c(
     KAPPA = k,
-    lower = k - q*s,
-    upper = k + q*s,
+    lower = ci[1],
+    upper = ci[2],
     conf.level = level))
-}                                                  
+}                                                                             
   
 #===============================================================================================================================                                      
                                       
