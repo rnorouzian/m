@@ -3797,7 +3797,7 @@ kap <- function (x, level = .95)
   
 #===============================================================================================================================                                      
                                       
-kappa <- function(X, Y, level = .95, raw.sheet = TRUE){
+kappa <- function(X, Y, level = .95, raw.sheet = FALSE){
   
   if(raw.sheet){
     
