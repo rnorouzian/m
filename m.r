@@ -3821,13 +3821,13 @@ efa <- function(x, factors, data = NULL, covmat = NULL, n.obs = NA,
 {
   
   
+  if(is.data.frame(x) & na.action == "na.omit" || is.data.frame(x) & na.action == "na.exclude") x <- na.omit(x)
+    
   cc <- match.call(expand.dots = FALSE)
   cc[[1]] <- quote(factanal)
   fit <- eval.parent(cc)
   fit$call <- match.call(expand.dots = FALSE)
-  
-  if(is.data.frame(x) & na.action == "na.omit" || is.data.frame(x) & na.action == "na.exclude") x <- na.omit(x)
-  
+ 
   noncent <- if(is.null(data)) scale(as.data.frame(x), center = center) else scale(as.data.frame(data), center = center)
   
   Rvv_1 <- solve(fit$correlation)
