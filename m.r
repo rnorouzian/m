@@ -3819,10 +3819,6 @@ efa <- function(x, factors, data = NULL, covmat = NULL, n.obs = NA,
                 scores = c("none", "regression", "Bartlett"),
                 rotation = "varimax", control = NULL, ...)
 {
-  
-  
-  if(is.data.frame(x) & na.action == "na.omit" || is.data.frame(x) & na.action == "na.exclude") x <- na.omit(x)
-    
   cc <- match.call(expand.dots = FALSE)
   cc[[1]] <- quote(factanal)
   fit <- eval.parent(cc)
