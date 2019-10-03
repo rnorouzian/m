@@ -3896,10 +3896,10 @@ interate <- function(..., nsim = 1e3, level = .95, raw.sheet = FALSE){
     names(r[[1]])[!names(r[[1]]) %in% ar]
   }
   
-  r <- lapply(dot.names, function(x) sapply(r, `[[`, x))
+  r <- setNames(lapply(dot.names, function(x) sapply(r, `[[`, x)), dot.names)
   L <- lapply(r, na.omit)
   L <- lapply(L, function(i) table(row(i), unlist(i)))
-  setNames(lapply(L, int, nsim = nsim, level = level), dot.names)
+  lapply(L, int, nsim = nsim, level = level)
 }                                   
                                       
                                       
