@@ -3889,7 +3889,7 @@ interate <- function(..., nsim = 1e3, level = .95, raw.sheet = FALSE){
   dot.names <- if(!raw.sheet){  
     
     Reduce(intersect, lapply(r, names))
-  
+    
   } else {
     
     ar <- head(formalArgs(d.prepos), -1)
@@ -3899,11 +3899,8 @@ interate <- function(..., nsim = 1e3, level = .95, raw.sheet = FALSE){
   r <- lapply(dot.names, function(x) sapply(r, `[[`, x))
   L <- lapply(r, na.omit)
   L <- lapply(L, function(i) table(row(i), unlist(i)))
-  L <- lapply(L, int, nsim = nsim, level = level)
-  names(L) <- dot.names
-  
-  return(L)
-}                                      
+  setNames(lapply(L, int, nsim = nsim, level = level), dot.names)
+}                                   
                                       
                                       
 #===============================================================================================================================
