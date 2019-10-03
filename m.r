@@ -3837,6 +3837,74 @@ efa <- function(x, factors, data = NULL, covmat = NULL, n.obs = NA,
   return(fit)
 }                                                         
                                       
+#===============================================================================================================================
+                                      
+
+int <- function (X, nsim = 1e3, level = .95) 
+{
+
+  X2 <- X * (X - 1)
+  sumcol <- colSums(X)
+  sumrow <- rowSums(X)
+  tot <- sum(X)
+  vet <- list()
+  pij <- matrix(, nrow = nrow(X), ncol = ncol(X))
+  
+  for (i in 1:length(sumrow)) {
+    for (j in 1:length(sumcol)) {
+      pij[i, j] <- X2[i, j]/(sumrow[i] * (sumrow[i] - 1))
+    }
+  }
+  pi <- rowSums(pij)
+  p <- mean(pi)
+  pj <- sumcol/tot
+  pj2 <- pj^2
+  pe <- sum(pj2)
+  KAPPA <- (p - pe)/(1 - pe)
+  s <- (ncol(X) * p - 1)/(ncol(X) - 1)
+  s.boot <- c()
+  pi.v.boot <- replicate(nsim, pi.boot <- sample(pi, size = nrow(X), replace = TRUE))
+  p.boot <- apply(pi.v.boot, 2, mean)
+  for (i in 1:nsim) {
+    s.boot[i] <- (ncol(X) * p.boot[i] - 1)/(ncol(X) - 1)
+  }
+  p <- (1 - level) / 2
+  s.boot.ci <- quantile(s.boot, probs = c(p, 1-p), na.rm = TRUE)
+  
+  return(c(KAPPA = KAPPA, 
+           NEW.KAPPA = s, 
+           lower = s.boot.ci[[1]], 
+           upper = s.boot.ci[[2]], 
+           conf.level = level))
+}
+
+                                      
+#===============================================================================================================================
+                                      
+                                      
+interate <- function(..., nsim = 1e3, level = .95, raw.sheet = FALSE){
+  
+  r <- list(...)
+  
+  dot.names <- if(!raw.sheet){  
+    
+    Reduce(intersect, lapply(r, names))
+  
+  } else {
+    
+    ar <- head(formalArgs(d.prepos), -1)
+    names(r[[1]])[!names(r[[1]]) %in% ar]
+  }
+  
+  r <- lapply(dot.names, function(x) sapply(r, `[[`, x))
+  L <- lapply(r, na.omit)
+  L <- lapply(L, function(i) table(row(i), unlist(i)))
+  L <- lapply(L, int, nsim = nsim, level = level)
+  names(L) <- dot.names
+  
+  return(L)
+}                                      
+                                      
                                       
 #===============================================================================================================================
                
