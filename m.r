@@ -3840,9 +3840,9 @@ efa <- function(x, factors, data = NULL, covmat = NULL, n.obs = NA,
 #===============================================================================================================================
                                       
 
-int <- function (X, nsim = 1e3, level = .95) 
+int <- function (X, nsim = 1e3, level = .95, digits = 6) 
 {
-
+  
   X2 <- X * (X - 1)
   sumcol <- colSums(X)
   sumrow <- rowSums(X)
@@ -3871,24 +3871,24 @@ int <- function (X, nsim = 1e3, level = .95)
   p <- (1 - level) / 2
   s.boot.ci <- quantile(s.boot, probs = c(p, 1-p), na.rm = TRUE)
   
-  return(c(KAPPA = KAPPA, 
+  return(round(c(KAPPA = KAPPA, 
            NEW.KAPPA = s, 
            lower = s.boot.ci[[1]], 
            upper = s.boot.ci[[2]], 
-           conf.level = level))
+           conf.level = level), digits))
 }
 
                                       
 #===============================================================================================================================
                                       
                                       
-interate <- function(..., nsim = 1e3, level = .95, raw.sheet = FALSE){
+interate <- function(..., nsim = 1e3, level = .95, raw.sheet = FALSE, digits = 6){
   
   r <- list(...)
-    
+  
   if(!(all(sapply(r, function(i) class(i)[1] %in% c("data.frame", "matrix"))))) stop("Ratings must be 'data.frame' or 'matrix'.", call. = FALSE)
   if(length(r) < 2) stop("At least '2 separate data.frames or matrices' for ratings of two independent raters required.", call. = FALSE)  
-    
+  
   r <- lapply(r, as.data.frame)
   
   dot.names <- if(!raw.sheet){  
@@ -3904,8 +3904,8 @@ interate <- function(..., nsim = 1e3, level = .95, raw.sheet = FALSE){
   r <- setNames(lapply(dot.names, function(x) sapply(r, `[[`, x)), dot.names)
   L <- lapply(r, na.omit)
   L <- lapply(L, function(i) table(row(i), unlist(i)))
-  lapply(L, int, nsim = nsim, level = level)
-}                                             
+  lapply(L, int, nsim = nsim, level = level, digits = digits)
+}                                              
                                       
                                       
 #===============================================================================================================================
