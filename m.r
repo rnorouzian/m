@@ -3851,7 +3851,7 @@ if(!(class(X)[1] %in% c("data.frame", "matrix", "table"))) stop("Ratings must be
   sumcol <- colSums(X)
   sumrow <- rowSums(X)
   tot <- sum(X)
-  vet <- list()
+    
   pij <- matrix(, nrow = nrow(X), ncol = ncol(X))
   
   for (i in 1:length(sumrow)) {
