@@ -3889,9 +3889,7 @@ intercode <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   if(!(all(sapply(r, function(i) class(i)[1] %in% c("data.frame", "matrix"))))) stop("Ratings must be 'data.frame' or 'matrix'.", call. = FALSE)
   if(length(r) < 2) stop("At least '2 separate data.frames or matrices' for ratings of two independent raters required.", call. = FALSE)  
-  
-  r <- lapply(seq_along(r), function(i) r[[i]][rowSums(is.na(r[[i]])) != ncol(r[[i]]), ]) 
-  
+
   r <- lapply(r, as.data.frame)
   
   dot.names <- if(!raw.sheet){  
@@ -3904,7 +3902,8 @@ intercode <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     names(r[[1]])[!names(r[[1]]) %in% ar]
   }
   
-  r <- lapply(seq_along(r), function(i) r[[i]][dot.names])            
+  r <- lapply(seq_along(r), function(i) r[[i]][dot.names])
+  r <- lapply(seq_along(r), function(i) r[[i]][rowSums(is.na(r[[i]])) != ncol(r[[i]]), ])            
   r <- setNames(lapply(dot.names, function(x) sapply(r, `[[`, x)), dot.names)
   if(na.rm) r <- lapply(r, na.omit)
   L <- lapply(r, function(i) table(row(i), unlist(i), useNA = useNA))
