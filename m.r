@@ -3883,13 +3883,16 @@ int <- function (X, nsim = 1e3, level = .95, digits = 6)
                                       
                                       
 intercode <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, raw.sheet = FALSE, digits = 6)
-  {
+{
   
   r <- list(...) 
   
   if(!(all(sapply(r, function(i) class(i)[1] %in% c("data.frame", "matrix"))))) stop("Ratings must be 'data.frame' or 'matrix'.", call. = FALSE)
-  if(length(r) < 2) stop("At least '2 separate data.frames or matrices' for ratings of two independent raters required.", call. = FALSE)  
-
+  
+  n.raters <- length(r)
+  
+  if(n.raters < 2) stop("At least '2 separate data.frames or matrices' for ratings of two independent raters required.", call. = FALSE)  
+  
   r <- lapply(r, as.data.frame)
   
   dot.names <- if(!raw.sheet){  
@@ -3908,8 +3911,8 @@ intercode <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   if(na.rm) r <- lapply(r, na.omit)
   L <- lapply(r, function(i) table(row(i), unlist(i), useNA = useNA))
   out <- lapply(L, int, nsim = nsim, level = level, digits = digits)
-  Map(c, out, rows.compared = sapply(r, nrow))
-}                                             
+  Map(c, out, rows.compared = sapply(r, nrow), n.raters = n.raters)
+}                                                   
                                       
                                       
 #===============================================================================================================================
