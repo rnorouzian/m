@@ -3904,6 +3904,7 @@ intercode <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     names(r[[1]])[!names(r[[1]]) %in% ar]
   }
   
+  r <- lapply(seq_along(r), function(i) r[[i]][dot.names])            
   r <- setNames(lapply(dot.names, function(x) sapply(r, `[[`, x)), dot.names)
   if(na.rm) r <- lapply(r, na.omit)
   L <- lapply(r, function(i) table(row(i), unlist(i), useNA = useNA))
