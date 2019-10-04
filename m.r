@@ -3882,7 +3882,7 @@ int <- function (X, nsim = 1e3, level = .95, digits = 6)
 #===============================================================================================================================
                                       
                                       
-interate <- function(..., nsim = 1e3, level = .95, useNA = c("no", "ifany", "always"), raw.sheet = FALSE, digits = 6){
+interate <- function(..., nsim = 1e3, level = .95, useNA = c("ifany", "no", "always"), raw.sheet = FALSE, digits = 6){
   
   r <- list(...) 
     
