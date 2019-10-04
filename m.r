@@ -3885,8 +3885,9 @@ int <- function (X, nsim = 1e3, level = .95)
 interate <- function(..., nsim = 1e3, level = .95, raw.sheet = FALSE){
   
   r <- list(...)
-  
-  if(length(r) < 2) stop("At least '2 separate data.frames' for ratings of two independent raters required.", call. = FALSE)  
+    
+  if(!(all(sapply(r, function(i) class(i)[1] %in% c("data.frame", "matrix"))))) stop("Ratings must be 'data.frame' or 'matrix'.", call. = FALSE)
+  if(length(r) < 2) stop("At least '2 separate data.frames or matrices' for ratings of two independent raters required.", call. = FALSE)  
     
   r <- lapply(r, as.data.frame)
   
