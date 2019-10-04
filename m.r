@@ -3886,6 +3886,8 @@ interate <- function(..., nsim = 1e3, level = .95, raw.sheet = FALSE){
   
   r <- list(...)
   
+  r <- lapply(r, as.data.frame)
+  
   dot.names <- if(!raw.sheet){  
     
     Reduce(intersect, lapply(r, names))
@@ -3900,7 +3902,7 @@ interate <- function(..., nsim = 1e3, level = .95, raw.sheet = FALSE){
   L <- lapply(r, na.omit)
   L <- lapply(L, function(i) table(row(i), unlist(i)))
   lapply(L, int, nsim = nsim, level = level)
-}                                   
+}                                             
                                       
                                       
 #===============================================================================================================================
