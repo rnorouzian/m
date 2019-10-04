@@ -3840,8 +3840,12 @@ efa <- function(x, factors, data = NULL, covmat = NULL, n.obs = NA,
 #===============================================================================================================================
                                       
 
-int <- function (X, nsim = 1e3, level = .95, digits = 6) 
+int <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6, raw = TRUE) 
 {
+  
+if(!(class(X)[1] %in% c("data.frame", "matrix", "table"))) stop("Ratings must be 'data.frame', 'matrix', and if not raw, a 'table'.", call. = FALSE)
+    
+  if(raw) X <- table(row(X), unlist(X), useNA = useNA)
   
   X2 <- X * (X - 1)
   sumcol <- colSums(X)
@@ -3872,10 +3876,10 @@ int <- function (X, nsim = 1e3, level = .95, digits = 6)
   s.boot.ci <- quantile(s.boot, probs = c(p, 1-p), na.rm = TRUE)
   
   return(round(c(KAPPA = KAPPA, 
-           S.index = s, 
-           lower = s.boot.ci[[1]], 
-           upper = s.boot.ci[[2]], 
-           conf.level = level), digits))
+                 S.index = s, 
+                 lower = s.boot.ci[[1]], 
+                 upper = s.boot.ci[[2]], 
+                 conf.level = level), digits))
 }
 
                                       
@@ -3909,10 +3913,10 @@ intercode <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   r <- lapply(seq_along(r), function(i) r[[i]][rowSums(is.na(r[[i]])) != ncol(r[[i]]), ])            
   r <- setNames(lapply(dot.names, function(x) sapply(r, `[[`, x)), dot.names)
   if(na.rm) r <- lapply(r, na.omit)
-  L <- lapply(r, function(i) table(row(i), unlist(i), useNA = useNA))
-  out <- lapply(L, int, nsim = nsim, level = level, digits = digits)
+  #L <- lapply(r, function(i) table(row(i), unlist(i), useNA = useNA))
+  out <- lapply(r, int, nsim = nsim, level = level, digits = digits, useNA = useNA, raw = TRUE)
   Map(c, out, rows.compared = sapply(r, nrow), n.raters = n.raters)
-}                                                   
+}                                                                         
                                       
                                       
 #===============================================================================================================================
