@@ -3895,6 +3895,8 @@ int2 <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6, raw =
   X2 <- X * (X - 1)
   sumcol <- colSums(X)
   sumrow <- rowSums(X)
+  nc <- ncol(X)
+  nr <- nrow(X)
   tot <- sum(X)
   pij <- X2/(sumrow * (sumrow - 1))
   pi <- rowSums(pij)
@@ -3903,10 +3905,10 @@ int2 <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6, raw =
   pj2 <- pj^2
   pe <- sum(pj2)
   KAPPA <- (p - pe)/(1 - pe)
-  s <- (ncol(X) * p - 1)/(ncol(X) - 1)
-  pi.v.boot <- replicate(nsim, pi.boot <- sample(pi, size = nrow(X), replace = TRUE))
+  s <- (nc * p - 1)/(nc - 1)
+  pi.v.boot <- replicate(nsim, pi.boot <- sample(pi, size = nr, replace = TRUE))
   p.boot <- apply(pi.v.boot, 2, mean)
-  s.boot <- sapply(seq_len(nsim), function(i) (ncol(X) * p.boot[i] - 1)/(ncol(X) - 1))
+  s.boot <- sapply(seq_len(nsim), function(i) (nc * p.boot[i] - 1)/(nc - 1))
   
   p <- (1 - level) / 2
   s.boot.ci <- quantile(s.boot, probs = c(p, 1-p), na.rm = TRUE)
