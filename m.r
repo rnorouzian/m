@@ -3762,8 +3762,39 @@ group.mean <- function (var, grp)
   return(tapply(var, grp, mean, na.rm = TRUE)[grp])
 }                                      
 
-#===================================Inter-rater Reliability in Meta=============================================================
+#===================================Modern Inter-rater Reliability in Meta-Analysis=====================================================
 
+rm.allrowNA <- function(X) { 
+  
+  if(inherits(X, "list")){
+    
+lapply(seq_along(X), function(i) X[[i]][rowSums(is.na(X[[i]])) != ncol(X[[i]]), ])
+    
+  } else { X[rowSums(is.na(X)) != ncol(X), ] }
+}
+
+#===============================================================================================================================
+       
+rm.allcolNA <- function(X) { 
+  
+  if(inherits(X, "list")){
+    
+    lapply(seq_along(X), function(i) X[[i]][, colSums(is.na(X[[i]])) != nrow(X[[i]])])
+    
+  } else { X[, colSums(is.na(X)) != nrow(X)] }
+}
+
+#===============================================================================================================================
+           
+rm.colrowNA <- function(X){
+
+r <- rm.allrowNA(X)
+rm.allcolNA(r)  
+
+}                                      
+                                      
+#================================================================================================================================                                      
+                                      
 kap <- function (x, level = .95)
 {
   
@@ -3913,7 +3944,7 @@ intercode <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   dot.names <- com.names[!com.names %in% ar]
   
   r <- lapply(seq_along(r), function(i) r[[i]][dot.names])
-  r <- lapply(seq_along(r), function(i) r[[i]][rowSums(is.na(r[[i]])) != ncol(r[[i]]), ])            
+  r <- rm.colrowNA(r)          
   r <- setNames(lapply(dot.names, function(x) sapply(r, `[[`, x)), dot.names)
   if(na.rm) r <- lapply(r, na.omit)
   out <- lapply(r, int, nsim = nsim, level = level, digits = digits, useNA = useNA, raw = TRUE)
