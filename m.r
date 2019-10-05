@@ -3923,7 +3923,7 @@ int2 <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6, raw =
 #===============================================================================================================================
                                       
                                       
-intercode <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, raw.sheet = FALSE, digits = 6)
+intercode <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 6)
 {
   
   r <- list(...) 
@@ -3936,15 +3936,9 @@ intercode <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   r <- lapply(r, as.data.frame)
   
-  dot.names <- if(!raw.sheet){  
-    
-    Reduce(intersect, lapply(r, names))
-    
-  } else {
-    
-    ar <- head(formalArgs(d.prepos), -1)
-    names(r[[1]])[!names(r[[1]]) %in% ar]
-  }
+  com.names <- Reduce(intersect, lapply(r, names))
+  ar <- head(formalArgs(d.prepos), -1)
+  dot.names <- com.names[!com.names %in% ar]
   
   r <- lapply(seq_along(r), function(i) r[[i]][dot.names])
   r <- lapply(seq_along(r), function(i) r[[i]][rowSums(is.na(r[[i]])) != ncol(r[[i]]), ])            
