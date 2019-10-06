@@ -3894,7 +3894,7 @@ which.min((pjk - pj)/(1 - pj))
 int <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6, raw = TRUE) 
 {
   
-  if(!(class(X)[1] %in% c("data.frame", "matrix", "table"))) stop("Ratings must be 'data.frame', 'matrix', and if not raw, a 'table'.", call. = FALSE)
+  if(!inherits(X, c("data.frame", "matrix", "table"))) stop("Ratings must be 'data.frame', 'matrix', and if not raw, a 'table'.", call. = FALSE)
   
   if(raw) X <- table(row(X), unlist(X), useNA = useNA)
   
