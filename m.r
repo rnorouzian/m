@@ -3987,10 +3987,12 @@ com.names <- if(n.df >= 2) {
      names(which(tbl >= 2))
   }
 }
-
+    
   ar <- head(formalArgs(d.prepos), -1)
   dot.names <- com.names[!com.names %in% ar]
 
+  if(length(dot.names) == 0) stop("No two variables/moderators names match.", call. = FALSE)
+    
   if(n.df >= 2) { r <- do.call(cbind, r)
                   tbl <- table(names(r)) } 
   
