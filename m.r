@@ -3984,8 +3984,8 @@ com.names <- if(n.df >= 2) {
                   
          } else {
                     
-     names(which(tbl >= 2))
-  }
+         names(which(tbl >= 2))
+    }
 }
     
   ar <- head(formalArgs(d.prepos), -1)
