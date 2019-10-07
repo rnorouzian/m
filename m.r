@@ -3792,7 +3792,33 @@ r <- rm.allrowNA(X)
 rm.allcolNA(r)  
 
 }                                      
-                                      
+
+           
+#================================================================================================================================
+           
+           
+full.clean <- function(X, which, keep.org.name = TRUE)
+  {
+  
+  X <- rm.colrowNA(X)
+  
+  X <- lapply(X, function(x) setNames(x, sub("\\.\\d+$", "", names(x))))
+  
+  if(inherits(X, "list") & length(X) >= 2){
+    
+    X <- lapply(seq_along(X), function(i) X[[i]][ , !names(X[[i]]) %in% which])
+    if(keep.org.name) lapply(X, function(x) setNames(X, sub("\\.\\d+$", "", names(X))))
+    X
+    
+  } else {
+    
+    X <- X[[1]][ , !names(X[[1]]) %in% which]
+    if(keep.org.name) names(X) <- sub("\\.\\d+$", "", names(X))
+    list(X)
+  }
+}           
+           
+           
 #================================================================================================================================                                      
                                       
 kap <- function (x, level = .95)
@@ -3953,49 +3979,58 @@ intercode <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
 
 #===============================================================================================================================
                        
+                       
 interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 6, common = FALSE)
 {
   
   r <- list(...) 
   
   if(!(all(sapply(r, inherits, c("data.frame", "matrix"))))) stop("Ratings must be 'data.frame' or 'matrix'.", call. = FALSE)
- 
-   n.df <- length(r)
+  
+  n.df <- length(r)
    
-   if(n.df == 1) tbl <- table(names(r[[1]]))
-   
-   r <- lapply(r, as.data.frame)
+  r <- lapply(r, as.data.frame)
+  
+  ar <- head(formalArgs(d.prepos), -1)
+  
+  r <- full.clean(r, ar)
+  
+  if(n.df == 1) tbl <- table(names(r[[1]]))
   
 com.names <- if(n.df >= 2) { 
-  
-  if(common) { Reduce(intersect, lapply(r, names)) 
     
-           } else {
-    
-    vec <- names(unlist(r, recursive = FALSE))
-    unique(vec[duplicated(vec)])
-
-      }
-          } else { 
-                
-  if(common) { 
-
-         names(which(tbl == max(tbl)))
-                  
-         } else {
-                    
-         names(which(tbl >= 2))
+    if(common) { Reduce(intersect, lapply(r, names)) 
+      
+    } else {
+      
+      vec <- names(unlist(r, recursive = FALSE))
+      unique(vec[duplicated(vec)])
+      
     }
-}
-    
-  ar <- head(formalArgs(d.prepos), -1)
-  dot.names <- com.names[!com.names %in% ar]
-
-  if(length(dot.names) == 0) stop("No two variables/moderators names match.", call. = FALSE)
-    
-  if(n.df >= 2) { r <- do.call(cbind, r)
-                  tbl <- table(names(r)) } 
   
+  } else { 
+    
+    if(common) { 
+      
+      names(which(tbl == max(tbl)))
+      
+    } else {
+      
+      names(which(tbl >= 2))
+    }
+  }
+  
+  dot.names <- com.names[!com.names %in% ar]
+  
+  if(length(dot.names) == 0) stop("No two variables/moderators names match.", call. = FALSE)
+  
+  if(n.df >= 2) { 
+    
+    r <- do.call(cbind, r)
+  
+  tbl <- table(names(r)) 
+  }
+
   n.rater <- if(common) { 
     
     tbl[tbl == max(tbl)] 
@@ -4004,21 +4039,21 @@ com.names <- if(n.df >= 2) {
     
     tbl[tbl >= 2]
   }
-    
+  
   r <- if(n.df >= 2) {
     
-   split.default(r[names(r) %in% dot.names], names(r)[names(r) %in% dot.names])
+    split.default(r[names(r) %in% dot.names], names(r)[names(r) %in% dot.names])
     
   } else {
     
-   split.default(r[[1]][names(r[[1]]) %in% dot.names], names(r[[1]])[names(r[[1]]) %in% dot.names])
+    split.default(r[[1]][names(r[[1]]) %in% dot.names], names(r[[1]])[names(r[[1]]) %in% dot.names])
     
   }
   
   if(na.rm) r <- lapply(r, na.omit)
   
-  r <- setNames(rm.colrowNA(r), dot.names)
   out <- lapply(r, int, nsim = nsim, level = level, digits = digits, useNA = useNA, raw = TRUE)
+  
   Map(c, out, row.comprd = sapply(r, nrow), min.cat = sapply(r, min.cat), n.rater = n.rater)
 }                        
                        
