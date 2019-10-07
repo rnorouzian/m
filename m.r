@@ -3768,9 +3768,9 @@ rm.allrowNA <- function(X) {
   
   if(inherits(X, "list")){
     
-lapply(seq_along(X), function(i) X[[i]][rowSums(is.na(X[[i]])) != ncol(X[[i]]), ])
+    lapply(seq_along(X), function(i) X[[i]][rowSums(is.na(X[[i]]) | X[[i]] == "") != ncol(X[[i]]), ])
     
-  } else { X[rowSums(is.na(X)) != ncol(X), ] }
+  } else { X[rowSums(is.na(X) | X == "") != ncol(X), ] }
 }
 
 #===============================================================================================================================
@@ -3779,9 +3779,9 @@ rm.allcolNA <- function(X) {
   
   if(inherits(X, "list")){
     
-    lapply(seq_along(X), function(i) X[[i]][, colSums(is.na(X[[i]])) != nrow(X[[i]])])
+    lapply(seq_along(X), function(i) X[[i]][, colSums(is.na(X[[i]]) | X[[i]] == "") != nrow(X[[i]])])
     
-  } else { X[, colSums(is.na(X)) != nrow(X)] }
+  } else { X[, colSums(is.na(X) | X == "") != nrow(X)] }
 }
 
 #===============================================================================================================================
