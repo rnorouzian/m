@@ -3797,7 +3797,7 @@ rm.allcolNA(r)
 #================================================================================================================================
            
            
-full.clean <- function(X, which, keep.org.name = TRUE)
+full.clean2 <- function(X, which, keep.org.name = TRUE)
   {
   
   X <- rm.colrowNA(X)
@@ -3818,7 +3818,26 @@ full.clean <- function(X, which, keep.org.name = TRUE)
   }
 }           
            
-           
+
+#================================================================================================================================
+                             
+
+full.clean <- function(X, which)
+{
+  
+  f <- function(dat, vec) {
+    i1 <- !names(dat) %in% vec
+    setNames(dat[i1], names(dat)[i1])
+  }
+  
+  X <- rm.colrowNA(X)
+  
+  X <- lapply(X, function(x) setNames(x, sub("\\.\\d+$", "", names(x))))
+    
+  lapply(X, f, vec = which)
+}                             
+                             
+                             
 #================================================================================================================================                                      
                                       
 kap <- function (x, level = .95)
