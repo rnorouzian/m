@@ -3822,7 +3822,7 @@ full.clean2 <- function(X, which, keep.org.name = TRUE)
 #================================================================================================================================
                              
 
-full.clean <- function(X, which)
+full.clean1 <- function(X, which)
 {
   
   f <- function(dat, vec) {
@@ -3837,7 +3837,35 @@ full.clean <- function(X, which)
   lapply(X, f, vec = which)
 }                             
                              
-                             
+#================================================================================================================================
+  
+drop.col <- function(dat, vec){
+
+f <- function(dat, vec) {
+  i1 <- !names(dat) %in% vec
+  setNames(dat[i1], names(dat)[i1])
+}
+
+if(inherits(dat, "list")) { lapply(dat, f, vec = vec)
+  } else { f(dat, vec) }
+}              
+              
+#================================================================================================================================              
+              
+              
+full.clean <- function(X, which, all = TRUE)
+{
+  
+  X <- rm.colrowNA(X)
+  
+  X <- lapply(X, function(x) setNames(x, sub("\\.\\d+$", "", names(x))))
+  
+if(all){ X } else { 
+  
+  drop.col(X, vec = which)
+  }
+}              
+              
 #================================================================================================================================                                      
                                       
 kap <- function (x, level = .95)
@@ -4079,7 +4107,7 @@ com.names <- if(n.df >= 2) {
 #===============================================================================================================================                       
   
                        
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 6, common = FALSE)
+interrate3 <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 6, common = FALSE)
 {
   
   r <- list(...) 
@@ -4150,6 +4178,83 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   Map(c, out, row.comprd = sapply(r, nrow), min.cat = sapply(r, min.cat), n.rater = n.rater)
 }                                      
+
+#===============================================================================================================================
+                       
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 6, common = FALSE, all = TRUE, drop = NA)
+{
+  
+  r <- list(...) 
+  
+  if(!(all(sapply(r, inherits, c("data.frame", "matrix"))))) stop("Ratings must be 'data.frame' or 'matrix'.", call. = FALSE)
+  
+  n.df <- length(r)
+  
+  r <- lapply(r, as.data.frame)
+  
+  if(!is.na(drop)) r <- drop.col(r, vec = drop)
+  
+  ar <- head(formalArgs(d.prepos), -1)
+  
+  r <- full.clean(r, ar, all)
+  
+  if(n.df == 1) tbl <- table(names(r[[1]]))
+  
+  
+  com.names <- if(n.df >= 2) { 
+    
+    if(common) { Reduce(intersect, lapply(r, names)) 
+      
+    } else {
+      
+      vec <- names(unlist(r, recursive = FALSE))
+      unique(vec[duplicated(vec)])
+      
+    }
+    
+  } else { 
+    
+    if(common) { 
+      
+      names(which(tbl == max(tbl)))
+      
+    } else {
+      
+      names(which(tbl >= 2))
+    }
+  }
+  
+  dot.names <- if(all) com.names else com.names[!com.names %in% ar]
+  
+  if(length(dot.names) == 0) stop("No two variables/moderators names match.", call. = FALSE)
+  
+  if(n.df >= 2) { 
+    
+    r <- do.call(cbind, r)
+    
+    tbl <- table(names(r)) 
+    
+  } else { r <- r[[1]]
+  
+  }
+  
+  n.rater <- if(common) { 
+    
+    tbl[tbl == max(tbl)] 
+    
+  } else {
+    
+    tbl[tbl >= 2]
+  }
+  
+  r <- split.default(r[names(r) %in% dot.names], names(r)[names(r) %in% dot.names])
+  
+  if(na.rm) r <- lapply(r, na.omit)
+  
+  out <- lapply(r, int, nsim = nsim, level = level, digits = digits, useNA = useNA, raw = TRUE)
+  
+  Map(c, out, row.comprd = sapply(r, nrow), min.cat = sapply(r, min.cat), n.rater = n.rater)
+}                       
                        
 #===============================================================================================================================
                
