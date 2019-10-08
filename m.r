@@ -4184,6 +4184,7 @@ interrate3 <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FA
 
 #===============================================================================================================================
                        
+                       
 interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 6, common = FALSE, all = TRUE, drop = NA)
 {
   
@@ -4195,12 +4196,12 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   r <- lapply(r, as.data.frame)
   
-  if(!is.na(drop)) r <- drop.col(r, vec = drop)
-  
   ar <- head(formalArgs(d.prepos), -1)
   
   r <- full.clean(r, ar, all)
-  
+   
+  if(!is.na(drop)) r <- drop.col(r, drop)   
+    
   if(n.df == 1) tbl <- table(names(r[[1]]))
   
   
