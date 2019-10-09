@@ -4003,112 +4003,6 @@ int <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6, raw = 
 }                                      
                                       
 #===============================================================================================================================
-                   
-intercode <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 6)
-{
-  
-  r <- list(...) 
-  
-  if(!(all(sapply(r, function(i) class(i)[1] %in% c("data.frame", "matrix"))))) stop("Ratings must be 'data.frame' or 'matrix'.", call. = FALSE)
-  
-  if(length(r) < 2) stop("At least '2 separate data.frames or matrices' for ratings of two independent raters required.", call. = FALSE)  
-  
-  r <- lapply(r, as.data.frame)
-  
-  com.names <- Reduce(intersect, lapply(r, names))
-  ar <- head(formalArgs(d.prepos), -1)
-  dot.names <- com.names[!com.names %in% ar]
-  
-  r <- lapply(seq_along(r), function(i) r[[i]][dot.names])
-  r <- rm.colrowNA(r)          
-  r <- setNames(lapply(dot.names, function(x) sapply(r, `[[`, x)), dot.names)
-  if(na.rm) r <- lapply(r, na.omit)
-  out <- lapply(r, int, nsim = nsim, level = level, digits = digits, useNA = useNA, raw = TRUE)
-  Map(c, out, rows.compared = sapply(r, nrow), min.cat = sapply(r, min.cat))
-}                                      
-
-#===============================================================================================================================
-                       
-                       
-interrate2 <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 6, common = FALSE)
-{
-  
-  r <- list(...) 
-  
-  if(!(all(sapply(r, inherits, c("data.frame", "matrix"))))) stop("Ratings must be 'data.frame' or 'matrix'.", call. = FALSE)
-  
-  n.df <- length(r)
-   
-  r <- lapply(r, as.data.frame)
-  
-  ar <- head(formalArgs(d.prepos), -1)
-  
-  r <- full.clean(r, ar)
-  
-  if(n.df == 1) tbl <- table(names(r[[1]]))
-  
-com.names <- if(n.df >= 2) { 
-    
-    if(common) { Reduce(intersect, lapply(r, names)) 
-      
-    } else {
-      
-      vec <- names(unlist(r, recursive = FALSE))
-      unique(vec[duplicated(vec)])
-      
-    }
-  
-  } else { 
-    
-    if(common) { 
-      
-      names(which(tbl == max(tbl)))
-      
-    } else {
-      
-      names(which(tbl >= 2))
-    }
-  }
-  
-  dot.names <- com.names[!com.names %in% ar]
-  
-  if(length(dot.names) == 0) stop("No two variables/moderators names match.", call. = FALSE)
-  
-  if(n.df >= 2) { 
-    
-    r <- do.call(cbind, r)
-  
-  tbl <- table(names(r)) 
-  }
-
-  n.rater <- if(common) { 
-    
-    tbl[tbl == max(tbl)] 
-    
-  } else {
-    
-    tbl[tbl >= 2]
-  }
-  
-  r <- if(n.df >= 2) {
-    
-    split.default(r[names(r) %in% dot.names], names(r)[names(r) %in% dot.names])
-    
-  } else {
-    
-    split.default(r[[1]][names(r[[1]]) %in% dot.names], names(r[[1]])[names(r[[1]]) %in% dot.names])
-    
-  }
-  
-  if(na.rm) r <- lapply(r, na.omit)
-  
-  out <- lapply(r, int, nsim = nsim, level = level, digits = digits, useNA = useNA, raw = TRUE)
-  
-  Map(c, out, row.comprd = sapply(r, nrow), min.cat = sapply(r, min.cat), n.rater = n.rater)
-}                        
-
-#===============================================================================================================================                       
-  
                        
 interrate3 <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 6, common = FALSE)
 {
@@ -4204,7 +4098,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     
   if(n.df == 1) tbl <- table(names(r[[1]]))
   
-  
+ 
   com.names <- if(n.df >= 2) { 
     
     if(common) { Reduce(intersect, lapply(r, names)) 
