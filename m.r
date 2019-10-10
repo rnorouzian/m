@@ -4004,82 +4004,21 @@ int <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6, raw = 
                                       
 #===============================================================================================================================
                        
-interrate3 <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 6, common = FALSE)
-{
-  
-  r <- list(...) 
-  
-  if(!(all(sapply(r, inherits, c("data.frame", "matrix"))))) stop("Ratings must be 'data.frame' or 'matrix'.", call. = FALSE)
-  
-  n.df <- length(r)
-  
-  r <- lapply(r, as.data.frame)
-  
-  ar <- head(formalArgs(d.prepos), -1)
-  
-  r <- full.clean(r, ar)
-  
-  if(n.df == 1) tbl <- table(names(r[[1]]))
-  
-  com.names <- if(n.df >= 2) { 
-    
-    if(common) { Reduce(intersect, lapply(r, names)) 
-      
-    } else {
-      
-      vec <- names(unlist(r, recursive = FALSE))
-      unique(vec[duplicated(vec)])
-      
-    }
-    
-  } else { 
-    
-    if(common) { 
-      
-      names(which(tbl == max(tbl)))
-      
-    } else {
-      
-      names(which(tbl >= 2))
-    }
-  }
-  
-  dot.names <- com.names[!com.names %in% ar]
-  
-  if(length(dot.names) == 0) stop("No two variables/moderators names match.", call. = FALSE)
-  
-  if(n.df >= 2) { 
-    
-    r <- do.call(cbind, r)
-    
-    tbl <- table(names(r)) 
-    
-  } else { r <- r[[1]]
-  
-  }
-  
-  n.rater <- if(common) { 
-    
-    tbl[tbl == max(tbl)] 
-    
-  } else {
-    
-    tbl[tbl >= 2]
-  }
-    
-  r <- split.default(r[names(r) %in% dot.names], names(r)[names(r) %in% dot.names])
-      
-  if(na.rm) r <- lapply(r, na.omit)
-  
-  out <- lapply(r, int, nsim = nsim, level = level, digits = digits, useNA = useNA, raw = TRUE)
-  
-  Map(c, out, row.comprd = sapply(r, nrow), min.cat = sapply(r, min.cat), n.rater = n.rater)
-}                                      
+is.constant <- function(x) length(unique(x)) == 1L 
 
+#===============================================================================================================================                   
+                   
+drop.inner.list <- function(L, what, omit.auto.suffix = TRUE) {
+  
+  if(omit.auto.suffix) L <- lapply(L, function(x) setNames(x, sub("\\.\\d+$", "", names(x))))
+  
+  L[!names(L) %in% what]
+
+}
 #===============================================================================================================================
                        
                        
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 6, common = FALSE, all = TRUE, drop = NA)
+interrate2 <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 6, common = FALSE, all = TRUE, drop = NA)
 {
   
   r <- list(...) 
@@ -4153,7 +4092,97 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   Map(c, out, row.comprd = sapply(r, nrow), min.cat = sapply(r, min.cat), n.rater = n.rater)
 }                       
-                       
+
+#==============================================================================================================================
+                                   
+                                   
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 6, common = FALSE, all = TRUE, drop = NA)
+{
+  
+  r <- list(...) 
+  
+  if(!(all(sapply(r, inherits, c("data.frame", "matrix"))))) stop("Ratings must be 'data.frame' or 'matrix'.", call. = FALSE)
+  
+  n.df <- length(r)
+  
+  r <- lapply(r, as.data.frame)
+  
+  ar <- formalArgs(d.prepos)[c(-2, -21)]
+  
+  r <- full.clean(r, ar, all)
+  
+  if(!is.na(drop)) r <- drop.col(r, drop)   
+  
+  if(n.df == 1) tbl <- table(names(r[[1]]))
+  
+  
+  com.names <- if(n.df >= 2) { 
+    
+    if(common) { Reduce(intersect, lapply(r, names)) 
+      
+    } else {
+      
+      vec <- names(unlist(r, recursive = FALSE))
+      unique(vec[duplicated(vec)])
+      
+    }
+    
+  } else { 
+    
+    if(common) { 
+      
+      names(which(tbl == max(tbl)))
+      
+    } else {
+      
+      names(which(tbl >= 2))
+    }
+  }
+  
+  dot.names <- if(all) com.names else com.names[!com.names %in% ar]
+  
+  if(length(dot.names) == 0) stop("No two variables/moderators names match.", call. = FALSE)
+  
+  if(n.df >= 2) { 
+    
+    r <- do.call(cbind, r)
+    
+    tbl <- table(names(r)) 
+    
+  } else { r <- r[[1]]
+  
+  }
+  
+  n.rater <- if(common) { 
+    
+    tbl[tbl == max(tbl)] 
+    
+  } else {
+    
+    tbl[tbl >= 2]
+  }
+  
+  st.level <- names(Filter(base::all, aggregate(.~study.name, r, is.constant)[-1]))
+  
+  L <- split.default(r[names(r) %in% dot.names], names(r)[names(r) %in% dot.names])
+  
+  L[st.level] <- lapply(L[st.level], function(x) x[ave(x[[1]], r$study.name, FUN = seq_along) == 1, ])
+  
+  L <- drop.inner.list(L, "study.name")
+  
+  if(na.rm) L <- lapply(L, na.omit)
+  
+  out <- lapply(L, int, nsim = nsim, level = level, digits = digits, useNA = useNA, raw = TRUE)
+  
+  #st.lv <- sapply(seq_along(out), function(i) names(out)[[i]] %in% st.level)
+  
+  message("\nNote: Variable(s)/moderator(s) ", dQuote(st.level), " detected as 'study.level'\n.")
+  
+  Map(c, out, row.comprd = sapply(L, nrow), min.cat = sapply(L, min.cat), n.rater = n.rater)
+ 
+}                                   
+                                   
+                                                                   
 #===============================================================================================================================
                
 need <- c("bayesmeta", "distr", "zoo") 
