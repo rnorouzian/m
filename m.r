@@ -4111,10 +4111,11 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   r <- full.clean(r, ar, all)
   
+  r <- lapply(r, function(x) do.call(rbind, c(split(x, x$study.name), make.row.names = FALSE)))   
+    
   if(!is.na(drop)) r <- drop.col(r, drop)   
   
   if(n.df == 1) tbl <- table(names(r[[1]]))
-  
   
   com.names <- if(n.df >= 2) { 
     
