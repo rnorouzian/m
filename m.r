@@ -4164,6 +4164,8 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   st.level <- names(Filter(base::all, aggregate(.~study.name, r, is.constant)[-1]))
   
+  st.level <- st.level[st.level %in% dot.names]
+  
   L <- split.default(r[names(r) %in% dot.names], names(r)[names(r) %in% dot.names])
   
   L[st.level] <- lapply(L[st.level], function(x) x[ave(x[[1]], r$study.name, FUN = seq_along) == 1, ])
@@ -4174,12 +4176,12 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   out <- lapply(L, int, nsim = nsim, level = level, digits = digits, useNA = useNA, raw = TRUE)
   
-  #st.lv <- sapply(seq_along(out), function(i) names(out)[[i]] %in% st.level)
+  st.lv <- sapply(seq_along(out), function(i) names(out)[[i]] %in% st.level)
   
-  message("\nNote: Variable(s)/moderator(s) ", dQuote(st.level), " detected as 'study.level'\n.")
+  message("\nNote: Variable(s)/moderator(s) ", dQuote(st.level), " detected as 'study.level'.\n")
   
   Map(c, out, row.comprd = sapply(L, nrow), min.cat = sapply(L, min.cat), n.rater = n.rater)
- 
+  
 }                                   
                                    
                                                                    
