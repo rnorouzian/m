@@ -4186,7 +4186,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   study.level <- sapply(seq_along(out), function(i) names(out)[[i]] %in% st.level)
   
-  message("\nNote: Moderator(s):", toString(sQuote(st.level)), " treated as 'study.level' moderator(s).\n")
+  message("\nNote: Moderator(s):", toString(dQuote(st.level)), " treated as 'study.level' moderator(s).\n")
   
   #Map(c, out, row.comprd = sapply(L, nrow), min.cat = sapply(L, min.cat), n.rater = n.rater)
   
