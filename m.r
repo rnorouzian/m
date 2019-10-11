@@ -4188,8 +4188,6 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   message("\nNote:", toString(dQuote(st.level), width = 50), " treated at 'study.level' see output.\n")
   
-  #Map(c, out, row.comprd = sapply(L, nrow), min.cat = sapply(L, min.cat), n.rater = n.rater)
-  
   d <- data.frame(out)
   
   d[] <- lapply(d, as.list)
