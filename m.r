@@ -4096,12 +4096,12 @@ interrate2 <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FA
 #==============================================================================================================================
                                    
                                    
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 6, common = FALSE, all = FALSE, drop = NA)
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NA)
 {
   
   r <- list(...) 
   
-  if(!(all(sapply(r, inherits, c("data.frame", "matrix"))))) stop("Ratings must be 'data.frame' or 'matrix'.", call. = FALSE)
+  if(!(all(sapply(r, inherits, c("data.frame", "matrix"))))) stop("Codings must be a 'data.frame' or 'matrix'.", call. = FALSE)
   
   n.df <- length(r)
   
@@ -4111,7 +4111,13 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   r <- full.clean(r, ar, all)
   
+  check <- all(sapply(seq_along(r), function(i) "study.name" %in% names(r[[i]])))
+  
+  if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
+  
   r <- lapply(r, function(x) do.call(rbind, c(split(x, x$study.name), make.row.names = FALSE)))
+  
+  drop <- setdiff(drop, "study.name")
   
   if(!is.na(drop)) r <- drop.col(r, drop)   
   
@@ -4178,12 +4184,19 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   out <- lapply(L, int, nsim = nsim, level = level, digits = digits, useNA = useNA, raw = TRUE)
   
-  st.lv <- sapply(seq_along(out), function(i) names(out)[[i]] %in% st.level)
+  study.level <- sapply(seq_along(out), function(i) names(out)[[i]] %in% st.level)
   
-  message("\nNote: Variable(s)/moderator(s) ", dQuote(st.level), " detected as 'study.level'.\n")
+  message("\nNote: Moderator(s):", toString(sQuote(st.level)), " treated as 'study.level' moderator(s).\n")
   
-  Map(c, out, row.comprd = sapply(L, nrow), min.cat = sapply(L, min.cat), n.rater = n.rater)
-}        
+  #Map(c, out, row.comprd = sapply(L, nrow), min.cat = sapply(L, min.cat), n.rater = n.rater)
+  
+  d <- data.frame(out)
+  
+  d[] <- lapply(d, as.list)
+  
+  data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(L, min.cat), 
+                     n.rater = n.rater, study.level = study.level)))
+}      
                                    
                                                                    
 #===============================================================================================================================
