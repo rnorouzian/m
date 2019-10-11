@@ -4098,7 +4098,7 @@ interrate2 <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FA
 #==============================================================================================================================
                                    
                                    
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NA)
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL)
 {
   
   r <- list(...) 
@@ -4121,10 +4121,9 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   drop <- setdiff(drop, "study.name")
   
-  if(!is.na(drop) & length(drop) != 0) r <- drop.col(r, drop)   
+  if(!is.null(drop) & length(drop) != 0) r <- drop.col(r, drop)   
   
   if(n.df == 1) tbl <- table(names(r[[1]]))
-  
   
   com.names <- if(n.df >= 2) { 
     
