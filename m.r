@@ -3856,16 +3856,18 @@ if(inherits(dat, "list")) { lapply(dat, f, vec = vec)
 #================================================================================================================================              
               
               
-full.clean <- function(X, which, all = TRUE)
+full.clean <- function(X, omit, all = TRUE, omit.auto.suffix = TRUE)
 {
   
   X <- rm.colrowNA(X)
   
-  X <- lapply(X, function(x) setNames(x, sub("\\.\\d+$", "", names(x))))
+  X <- if(inherits(X, "list") & omit.auto.suffix){ lapply(X, function(x) setNames(x, sub("\\.\\d+$", "", names(x)))) 
+    
+    } else if(inherits(X, "data.frame") & omit.auto.suffix) { setNames(X, sub("\\.\\d+$", "", names(X))) } else { X }
   
-if(all){ X } else { 
-  
-  drop.col(X, vec = which)
+  if(all){ X } else { 
+    
+    drop.col(X, vec = omit)
   }
 }              
               
