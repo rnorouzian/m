@@ -4121,7 +4121,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   drop <- setdiff(drop, "study.name")
   
-  if(!is.na(drop)) r <- drop.col(r, drop)   
+  if(!is.na(drop) || length(drop) != 0) r <- drop.col(r, drop)   
   
   if(n.df == 1) tbl <- table(names(r[[1]]))
   
