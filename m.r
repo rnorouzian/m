@@ -4015,12 +4015,25 @@ drop.inner.list <- function(L, what, omit.auto.suffix = TRUE) {
   if(omit.auto.suffix) L <- lapply(L, function(x) setNames(x, sub("\\.\\d+$", "", names(x))))
   
   L[!names(L) %in% what]
-
 }
+                                   
 #===============================================================================================================================
-                       
-                       
-interrate2 <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 6, common = FALSE, all = TRUE, drop = NA)
+   
+is.unique <- function(X, which){
+  
+  f <- function(X, which) { nrow(unique(X[which])) == nrow(X[which]) }
+  
+  test <- if(inherits(X, "list")) sapply(X, f, which) else if(inherits(X, "data.frame")) f(X, which) else {
+    
+    length(unique(X)) == length(X)
+  }
+  base::all(test)  
+  }                                   
+                                   
+#===============================================================================================================================
+                                   
+                                   
+interrate1 <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 6, common = FALSE, all = TRUE, drop = NA)
 {
   
   r <- list(...) 
@@ -4098,7 +4111,7 @@ interrate2 <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FA
 #==============================================================================================================================
                                    
                                    
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL)
+interrate2 <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL)
 {
   
   r <- list(...) 
@@ -4197,7 +4210,123 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
                      n.rater = n.rater, study.level = study.level)))
 }      
                                    
-                                                                   
+#===============================================================================================================================
+           
+                        
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE)
+{
+  
+  r <- list(...) 
+  
+  if(!(all(sapply(r, inherits, c("data.frame", "matrix"))))) stop("Codings must be a 'data.frame' or 'matrix'.", call. = FALSE)
+  
+  n.df <- length(r)
+  
+  r <- lapply(r, as.data.frame)
+  
+  arg <- formalArgs(d.prepos)
+    
+  ar <- if(!by.group.name) arg[-c(2, 21)] else arg[-c(2, 3, 21)]
+  
+  r <- full.clean(r, ar, all)
+  
+  check <- all(sapply(seq_along(r), function(i) "study.name" %in% names(r[[i]])))
+  
+  if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
+  
+  r <- lapply(r, function(x) do.call(rbind, c(split(x, x$study.name), make.row.names = FALSE)))
+  
+  
+  if(by.group.name){
+  
+  check <- all(sapply(seq_along(r), function(i) "group.name" %in% names(r[[i]])))
+  
+  if(!check) stop("Add a new column named 'group.name' with distinct names for groups in each row.", call. = FALSE)
+  
+  if(!is.unique(r, "group.name")) { stop("Each 'group.name' in each row must be distinct.", call. = FALSE) 
+  
+       } else { r <- lapply(r, function(x) do.call(rbind, c(split(x, x$group.name), make.row.names = FALSE))) }
+   }
+  
+  drop <- if(!by.group.name) setdiff(drop, "study.name") else setdiff(drop, c("study.name", "group.name"))
+  
+  if(!is.null(drop) & length(drop) != 0) r <- drop.col(r, drop)   
+  
+  if(n.df == 1) tbl <- table(names(r[[1]]))
+  
+  com.names <- if(n.df >= 2) { 
+    
+    if(common) { Reduce(intersect, lapply(r, names)) 
+      
+    } else {
+      
+      vec <- names(unlist(r, recursive = FALSE))
+      unique(vec[duplicated(vec)])
+      
+    }
+    
+  } else { 
+    
+    if(common) { 
+      
+      names(which(tbl == max(tbl)))
+      
+    } else {
+      
+      names(which(tbl >= 2))
+    }
+  }
+  
+  dot.names <- if(all) com.names else com.names[!com.names %in% ar]
+  
+  if(length(dot.names) == 0) stop("No two variables/moderators names match.", call. = FALSE)
+  
+  if(n.df >= 2) { 
+    
+    r <- do.call(cbind, r)
+    
+    tbl <- table(names(r)[!names(r) %in% c(ar, "study.name")]) 
+    
+  } else { r <- r[[1]]
+  
+  }
+  
+  n.rater <- if(common) { 
+    
+    tbl[tbl == max(tbl)] 
+    
+  } else {
+    
+    tbl[tbl >= 2]
+  }
+  
+  st.level <- names(Filter(base::all, aggregate(.~study.name, r, is.constant)[-1]))
+  
+  st.level <- st.level[st.level %in% dot.names]
+  
+  L <- split.default(r[names(r) %in% dot.names], names(r)[names(r) %in% dot.names])
+  
+  L[st.level] <- lapply(L[st.level], function(x) x[ave(x[[1]], r$study.name, FUN = seq_along) == 1, ])
+  
+  L <- if(!by.group.name) drop.inner.list(L, "study.name") else drop.inner.list(L, c("study.name", "group.name"))
+  
+  if(na.rm) L <- lapply(L, na.omit)
+  
+  out <- lapply(L, int, nsim = nsim, level = level, digits = digits, useNA = useNA, raw = TRUE)
+  
+  study.level <- sapply(seq_along(out), function(i) names(out)[[i]] %in% st.level)
+  
+  message("\nNote:", toString(dQuote(st.level), width = 50), " treated at 'study.level' see output.\n")
+  
+  d <- data.frame(out)
+  
+  d[] <- lapply(d, as.list)
+  
+  data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(L, min.cat), 
+                     n.rater = n.rater, study.level = study.level)))
+}                              
+                        
+                        
 #===============================================================================================================================
                
 need <- c("bayesmeta", "distr", "zoo") 
