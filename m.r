@@ -3771,7 +3771,7 @@ rm.allrowNA <- function(X) {
   
   if(inherits(X, "list")){
     
-    lapply(seq_along(X), function(i) X[[i]][rowSums(is.na(X[[i]]) | X[[i]] == "") != ncol(X[[i]]), ])
+    lapply(X, function(i) i[rowSums(is.na(i) | i == "") != ncol(i), ])
     
   } else { X[rowSums(is.na(X) | X == "") != ncol(X), ] }
 }
@@ -3782,7 +3782,7 @@ rm.allcolNA <- function(X) {
   
   if(inherits(X, "list")){
     
-    lapply(seq_along(X), function(i) X[[i]][, colSums(is.na(X[[i]]) | X[[i]] == "") != nrow(X[[i]])])
+    lapply(X, function(i) i[, colSums(is.na(i) | i == "") != nrow(i)])
     
   } else { X[, colSums(is.na(X) | X == "") != nrow(X)] }
 }
@@ -4153,7 +4153,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   r <- full.clean(r, ar, all)
   
-  check <- all(sapply(seq_along(r), function(i) "study.name" %in% names(r[[i]])))
+  check <- all(sapply(r, function(i) "study.name" %in% names(i)))
   
   if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
   
@@ -4162,7 +4162,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   if(by.group.name){
   
-  check <- all(sapply(seq_along(r), function(i) "group.name" %in% names(r[[i]])))
+  check <- all(sapply(r, function(i) "group.name" %in% names(i)))
   
   if(!check) stop("Add a new column named 'group.name' with distinct names for groups in each row.", call. = FALSE)
   
@@ -4237,7 +4237,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   out <- lapply(L, int, nsim = nsim, level = level, digits = digits, useNA = useNA, raw = TRUE)
   
-  study.level <- sapply(seq_along(out), function(i) names(out)[[i]] %in% st.level)
+  study.level <- sapply(out, function(i) names(i) %in% st.level)
   
   message("\nNote:", toString(dQuote(st.level), width = 50), " treated at 'study.level' see output.\n")
   
