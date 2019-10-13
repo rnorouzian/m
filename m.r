@@ -4239,7 +4239,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   study.level <- sapply(seq_along(out), function(i) names(out)[[i]] %in% st.level)
   
-  message("\nNote:", toString(dQuote(st.level), width = 50), " treated at 'study.level' see output.\n")
+  message("\nNote: ", toString(dQuote(st.level), width = 50), " treated at 'study.level' see output.\n")
   
   d <- data.frame(out)
   
