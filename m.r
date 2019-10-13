@@ -4237,7 +4237,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   out <- lapply(L, int, nsim = nsim, level = level, digits = digits, useNA = useNA, raw = TRUE)
   
-  study.level <- sapply(out, function(i) names(i) %in% st.level)
+  study.level <- sapply(seq_along(out), function(i) names(out)[[i]] %in% st.level)
   
   message("\nNote:", toString(dQuote(st.level), width = 50), " treated at 'study.level' see output.\n")
   
