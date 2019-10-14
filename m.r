@@ -3949,26 +3949,19 @@ efa <- function(x, factors, data = NULL, covmat = NULL, n.obs = NA,
 
 #===============================================================================================================================
                                                           
-detail <- function(X){
-  
-  X <- as.matrix(X)
+detail <- function(X, useNA = "ifany"){
+
   nr <- nrow(X)
   nc <- ncol(X)
-  levs <- levels(as.factor(X))
-  for (i in 1:nr) {
-    frow <- factor(X[i, ], levels = levs)
-    if (i == 1) 
-      ttab <- as.numeric(table(frow))
-    else ttab <- rbind(ttab, as.numeric(table(frow)))
-  }
-  ttab <- matrix(ttab, nrow = nr)
-  
-  pj <- apply(ttab, 2, sum)/(nr * nc)
-  pjk <- (apply(ttab^2, 2, sum) - nr * nc * pj)/(nr * nc * (nc - 1) * pj)
-  kap <- (pjk - pj)/(1 - pj)
-  names(kap) <- levs
-  kap
-}           
+  tab <- table(row(X), unlist(X), useNA = useNA)
+  pj <- apply(tab, 2, sum)/(nr * nc)
+  pjk <- (apply(tab^2, 2, sum) - nr * nc * pj)/(nr * nc * (nc - 1) * pj)
+  K <- (pjk - pj)/(1 - pj)
+  h <- names(K)
+  h[is.na(h)] <- "NA"
+  names(K) <- h
+  return(K)
+}         
 
 #===============================================================================================================================                                                          
 
@@ -4160,7 +4153,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   out <- lapply(L, int, nsim = nsim, level = level, digits = digits, useNA = useNA, raw = TRUE)
   
-  A <- lapply(L, detail)
+  A <- lapply(L, detail, useNA = useNA)
   
   study.level <- sapply(seq_along(out), function(i) names(out)[[i]] %in% st.level)
   
