@@ -3966,7 +3966,54 @@ pj <- apply(ttab, 2, sum)/(nr * nc)
 pjk <- (apply(ttab^2, 2, sum) - nr * nc * pj)/(nr * nc * (nc - 1) * pj)
 which.min((pjk - pj)/(1 - pj))
 }                                      
-                                      
+
+#===============================================================================================================================
+                                                          
+detail <- function(X){
+  
+  X <- as.matrix(X)
+  nr <- nrow(X)
+  nc <- ncol(X)
+  levs <- levels(as.factor(X))
+  for (i in 1:nr) {
+    frow <- factor(X[i, ], levels = levs)
+    if (i == 1) 
+      ttab <- as.numeric(table(frow))
+    else ttab <- rbind(ttab, as.numeric(table(frow)))
+  }
+  ttab <- matrix(ttab, nrow = nr)
+  
+  pj <- apply(ttab, 2, sum)/(nr * nc)
+  pjk <- (apply(ttab^2, 2, sum) - nr * nc * pj)/(nr * nc * (nc - 1) * pj)
+  kap <- (pjk - pj)/(1 - pj)
+  names(kap) <- levs
+  kap
+}           
+
+#===============================================================================================================================                                                          
+
+set.margin <- function() 
+{
+  par(mgp = c(1.5, 0.5, 0), mar = c(2.5, 2.5, 2, 1) + .1, 
+      tck = -0.02)
+}                                                          
+
+ 
+#===============================================================================================================================                                                          
+ 
+splot <- function(y, main){
+  
+  x <- seq_len(length(names(y)))
+  r = range(x)
+  
+  plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*r[2]),
+       ylab = "KAPPA (%Agree)", xaxt = "n", xlab = "Category", lend = 1, lwd = 7,
+       col = colorRampPalette(c(4, 2))(length(y)), font.lab = 2, 
+       panel.first = abline(h = 0, col = 8))
+  
+  axis(1, at = x, labels = names(y))
+}                                                          
+                                                          
 #===============================================================================================================================
       
 int <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6, raw = TRUE) 
@@ -4136,7 +4183,7 @@ interrate2 <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FA
 #===============================================================================================================================
            
                         
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE)
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = FALSE)
 {
   
   r <- list(...) 
@@ -4148,7 +4195,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   r <- lapply(r, as.data.frame)
   
   arg <- formalArgs(d.prepos)
-    
+  
   ar <- if(!by.group.name) arg[-c(2, 21)] else arg[-c(2, 3, 21)]
   
   r <- full.clean(r, ar, all)
@@ -4161,15 +4208,15 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   
   if(by.group.name){
-  
-  check <- all(sapply(r, function(i) "group.name" %in% names(i)))
-  
-  if(!check) stop("Add a new column named 'group.name' with distinct names for groups in each row.", call. = FALSE)
-  
-  if(!is.unique(r, "group.name")) { stop("Each 'group.name' in each row must be distinct.", call. = FALSE) 
-  
-       } else { r <- lapply(r, function(x) do.call(rbind, c(split(x, x$group.name), make.row.names = FALSE))) }
-   }
+    
+    check <- all(sapply(r, function(i) "group.name" %in% names(i)))
+    
+    if(!check) stop("Add a new column named 'group.name' with distinct names for groups in each row.", call. = FALSE)
+    
+    if(!is.unique(r, "group.name")) { stop("Each 'group.name' in each row must be distinct.", call. = FALSE) 
+      
+    } else { r <- lapply(r, function(x) do.call(rbind, c(split(x, x$group.name), make.row.names = FALSE))) }
+  }
   
   drop <- if(!by.group.name) setdiff(drop, "study.name") else setdiff(drop, c("study.name", "group.name"))
   
@@ -4237,6 +4284,8 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   out <- lapply(L, int, nsim = nsim, level = level, digits = digits, useNA = useNA, raw = TRUE)
   
+  A <- lapply(L, detail)
+  
   study.level <- sapply(seq_along(out), function(i) names(out)[[i]] %in% st.level)
   
   message("\nNote: ", toString(dQuote(st.level), width = 50), " treated at 'study.level' see output.\n")
@@ -4245,7 +4294,18 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   d[] <- lapply(d, as.list)
   
-  data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(L, min.cat), 
+  if(plot){
+    
+    n <- length(L)
+    graphics.off()
+    org.par <- par(no.readonly = TRUE)
+    on.exit(par(org.par))
+    if(n > 1L) { par(mfrow = n2mfrow(n)) ; set.margin() }
+
+    invisible(mapply(splot, y = A, main = names(A)))
+  }
+  
+  data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(seq_along(A), function(i) names(A[[i]])[which.min(A[[i]])]), 
                      n.rater = n.rater, study.level = study.level)))
 }                              
                         
