@@ -4145,7 +4145,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   L <- split.default(r[names(r) %in% dot.names], names(r)[names(r) %in% dot.names])
   
-  L[st.level] <- lapply(L[st.level], function(x) x[ave(x[[1]], r$study.name, FUN = seq_along) == 1, ])
+  if(length(st.level) != 0) L[st.level] <- lapply(L[st.level], function(x) x[ave(x[[1]], r$study.name, FUN = seq_along) == 1, ])
   
   L <- if(!by.group.name) drop.inner.list(L, "study.name") else drop.inner.list(L, c("study.name", "group.name"))
   
