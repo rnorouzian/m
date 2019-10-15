@@ -4140,7 +4140,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   }
   
   st.level <- names(Filter(base::all, aggregate(.~study.name, r, is.constant)[-1]))
-  
+                         
   st.level <- st.level[st.level %in% dot.names]
   
   L <- split.default(r[names(r) %in% dot.names], names(r)[names(r) %in% dot.names])
@@ -4157,6 +4157,8 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   study.level <- sapply(seq_along(out), function(i) names(out)[[i]] %in% st.level)
   
+  if(length(st.level) == 0) st.level <- "No moderator"
+                        
   message("\nNote: ", toString(dQuote(st.level), width = 50), " treated at 'study.level' see output.\n")
   
   d <- data.frame(out)
