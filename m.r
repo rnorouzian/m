@@ -1680,9 +1680,9 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
   
 #  out <- max(data$outcome, na.rm = TRUE)
   
-  m <- split(data, data$study.name)        
-  
-  m[[1]] <- NULL  
+  data <- rm.allrowNA(data)
+    
+  m <- split(data, data$study.name)         
   
   if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
   
