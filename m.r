@@ -4159,7 +4159,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   if(length(st.level) == 0) st.level <- "No moderator"
                         
-  message("\nNote: ", toString(dQuote(st.level), width = 50), " treated at 'study.level' see output.\n")
+  message("\nNote: ", toString(dQuote(st.level), width = 45), " treated at 'study.level' see output.\n")
   
   d <- data.frame(out)
   
