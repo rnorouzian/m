@@ -4061,8 +4061,8 @@ splot <- function(y, main){
   
   x <- seq_len(length(names(y)))
   
-  plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*max(x)),
-       ylab = "KAPPA", xaxt = "n", xlab = "Category", lend = 1, lwd = 6,
+  plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*max(x)), ylim = 0:1,
+       ylab = "Specific Agree(%)", xaxt = "n", xlab = "Category", lend = 1, lwd = 6,
        col = colorRampPalette(c(4, 2))(length(y)), font.lab = 2, 
        panel.first = abline(h = 0, col = 8))
   
