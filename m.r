@@ -4057,12 +4057,12 @@ set.margin <- function()
  
 #===============================================================================================================================                                                          
  
-splot <- function(y, main, ylim){
+splot <- function(y, main){
   
   x <- seq_len(length(names(y)))
   
-  plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*max(x)), ylim = ylim,
-       ylab = "Specific Agree(%)", xaxt = "n", xlab = "Category", lend = 1, lwd = 6,
+  plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*max(x)),
+       ylab = "S.Agree(%)", xaxt = "n", xlab = "Category", lend = 1, lwd = 6,
        col = colorRampPalette(c(4, 2))(length(y)), font.lab = 2, 
        panel.first = abline(h = 0, col = 8))
   
@@ -4256,7 +4256,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     on.exit(par(org.par))
     if(n > 1L) { par(mfrow = n2mfrow(n)) ; set.margin() }
 
-    invisible(mapply(splot, y = A, main = names(A), ylim = range(A, finite = TRUE)))
+    invisible(mapply(splot, y = A, main = names(A)))
   }
   
   data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(seq_along(A), function(i) names(A[[i]])[which.min(A[[i]])]), 
