@@ -1713,7 +1713,7 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
   
   if(!missing(by)){ 
     
-    s <- substitute(by)
+    s <- if(is.call(by)) by else substitute(by)
     k <- as.list(s)
     
     if("control" %in% k || "!control" %in% k) stop("'control' can't be a moderating variable either alone or with other variables.", call. = FALSE)
