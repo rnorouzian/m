@@ -1678,14 +1678,11 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
 dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
 {
   
-#  out <- max(data$outcome, na.rm = TRUE)
-    
   m <- split(data, data$study.name)         
   
   m[[1]] <- NULL  
-    
-  if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
   
+  if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
   
   if(impute) {  
     
@@ -1705,7 +1702,7 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
   
   ar <- head(formalArgs(d.prepos), -1)
   
-  dot.names <- names(m[[1]])[!names(m[[1]]) %in% ar]
+  dot.names <- names(data)[!names(data) %in% ar]
   
   args <- lapply(m, function(x) unclass(x[c(ar, dot.names)]))
   
@@ -1730,12 +1727,9 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
     L <- Map(rbind, h, g)   
   }
   
-  study.name <- names(L)
-  
   G <- function(m, n.sim)
   {
-    
-    
+      
     cdel1 <- reget(m, control & post == 2 & outcome == 1)
     cdel2 <- reget(m, control & post == 3 & outcome == 1)
     cs <- reget(m, control & post == 1 & outcome == 1)
@@ -1753,59 +1747,51 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
     del2 <- all(sapply(list(cdel2, tdel2), function(x) !is.null(x)))
     
     
- #   if(out >= 2){ 
-      
-      cdel1..2 <- reget(m, control & post == 2 & outcome == 2)
-      cdel2..2 <- reget(m, control & post == 3 & outcome == 2)
-      cs..2 <- reget(m, control & post == 1 & outcome == 2)
-      
-      tdel1..2 <- reget(m, !control & post == 2 & outcome == 2)
-      tdel2..2 <- reget(m, !control & post == 3 & outcome == 2)
-      ts..2 <- reget(m, !control & post == 1 & outcome == 2)
-      
-      
-      short..2 <- all(sapply(list(cs..2, ts..2), function(x) !is.null(x)))
-      
-      del1..2 <- all(sapply(list(cdel1..2, tdel1..2), function(x) !is.null(x)))
-      
-      del2..2 <- all(sapply(list(cdel2..2, tdel2..2), function(x) !is.null(x)))
- #   }   
+    cdel1..2 <- reget(m, control & post == 2 & outcome == 2)
+    cdel2..2 <- reget(m, control & post == 3 & outcome == 2)
+    cs..2 <- reget(m, control & post == 1 & outcome == 2)
+    
+    tdel1..2 <- reget(m, !control & post == 2 & outcome == 2)
+    tdel2..2 <- reget(m, !control & post == 3 & outcome == 2)
+    ts..2 <- reget(m, !control & post == 1 & outcome == 2)
     
     
-#    if(out >= 3){ 
-      
-      cdel1..3 <- reget(m, control & post == 2 & outcome == 3)
-      cdel2..3 <- reget(m, control & post == 3 & outcome == 3)
-      cs..3 <- reget(m, control & post == 1 & outcome == 3)
-      
-      tdel1..3 <- reget(m, !control & post == 2 & outcome == 3)
-      tdel2..3 <- reget(m, !control & post == 3 & outcome == 3)
-      ts..3 <- reget(m, !control & post == 1 & outcome == 3)
-      
-      short..3 <- all(sapply(list(cs..3, ts..3), function(x) !is.null(x)))
-      
-      del1..3 <- all(sapply(list(cdel1..3, tdel1..3), function(x) !is.null(x)))
-      
-      del2..3 <- all(sapply(list(cdel2..3, tdel2..3), function(x) !is.null(x))) 
-#    }   
+    short..2 <- all(sapply(list(cs..2, ts..2), function(x) !is.null(x)))
+    
+    del1..2 <- all(sapply(list(cdel1..2, tdel1..2), function(x) !is.null(x)))
+    
+    del2..2 <- all(sapply(list(cdel2..2, tdel2..2), function(x) !is.null(x)))
     
     
- #   if(out == 4){ 
+    cdel1..3 <- reget(m, control & post == 2 & outcome == 3)
+    cdel2..3 <- reget(m, control & post == 3 & outcome == 3)
+    cs..3 <- reget(m, control & post == 1 & outcome == 3)
+    
+    tdel1..3 <- reget(m, !control & post == 2 & outcome == 3)
+    tdel2..3 <- reget(m, !control & post == 3 & outcome == 3)
+    ts..3 <- reget(m, !control & post == 1 & outcome == 3)
+    
+    short..3 <- all(sapply(list(cs..3, ts..3), function(x) !is.null(x)))
+    
+    del1..3 <- all(sapply(list(cdel1..3, tdel1..3), function(x) !is.null(x)))
+    
+    del2..3 <- all(sapply(list(cdel2..3, tdel2..3), function(x) !is.null(x))) 
+        
+    
+    cdel1..4 <- reget(m, control & post == 2 & outcome == 4)
+    cdel2..4 <- reget(m, control & post == 3 & outcome == 4)
+    cs..4 <- reget(m, control & post == 1 & outcome == 4)
+    
+    tdel1..4 <- reget(m, !control & post == 2 & outcome == 4)
+    tdel2..4 <- reget(m, !control & post == 3 & outcome == 4)
+    ts..4 <- reget(m, !control & post == 1 & outcome == 4)
+    
+    short..4 <- all(sapply(list(cs..4, ts..4), function(x) !is.null(x)))
+    
+    del1..4 <- all(sapply(list(cdel1..4, tdel1..4), function(x) !is.null(x)))
+    
+    del2..4 <- all(sapply(list(cdel2..4, tdel2..4), function(x) !is.null(x)))         
       
-      cdel1..4 <- reget(m, control & post == 2 & outcome == 4)
-      cdel2..4 <- reget(m, control & post == 3 & outcome == 4)
-      cs..4 <- reget(m, control & post == 1 & outcome == 4)
-      
-      tdel1..4 <- reget(m, !control & post == 2 & outcome == 4)
-      tdel2..4 <- reget(m, !control & post == 3 & outcome == 4)
-      ts..4 <- reget(m, !control & post == 1 & outcome == 4)
-      
-      short..4 <- all(sapply(list(cs..4, ts..4), function(x) !is.null(x)))
-      
-      del1..4 <- all(sapply(list(cdel1..4, tdel1..4), function(x) !is.null(x)))
-      
-      del2..4 <- all(sapply(list(cdel2..4, tdel2..4), function(x) !is.null(x)))         
- #   }    
     
     if(short){
       nc1 <- m$n[m$control & m$post == 1 & m$outcome == 1]
@@ -1816,7 +1802,6 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
       rv <- m$rev.sign[m$post == 1 & m$outcome == 1]
       
       SHORT <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
-      
     }
     
     
@@ -1956,14 +1941,8 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
          DEL2 = if(del2) DEL2 else NULL, DEL2..2 = if(del2..2) DEL2..2 else NULL, DEL2..3 = if(del2..3) DEL2..3 else NULL, DEL2..4 = if(del2..4) DEL2..4 else NULL) 
   }
   
-  h <- lapply(1:length(L), function(i) G(m = L[[i]], n.sim = n.sim))
-  
-  names(h) <- study.name
-  
-  return(h) 
+  setNames(lapply(L, G, n.sim = n.sim), names(L))
 }                              
-
-
 
 #=======================================================================================================================================
 
