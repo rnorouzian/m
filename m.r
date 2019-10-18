@@ -3503,7 +3503,82 @@ meta.withiniii <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(
               
 #=======================================================================================================================================
 
-
+              
+meta.within <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 2, r = .5){
+  
+  L <- eval(substitute(dint(data = data, by = by, impute = impute, n.sim = n.sim)))
+  
+  study.name <- names(L)
+  
+  G <- function(m)
+  {
+    
+    d1 <- m$SHORT$dint
+    d1..2 <- m$SHORT..2$dint
+    d1..3 <- m$SHORT..3$dint
+    d1..4 <- m$SHORT..4$dint
+    
+    sd1 <- m$SHORT$SD
+    sd1..2 <- m$SHORT..2$SD
+    sd1..3 <- m$SHORT..3$SD
+    sd1..4 <- m$SHORT..4$SD
+    
+    d2 <- m$DEL1$dint
+    d2..2 <- m$DEL1..2$dint
+    d2..3 <- m$DEL1..3$dint
+    d2..4 <- m$DEL1..4$dint
+    
+    sd2 <- m$DEL1$SD
+    sd2..2 <- m$DEL1..2$SD
+    sd2..3 <- m$DEL1..3$SD
+    sd2..4 <- m$DEL1..4$SD
+    
+    d3 <- m$DEL2$dint
+    d3..2 <- m$DEL2..2$dint
+    d3..3 <- m$DEL2..3$dint
+    d3..4 <- m$DEL2..4$dint
+    
+    sd3 <- m$DEL2$SD
+    sd3..2 <- m$DEL2..2$SD
+    sd3..3 <- m$DEL2..3$SD
+    sd3..4 <- m$DEL2..4$SD
+    
+    d1s <- c(d1, d1..2, d1..3, d1..4)
+    sd1s <- c(sd1, sd1..2, sd1..3, sd1..4)
+    
+    d2s <- c(d2, d2..2, d2..3, d2..4)
+    sd2s <- c(sd2, sd2..2, sd2..3, sd2..4)
+    
+    d3s <- c(d3, d3..2, d3..3, d3..4)
+    sd3s <- c(sd3, sd3..2, sd3..3, sd3..4)
+    
+    Short <- !is.null(d1s)    ; Del1 <- !is.null(d2s)       ; Del2 <- !is.null(d3s)
+    
+    res <- if(option == 1 & Short)  option1(d1s, sd1s, r = r) else if(option == 2 & Short) option2(d1s, sd1s, r = r) else NA
+    
+    short <- c(Mean.dint.short = res[1], SD.dint.short = res[2])
+    
+    res1 <- if(option == 1 & Short)  option1(d2s, sd2s, r = r) else if(option == 2 & Del1) option2(d2s, sd2s, r = r) else NA
+    
+    del1  <- c(Mean.dint.del1 = res1[1], SD.dint.del1 = res1[2])
+    
+    res2 <- if(option == 1 & Short) option1(d3s, sd3s, r = r) else if(option == 2 & Del2) option2(d3s, sd3s, r = r) else NA
+    
+    del2  <- c(Mean.dint.del2 = res2[1], SD.dint.del2 = res2[2])
+    
+    out <- data.frame(Mean.dint.short = if(Short)short[1] else NA, SD.dint.short = if(Short) short[2]else NA,
+                      Mean.dint.del1 = if(Del1)del1[1]else NA, SD.dint.del1 = if(Del1)del1[2]else NA,
+                      Mean.dint.del2 = if(Del2)del2[1]else NA,
+                      SD.dint.del2 = if(Del2)del2[2]else NA, row.names = NULL)
+    return(out)
+  }
+setNames(lapply(L, G), study.name)
+}              
+              
+              
+#=======================================================================================================================================
+              
+              
 meta.bayesii <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, long = FALSE, option = 2, r = .5, dif = TRUE, n.sim = 1e5)
 {
    
@@ -3596,12 +3671,10 @@ meta.bayesii <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)
 #===============================================================================================================================
                  
                  
-meta.bayesiii <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, long = FALSE, option = 2, r = .5, dif = TRUE, n.sim = 1e5, time = TRUE)
+meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, long = FALSE, option = 2, r = .5, dif = FALSE, n.sim = 1e5, combine = FALSE)
 {
   
-  j <- eval(substitute(meta.withiniii(data = data, by = by, tau.prior = tau.prior, impute = impute, n.sim = n.sim, option = option, r = r)))
-  
-  study.name <- names(j)
+  j <- eval(substitute(meta.within(data = data, by = by, impute = impute, n.sim = n.sim, option = option, r = r)))
   
   L <- lapply(c('Mean.dint.short', 'SD.dint.short', 'Mean.dint.del1', 'SD.dint.del1', 'Mean.dint.del2',
                 'SD.dint.del2'), function(i) {V <- unlist(sapply(j, `[[`, i)); V[!is.na(V)]})
@@ -3616,94 +3689,94 @@ meta.bayesiii <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x
   if(all(!test)) stop("Insufficient studies to meta-analyze either 'short-' or 'long-term' effects.", call. = FALSE)
   
   
-if(time){
+  if(combine){
     
-  pt <- unlist(ds)
-  ds <- tapply(pt, names(pt), FUN = mean)
-  
-  pt <- unlist(sds)
-  sds <- tapply(pt, names(pt), FUN = opt1, r = r)
-  
-  
+    pt <- unlist(ds)
+    ds <- tapply(pt, names(pt), FUN = mean)
+    
+    pt <- unlist(sds)
+    sds <- tapply(pt, names(pt), FUN = opt1, r = r)
+    
+    
     res <- bayesmeta(                y = ds,
-                                 sigma = sds,
-                                labels = names(ds), tau.prior = tau.prior)
+                                     sigma = sds,
+                                     labels = names(ds), tau.prior = tau.prior)
     res$call <- match.call(expand.dots = FALSE)
     
     return(res)
-}
+  }
   
   
-if(!time){  
-  
-  if(dif){
+  if(!combine){  
     
-    ds <- one.rm(ds)
-    sds <- one.rm(sds)
-    ds <- comb.dif.mean(ds)
-    sds <- comb.dif.sd(sds, r = r)
-    
-    res <- bayesmeta(                y = ds,
-                                 sigma = sds,
-                                labels = names(ds), tau.prior = tau.prior)
-    res$call <- match.call(expand.dots = FALSE)
-    
-    return(res)
-    
-  } else {
-    
-    if(test[1]) { result1 <- bayesmeta(          y = ds[[1]],
-                                             sigma = sds[[1]],
-                                            labels = names(ds[[1]]), tau.prior = tau.prior)
-            result1$call <- match.call(expand.dots = FALSE)
-    } 
-    
-    
-    if(test[2]) { result2 <- bayesmeta(          y = ds[[2]],
-                                             sigma = sds[[2]],
-                                            labels = names(ds[[2]]), tau.prior = tau.prior)
-    result2$call <- match.call(expand.dots = FALSE)
-    }  
-    
-    
-    if(test[3]) { result3 <- bayesmeta(     y = ds[[3]],
-                                            sigma = sds[[3]],
-                                            labels = names(ds[[3]]), tau.prior = tau.prior)
-    result3$call <- match.call(expand.dots = FALSE)
-    }  
-    
-    
-    if(test[2] & test[3] & long){
+    if(dif){
       
-      ddelys <- c(result2$summary["mean","mu"], result3$summary["mean","mu"])
-      sdelys <- c(result2$summary["sd","mu"], result3$summary["sd","mu"])
+      ds <- one.rm(ds)
+      sds <- one.rm(sds)
+      ds <- comb.dif.mean(ds)
+      sds <- comb.dif.sd(sds, r = r)
       
-      result4 <- bayesmeta(      y = ddelys,
-                                 sigma = sdelys,
-                                 labels = c("Delay1", "Delay2"), tau.prior = tau.prior)
-      result4$call <- match.call(expand.dots = FALSE)
+      res <- bayesmeta(                y = ds,
+                                       sigma = sds,
+                                       labels = names(ds), tau.prior = tau.prior)
+      res$call <- match.call(expand.dots = FALSE)
       
-      if(test[1])return(list(SHORT = result1, LONG = result4))
-      if(!test[1])return(list(LONG = result4))
-    }
-    
-    if(!test[1]) message("NOTE: No or insufficient studies to meta-analyze 'short-term' effects.")
-    if(!test[2]) message("NOTE: No or insufficient studies to meta-analyze 'delayed 1' effects.")
-    if(!test[3]) message("NOTE: No or insufficient studies to meta-analyze 'delayed 2' effects.")
-    
-    
-    if(!long || long & !test[2] || long & !test[3]){ 
+      return(res)
       
-      if(all(test)) return(list(SHORT = result1, DEL1 = result2, DEL2 = result3))
-      if(test[1] & test[2] & !test[3]) return(list(SHORT = result1, DEL1 = result2))
-      if(test[1] & !test[2] & !test[3]) return(list(SHORT = result1))
-      if(!test[1] & test[2] & !test[3]) return(list(DEL1 = result2))
-      if(!test[1] & !test[2] & test[3]) return(list(DEL2 = result3))
-      if(!test[1] & test[2] & test[3]) return(list(DEL1 = result2, DEL2 = result3))
+    } else {
+      
+      if(test[1]) { result1 <- bayesmeta(          y = ds[[1]],
+                                                   sigma = sds[[1]],
+                                                   labels = names(ds[[1]]), tau.prior = tau.prior)
+      result1$call <- match.call(expand.dots = FALSE)
+      } 
+      
+      
+      if(test[2]) { result2 <- bayesmeta(          y = ds[[2]],
+                                                   sigma = sds[[2]],
+                                                   labels = names(ds[[2]]), tau.prior = tau.prior)
+      result2$call <- match.call(expand.dots = FALSE)
+      }  
+      
+      
+      if(test[3]) { result3 <- bayesmeta(     y = ds[[3]],
+                                              sigma = sds[[3]],
+                                              labels = names(ds[[3]]), tau.prior = tau.prior)
+      result3$call <- match.call(expand.dots = FALSE)
+      }  
+      
+      
+      if(test[2] & test[3] & long){
+        
+        ddelys <- c(result2$summary["mean","mu"], result3$summary["mean","mu"])
+        sdelys <- c(result2$summary["sd","mu"], result3$summary["sd","mu"])
+        
+        result4 <- bayesmeta(      y = ddelys,
+                                   sigma = sdelys,
+                                   labels = c("Delay1", "Delay2"), tau.prior = tau.prior)
+        result4$call <- match.call(expand.dots = FALSE)
+        
+        if(test[1])return(list(SHORT = result1, LONG = result4))
+        if(!test[1])return(list(LONG = result4))
+      }
+      
+      if(!test[1]) message("NOTE: No or insufficient studies to meta-analyze 'short-term' effects.")
+      if(!test[2]) message("NOTE: No or insufficient studies to meta-analyze 'delayed 1' effects.")
+      if(!test[3]) message("NOTE: No or insufficient studies to meta-analyze 'delayed 2' effects.")
+      
+      
+      if(!long || long & !test[2] || long & !test[3]){ 
+        
+        if(all(test)) return(list(SHORT = result1, DEL1 = result2, DEL2 = result3))
+        if(test[1] & test[2] & !test[3]) return(list(SHORT = result1, DEL1 = result2))
+        if(test[1] & !test[2] & !test[3]) return(list(SHORT = result1))
+        if(!test[1] & test[2] & !test[3]) return(list(DEL1 = result2))
+        if(!test[1] & !test[2] & test[3]) return(list(DEL2 = result3))
+        if(!test[1] & test[2] & test[3]) return(list(DEL1 = result2, DEL2 = result3))
       }             
     }
   }
-}                  
+}                 
                  
                  
 #===============================================================================================================================
