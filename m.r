@@ -4001,7 +4001,7 @@ efa <- function(x, factors, data = NULL, covmat = NULL, n.obs = NA,
 
 #===============================================================================================================================
                                                           
-detail <- function(X, useNA = "ifany"){
+detail2 <- function(X, useNA = "ifany"){
 
   nr <- nrow(X)
   nc <- ncol(X)
@@ -4015,6 +4015,37 @@ detail <- function(X, useNA = "ifany"){
   return(K)
 }         
 
+#===============================================================================================================================
+                                                          
+detail <- function(X, useNA = "ifany") {
+  
+  X <- as.matrix(X)
+
+  tab <- table(row(X), unlist(X), useNA = useNA)
+  
+  n_cats <- length(colnames(tab))
+  
+  weight.matrix <- diag(n_cats)
+  
+  rosum <- rowSums(tab)
+  
+  obs_oc <- tab * (t(weight.matrix %*% t(tab)) - 1)
+  
+  obs_c <- colSums(obs_oc)
+  
+  max_oc <- tab * (rosum - 1)
+  
+  max_c <- colSums(max_oc)
+  
+  SA <- obs_c / max_c
+  
+  h <- names(SA)
+  
+  h[is.na(h)] <- "NA"
+  
+  setNames(SA, h)
+}                                                          
+                                                          
 #===============================================================================================================================                                                          
 
 set.margin <- function() 
