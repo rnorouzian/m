@@ -4034,19 +4034,18 @@ set.margin <- function()
 
 #===============================================================================================================================                                                          
  
-splot <- function(y, main, lwd = 5, same = TRUE){
+splot <- function(y, main, lwd = 5){
   
-  x <- seq_len(length(names(y)))
+  x <- seq_len(length(y))
   
-  ylim <- if(same) 0:1 else NULL
-  
-  plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*max(x)), ylim = ylim,
-       ylab = "%SAgree", xaxt = "n", xlab = "Category", lend = 1, lwd = lwd,
+  plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*max(x)), ylim = 0:1,
+       ylab = "SA (%)", xaxt = "n", xlab = "Category", lend = 1, lwd = lwd,
        col = colorRampPalette(c(4, 2))(length(y)), font.lab = 2, 
        panel.first = abline(h = 0, col = 8), las = 1, cex.axis = .9, padj = .3)
   
   axis(1, at = x, labels = names(y))
-}                                                       
+} 
+                                                       
                                                           
 #===============================================================================================================================
       
@@ -4114,7 +4113,7 @@ is.unique <- function(X, which){
 #===============================================================================================================================
            
                         
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = FALSE, lwd = 5, same = TRUE)
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = FALSE, lwd = 5)
 {
   
   r <- list(...) 
@@ -4234,7 +4233,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     on.exit(par(org.par))
     if(n > 1L) { par(mfrow = n2mfrow(n)) ; set.margin() }
     
-    invisible(mapply(splot, y = A, main = names(A), lwd = lwd, same = same))
+    invisible(mapply(splot, y = A, main = names(A), lwd = lwd))
   }
   
   data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) names(i)[which.min(i)]), 
