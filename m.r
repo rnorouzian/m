@@ -1626,7 +1626,7 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
   org.par <- par(no.readonly = TRUE)
   on.exit(par(org.par))
   
-  if(L > 1L) { par(mfrow = n2mfrow(L)) ; set.margin2() }
+  if(L > 1L) { par(mfrow = n2mfrow(L)) ; set.margin() }
   
   G <- function(fit, main){  
     
