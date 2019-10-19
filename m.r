@@ -4034,17 +4034,19 @@ set.margin <- function()
 
 #===============================================================================================================================                                                          
  
-splot <- function(y, main, lwd = 5){
+splot <- function(y, main, lwd = 5, same = TRUE){
   
   x <- seq_len(length(names(y)))
   
-  plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*max(x)),
-       ylab = "S-Agree (%)", xaxt = "n", xlab = "Category", lend = 1, lwd = lwd,
+  ylim <- if(same) 0:1 else NULL
+  
+  plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*max(x)), ylim = ylim,
+       ylab = "%SAgree", xaxt = "n", xlab = "Category", lend = 1, lwd = lwd,
        col = colorRampPalette(c(4, 2))(length(y)), font.lab = 2, 
-       panel.first = abline(h = 0, col = 8))
+       panel.first = abline(h = 0, col = 8), las = 1, cex.axis = .9)
   
   axis(1, at = x, labels = names(y))
-}                                                          
+}                                                        
                                                           
 #===============================================================================================================================
       
@@ -4112,7 +4114,7 @@ is.unique <- function(X, which){
 #===============================================================================================================================
            
                         
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = FALSE, lwd = 5)
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = FALSE, lwd = 5, same = TRUE)
 {
   
   r <- list(...) 
@@ -4199,7 +4201,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   }
   
   st.level <- names(Filter(base::all, aggregate(.~study.name, r, is.constant)[-1]))
-                         
+  
   st.level <- st.level[st.level %in% dot.names]
   
   L <- split.default(r[names(r) %in% dot.names], names(r)[names(r) %in% dot.names])
@@ -4217,13 +4219,13 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   study.level <- sapply(seq_along(out), function(i) names(out)[[i]] %in% st.level)
   
   if(length(st.level) == 0) st.level <- "No moderator"
-                        
+  
   message("\nNote: ", toString(dQuote(st.level), width = 47), " treated at 'study.level' see output.\n")
   
   d <- data.frame(out)
   
   d[] <- lapply(d, as.list)
-                        
+  
   if(plot){
     
     n <- length(L)
@@ -4231,13 +4233,13 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     org.par <- par(no.readonly = TRUE)
     on.exit(par(org.par))
     if(n > 1L) { par(mfrow = n2mfrow(n)) ; set.margin() }
-
-    invisible(mapply(splot, y = A, main = names(A), lwd = lwd))
+    
+    invisible(mapply(splot, y = A, main = names(A), lwd = lwd, same = same))
   }
   
   data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(seq_along(A), function(i) names(A[[i]])[which.min(A[[i]])]), 
                      n.rater = n.rater, study.level = study.level)))
-}                              
+}                        
                         
                         
 #===============================================================================================================================
