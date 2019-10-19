@@ -4237,7 +4237,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     invisible(mapply(splot, y = A, main = names(A), lwd = lwd, same = same))
   }
   
-  data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(seq_along(A), function(i) names(A[[i]])[which.min(A[[i]])]), 
+  data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) names(i)[which.min(i)]), 
                      n.rater = n.rater, study.level = study.level)))
 }                        
                         
