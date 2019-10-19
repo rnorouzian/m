@@ -4010,33 +4010,19 @@ detail2 <- function(X, useNA = "ifany"){
 #===============================================================================================================================
                                                           
 detail <- function(X, useNA = "ifany") {
-  
   X <- as.matrix(X)
-
   tab <- table(row(X), unlist(X), useNA = useNA)
-  
-  n_cats <- length(colnames(tab))
-  
-  weight.matrix <- diag(n_cats)
-  
+  w <- diag(ncol(tab))
   rosum <- rowSums(tab)
-  
-  obs_oc <- tab * (t(weight.matrix %*% t(tab)) - 1)
-  
+  obs_oc <- tab * (t(w %*% t(tab)) - 1)
   obs_c <- colSums(obs_oc)
-  
   max_oc <- tab * (rosum - 1)
-  
   max_c <- colSums(max_oc)
-  
   SA <- obs_c / max_c
-  
   h <- names(SA)
-  
   h[is.na(h)] <- "NA"
-  
   setNames(SA, h)
-}                                                          
+}                                                       
                                                           
 #===============================================================================================================================                                                          
 
@@ -4046,7 +4032,6 @@ set.margin <- function()
       tck = -0.02)
 }                                                          
 
- 
 #===============================================================================================================================                                                          
  
 splot <- function(y, main){
