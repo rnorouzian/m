@@ -4039,7 +4039,7 @@ splot <- function(y, main, lwd = 5){
   x <- seq_len(length(y))
   
   plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*max(x)), ylim = 0:1,
-       ylab = "SA (%)", xaxt = "n", xlab = "Category", lend = 1, lwd = lwd,
+       ylab = "%SA", xaxt = "n", xlab = "Category", lend = 1, lwd = lwd,
        col = colorRampPalette(c(4, 2))(length(y)), font.lab = 2, 
        panel.first = abline(h = 0, col = 8), las = 1, cex.axis = .9, padj = .3)
   
