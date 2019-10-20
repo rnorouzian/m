@@ -4028,7 +4028,7 @@ detail <- function(X, useNA = "ifany") {
 
 set.margin <- function() 
 {
-  par(mgp = c(1.5, 0.14, 0), mar = c(2.5, 2.5, 2, 1) + .1, 
+  par(mgp = c(1.5, 0.14, 0), mar = c(2.5, 2.6, 1.8, .5), 
       tck = -0.02)
 }                                                         
 
