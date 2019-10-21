@@ -1643,8 +1643,8 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
     
     plot(x, mu, type = "l", xlim = range(x)+c(-.05, .05), ylim = range(lo, hi), ylab = ylab, lwd = 2, lty = 2, lend = 1,
          xaxt = "n", xlab = xlab, panel.l = axis(1, at = x, labels = if(!is.null(labels)) labels else c(if(!is.na(mu[1]) & is.null(LO))
-           "Post_1" else if(!is.na(mu[2]) & !is.null(LO)) "Short" else NULL, if(!is.na(mu[2]) & is.null(LO)) "Post_2" else if(!is.na(mu[2]) & !is.null(LO)) "Long" else NULL,
-           if(!is.na(mu[3]) & is.null(LO)) "Post_3" 
+           "Short" else if(!is.na(mu[2]) & !is.null(LO)) "Short" else NULL, if(!is.na(mu[2]) & is.null(LO)) "Medium" else if(!is.na(mu[2]) & !is.null(LO)) "Long" else NULL,
+           if(!is.na(mu[3]) & is.null(LO)) "Long" 
            else NULL)), main = main)
     
     if(!is.na(mu[1])) lines(c(0, 0), c(lo[1], hi[1]), col = 2, lwd = 4, lend = 1)
