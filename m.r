@@ -796,16 +796,16 @@ d.prepos4 <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = N
 #================================================================================================================================       
        
        
-d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA, stder = NA, mpre = NA, mpos = NA, sdpre = NA, sdpos = NA, r = NA, rev.sign = FALSE, rev.group = FALSE, autoreg = FALSE, t.pair = NA, df = NA, sdif = NA, post, control, outcome, ...) 
+d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA, stder = NA, mpre = NA, mpos = NA, sdpre = NA, sdpos = NA, r = NA, rev.sign = FALSE, rev.group = FALSE, autoreg = FALSE, t.pair = NA, df = NA, sdif = NA, post, control, outcome, time, ...) 
 {
   
-  if(missing(control) || missing(post) || missing(outcome)) stop("'post', 'outcome' and/or 'control' missing in the EXCEL sheet.", call. = FALSE)
+  if(missing(control) || missing(post) || missing(outcome) || missing(time)) stop("'post', 'outcome', 'time', or 'control' missing in the EXCEL sheet.", call. = FALSE)
   
   rev.sign <- ifelse(is.na(rev.sign), FALSE, rev.sign)
   rev.group <- ifelse(is.na(rev.group), FALSE, rev.group)
   autoreg <- ifelse(is.na(autoreg), FALSE, autoreg)
   control <- ifelse(is.na(control), FALSE, control)
-    
+  
   r <- ifelse(autoreg == TRUE, autoreg(max(post, na.rm = TRUE), r)[,1][-1][post], r)
   
   n <- ifelse(!is.na(n), n, ifelse(is.na(n) & !is.na(df), df + 1, NA))
@@ -819,7 +819,7 @@ d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA
   d <- ifelse(!is.na(mdif) & is.na(d) & !is.na(sdif), mdif/sdif, d)*cfactor(n-1)
   d <- ifelse(rev.group, -d, d)
   
-  out <- data.frame(d, n, sdif, r, rev.sign, post, control, outcome, ...)
+  out <- data.frame(d, n, sdif, r, rev.sign, post, control, outcome, time, ...)
   
   if(all(is.na(out$d))) stop("\ninsufficient info. to calculate effect size(s).", call. = FALSE)
   
