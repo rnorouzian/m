@@ -1617,7 +1617,7 @@ if(!test[1] & test[2] & test[3]) return(list(DEL1 = result2, DEL2 = result3))
 #===============================================================================================================================
              
                
-dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint)", labels = NULL){
+dint.plot2 <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint)", labels = NULL){
   
   m <-list(...)
   L <- length(m)
@@ -1663,7 +1663,47 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
   
   for(i in 1:L) G(m[[i]], main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i])
 }         
-               
+   
+#===============================================================================================================================                  
+ 
+dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint)", labels = NULL){
+  
+  m <-list(...)
+  L <- length(m)
+  n <- substitute(...())
+  graphics.off()
+  org.par <- par(no.readonly = TRUE)
+  on.exit(par(org.par))
+  
+  if(L > 1L) { par(mfrow = n2mfrow(L)) ; set.margin() }
+  
+  G <- function(fit, main){  
+    
+    L <- length(fit)  
+    
+    mu <- sapply(1:L, function(i) fit[[i]]$summary["mean","mu"])
+    lo <- sapply(1:L, function(i) fit[[i]]$summary["95% lower","mu"])
+    hi <- sapply(1:L, function(i) fit[[i]]$summary["95% upper","mu"])
+    k <- sapply(1:L, function(i) fit[[i]]$k)
+    
+    x <- 0:(L-1)
+    
+    plot(x, mu, type = "l", xlim = range(x)+c(-.05, .05), ylim = range(lo, hi), ylab = ylab, lwd = 2, lty = 2, lend = 1, font.lab = 2,
+         xaxt = "n", xlab = xlab, panel.last = axis(1, at = x, labels = if(!is.null(labels)) labels else names(fit), main = main))
+    
+    invisible(lapply(seq_len(L), function(i) if(!is.na(mu[i])) lines(c(i-1, i-1), c(lo[i], hi[i]), col = 2, lwd = 4, lend = 1)))
+    
+    text(x, .88*hi, paste0("(k = ", k,")"), cex = .75, font = 2, xpd = NA, srt = 90, pos = 2) 
+    
+    points(x, mu, pch = 22, cex = 6.3, bg = "cyan", col = "magenta", xpd = NA)
+    
+    text(x, c(.97*lo, mu, 1.03*hi), 
+         round(c(lo, mu, hi), 3), cex = .9, font = 2, xpd = NA)
+  }
+  
+  for(i in 1:L) G(m[[i]], main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i])
+}                  
+                  
 #===============================================================================================================================
                   
                   
@@ -4294,7 +4334,7 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
   
   for(a in seq_len(so)) z[[a]] <- f2(j = k[[a]], tau.prior = tau.prior)
   
-  setNames(z, c("SHORT", "MED", "LONG"))
+  setNames(z, as.character(unique(na.omit(data$weeks))))
 }             
                       
 #===============================================================================================================================
