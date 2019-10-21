@@ -4240,7 +4240,64 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
                      n.rater = n.rater, study.level = study.level)))
 }                        
                         
-                        
+#===============================================================================================================================
+             
+metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, n.sim = 1e5, option = 2, r = .5){
+  
+  
+  f1 <- function(data, zy, impute, n.sim, option, r){ 
+    
+    L <- eval(substitute(dint(data = data, by = zy, impute = impute, n.sim = n.sim)))
+    
+    ds <- lapply(L, function(x) do.call(rbind, x)$dint)
+    sds <- lapply(L, function(x) do.call(rbind, x)$SD)  
+    
+    f <- if(option == 1) option1 else option2
+    
+    mapply(f, ds, sds, r, SIMPLIFY = FALSE)
+  }
+  
+  f2 <- function(j, tau.prior){  
+    
+    ds <- sapply(seq_along(j), function(i) j[[i]][1])
+    sds <- sapply(seq_along(j), function(i) j[[i]][2])
+    
+    test <- length(ds) >= 2
+    
+    if(!test) stop("Insufficient studies to meta-analyze either 'short-' or 'long-term' effects.", call. = FALSE)
+    
+    res <- bayesmeta(        y = ds,
+                         sigma = sds,
+                        labels = names(j), 
+                     tau.prior = tau.prior)
+    res$call <- match.call(expand.dots = FALSE)
+    
+    return(res)
+  }  
+  
+  G <- if(missing(mod)) { lapply(unique(na.omit(data$weeks)), function(y) bquote(weeks == .(y))) 
+  
+  } else {
+    
+  s <- substitute(mod)
+  lapply(unique(na.omit(data$weeks)), function(x) bquote(.(s) & weeks == .(x)))
+  }
+  
+  go <- length(G)
+  
+  k <- vector("list", go)
+  
+  for(w in seq_len(go)) k[[w]] <- f1(data = data, zy = G[[w]], impute = impute, n.sim = n.sim, option = option, r = r)
+  
+  so <- length(k)
+  
+  z <- vector("list", so)
+  
+  for(a in seq_len(so)) z[[a]] <- f2(j = k[[a]], tau.prior = tau.prior)
+  
+  setNames(z, c("SHORT", "DEL1", "DEL2"))
+}             
+                      
 #===============================================================================================================================
                
 need <- c("bayesmeta", "distr", "zoo") 
