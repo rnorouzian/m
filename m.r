@@ -4253,7 +4253,7 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
     
     f <- if(option == 1) option1 else option2
     
-    mapply(f, ds, sds, r, SIMPLIFY = FALSE)
+    mapply(f, ds = ds, sds = sds, r = r, SIMPLIFY = FALSE)
   }
   
   f2 <- function(j, tau.prior){  
