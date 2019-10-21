@@ -4244,7 +4244,6 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
              
 metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, n.sim = 1e5, option = 2, r = .5){
   
-  
   f1 <- function(data, zy, impute, n.sim, option, r){ 
     
     L <- eval(substitute(dint(data = data, by = zy, impute = impute, n.sim = n.sim)))
