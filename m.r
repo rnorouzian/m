@@ -4336,7 +4336,29 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
   
   setNames(z, as.character(unique(na.omit(data$time))))
 }             
-                      
+
+#===============================================================================================================================
+         
+
+long.form <- function(data, raw = TRUE){
+
+L <- if(raw) dint(data) else data
+
+d <- do.call(rbind, Map(cbind, lapply(L, function(x) 
+  do.call(rbind, x)), id = seq_along(L)))
+
+ar <- formalArgs(d.prepos)[-c(21, 22)]
+
+mod.names <- names(data)[!names(data) %in% ar]
+
+mods <- subset(data[order(data$study.name), ], !control, select = mod.names)
+
+d <- cbind(study.name = sub("(.*)\\.(SHORT|DEL(1|2))(\\.+\\d.*)?", "\\1", rownames(d)), d, mods)
+rownames(d) <- NULL
+d
+}         
+         
+         
 #===============================================================================================================================
                
 need <- c("bayesmeta", "distr", "zoo") 
