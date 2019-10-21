@@ -4314,12 +4314,12 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
     return(res)
   }  
   
-  G <- if(missing(mod)) { lapply(unique(na.omit(data$weeks)), function(y) bquote(weeks == .(y))) 
+  G <- if(missing(mod)) { lapply(unique(na.omit(data$time)), function(y) bquote(time == .(y))) 
   
   } else {
     
   s <- substitute(mod)
-  lapply(unique(na.omit(data$weeks)), function(x) bquote(.(s) & weeks == .(x)))
+  lapply(unique(na.omit(data$time)), function(x) bquote(.(s) & time == .(x)))
   }
   
   go <- length(G)
@@ -4334,7 +4334,7 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
   
   for(a in seq_len(so)) z[[a]] <- f2(j = k[[a]], tau.prior = tau.prior)
   
-  setNames(z, as.character(unique(na.omit(data$weeks))))
+  setNames(z, as.character(unique(na.omit(data$time))))
 }             
                       
 #===============================================================================================================================
