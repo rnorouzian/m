@@ -1701,9 +1701,9 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
          round(c(lo, mu, hi), 3), cex = .9, font = 2, xpd = NA)
   }
   
-  for(i in 1:L) G(m[[i]], main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i])
+  invisible(lapply(seq_len(L), function(i) G(m[[i]], main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i])))
 }                  
-                  
+                                     
 #===============================================================================================================================
                   
                   
