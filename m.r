@@ -1688,10 +1688,10 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
     
     x <- 0:(L-1)
     
-    plot(x, mu, type = "l", xlim = range(x)+c(-.05, .05), ylim = range(lo, hi), ylab = ylab, lwd = 2, lty = 2, lend = 1, font.lab = 2,
-     xaxt = "n", xlab = xlab, panel.last = axis(1, at = x, labels = if(!is.null(labels)) labels else names(fit)), main = main)
+    plot(x, mu, type = "l", xlim = range(x)+c(-.05, .05), ylim = range(lo, hi), ylab = ylab, lwd = 2, lty = 2, lend = 1, font.lab = 2, 
+         xaxt = "n", xlab = xlab, panel.last = axis(1, at = x, labels = if(!is.null(labels)) labels else names(fit)), main = main, las = 1, cex.axis = .9, padj = .3)
     
-    invisible(lapply(seq_len(L), function(i) if(!is.na(mu[i])) lines(c(i-1, i-1), c(lo[i], hi[i]), col = 2, lwd = 4, lend = 1)))
+    invisible(lapply(seq_len(L), function(i) if(!is.na(mu[i])) lines(c(i-1, i-1), c(lo[i], hi[i]), lwd = 4, lend = 1, col = 2)))
     
     text(x, .88*hi, paste0("(k = ", k,")"), cex = .75, font = 2, xpd = NA, srt = 90, pos = 2) 
     
