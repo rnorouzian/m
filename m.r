@@ -4656,9 +4656,9 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
 #===============================================================================================================================
          
 
-long.form <- function(data, raw = TRUE){
+long.form <- function(data, compute = TRUE){
 
-L <- if(raw) dint(data) else data
+L <- if(compute) dint(data) else data
 
 d <- do.call(rbind, Map(cbind, lapply(L, function(x) 
   do.call(rbind, x)), id = seq_along(L)))
@@ -4674,7 +4674,38 @@ rownames(d) <- NULL
 d
 }         
          
-         
+#===============================================================================================================================
+                                      
+                                      
+fold <- function(x, breaks, labels = NULL, xlab = "Time", ylab = "Frequency",  ...){
+
+graphics.off()
+org.par <- par(no.readonly = TRUE)
+on.exit(par(org.par))   
+par(mfrow = c(2, 1))
+set.margin() 
+    
+cats <- cut(x, breaks = c(-Inf, breaks, Inf), include.lowest = TRUE, labels = labels)
+
+cols <- colorRampPalette(c(4, 2))(length(unique(cats)))
+
+tab <- table(x, dnn = NULL)
+cattab <- table(cats, dnn = NULL)    
+
+grp <- cut(as.numeric(names(tab)), 
+           breaks = c(-Inf, breaks, Inf), 
+           include.lowest = TRUE)
+
+plot(tab, xlab = xlab, ylab = ylab, main = "Original", panel.f = abline(h = 0, col = 8), col = cols[grp], ...)
+
+plot(cattab, xlab = xlab, ylab = ylab, main = "Categorized", panel.f = abline(h = 0, col = 8), col = cols, ...)
+
+box()
+
+list(Original = tab, Categorized = cattab, cats = cats)
+}                                      
+                                      
+                                      
 #===============================================================================================================================
                
 need <- c("bayesmeta", "distr", "zoo") # "metafor"
