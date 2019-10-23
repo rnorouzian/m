@@ -4603,8 +4603,8 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
     
     L <- eval(substitute(dint(data = data, by = zy, impute = impute, n.sim = n.sim)))
     
-    ds <- lapply(L, function(x) do.call(rbind, x)$dint)
-    sds <- lapply(L, function(x) do.call(rbind, x)$SD)  
+  ds <- Filter(Negate(is.null), lapply(L, function(x) do.call(rbind, x)$dint))
+ sds <- Filter(Negate(is.null), lapply(L, function(x) do.call(rbind, x)$SD)) 
     
     f <- if(option == 1) option1 else option2
     
