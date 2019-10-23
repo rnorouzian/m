@@ -4676,7 +4676,7 @@ d
 #===============================================================================================================================
                                       
                                       
-fold <- function(x, breaks, labels = NULL, xlab = "Time", ylab = "Frequency", na.rm = TRUE, ...){
+fold <- function(x, breaks, labels = NULL, xlab = "Time", ylab = "Frequency", lend = 1, na.rm = TRUE, ...){
   
   graphics.off()
   org.par <- par(no.readonly = TRUE)
@@ -4697,9 +4697,9 @@ fold <- function(x, breaks, labels = NULL, xlab = "Time", ylab = "Frequency", na
              breaks = c(-Inf, breaks, Inf), 
              include.lowest = TRUE)
   
-  plot(tab, xlab = xlab, ylab = ylab, main = "Original", panel.f = abline(h = 0, col = 8), col = cols[grp], ...)
+  plot(tab, xlab = xlab, ylab = ylab, main = "Original", panel.f = abline(h = 0, col = 8), col = cols[grp], lend = lend, ...)
   
-  plot(cattab, xlab = xlab, ylab = ylab, main = "Categorized", panel.f = abline(h = 0, col = 8), col = cols, ...)
+  plot(cattab, xlab = xlab, ylab = ylab, main = "Categorized", panel.f = abline(h = 0, col = 8), col = cols, lend = lend, ...)
   
   box()
   
