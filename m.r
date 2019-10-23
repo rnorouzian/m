@@ -1987,6 +1987,20 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
   m <- Filter(NROW, rm.allrowNA2(m)) 
   
   if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
+    
+  if(impute) {  
+    ar <- formalArgs(rdif)[c(-7, -9)]
+
+   args <- lapply(m, function(x) unclass(x[ar]))
+
+   argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
+
+   f <- do.call(Map, c(f = rdif, argsT))
+
+   f <- lapply(f, na.locf0)
+                             
+   m <- Map(function(x, y) transform(x, r = na.locf0(y, fromLast = TRUE)), m, f) 
+   }     
   
   ar <- formalArgs(d.prepos)[-c(21, 22)]
   
