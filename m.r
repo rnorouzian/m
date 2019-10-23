@@ -4739,25 +4739,20 @@ dinto <- function(data = NULL)
 
 test.sheet <- function(data){
   
-L <- split(data, data$study.name)
-L <- Filter(NROW, rm.allrowNA2(L))
-
-f <- function(number){
+  L <- split(data, data$study.name)
+  L <- Filter(NROW, rm.allrowNA2(L))
   
-  ns <- names(L)[seq_len(number)]
-  
-  H <- setNames(lapply(seq_len(number), function(i) L[[i]]), ns)
-  
-  B <- do.call(rbind, c(H, make.row.names = FALSE))
-  
-  z <- try(dinto(B), silent = TRUE)
-  
-  if(inherits(z, "try-error")) message("Error: coding problem in: ", toString(dQuote(ns[number])), "* detected*.") else message("metaling: No coding problem detected.")
-}
-invisible(lapply(seq_along(L), function(i) f(i)))
-}         
-           
-           
+  f <- function(number){
+    
+    ns <- names(L)[number]
+    
+    z <- try(dinto(L[[number]]), silent = TRUE)
+    
+    if(inherits(z, "try-error")) message("Error: coding problem in: *", toString(dQuote(ns)), "* detected.") else message("OK: No coding problem detected.")
+  }
+  invisible(lapply(seq_along(L), function(i) f(i)))
+}        
+                     
 #===============================================================================================================================
                
 need <- c("bayesmeta", "distr", "zoo") # "metafor"
