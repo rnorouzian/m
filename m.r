@@ -4596,6 +4596,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
 }                        
                         
 #===============================================================================================================================
+      
              
 metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, n.sim = 1e5, option = 2, r = .5){
   
@@ -4603,8 +4604,8 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
     
     L <- eval(substitute(dint(data = data, by = zy, impute = impute, n.sim = n.sim)))
     
-  ds <- Filter(Negate(is.null), lapply(L, function(x) do.call(rbind, x)$dint))
- sds <- Filter(Negate(is.null), lapply(L, function(x) do.call(rbind, x)$SD)) 
+    ds <- Filter(Negate(is.null), lapply(L, function(x) do.call(rbind, x)$dint))
+    sds <- Filter(Negate(is.null), lapply(L, function(x) do.call(rbind, x)$SD)) 
     
     f <- if(option == 1) option1 else option2
     
@@ -4621,20 +4622,22 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
     if(!test) stop("Insufficient studies to meta-analyze either 'short-' or 'long-term' effects.", call. = FALSE)
     
     res <- bayesmeta(        y = ds,
-                         sigma = sds,
-                        labels = names(j), 
-                     tau.prior = tau.prior)
+                             sigma = sds,
+                             labels = names(j), 
+                             tau.prior = tau.prior)
     res$call <- match.call(expand.dots = FALSE)
     
     return(res)
   }  
   
-  G <- if(missing(mod)) { lapply(unique(na.omit(data$time)), function(y) bquote(time == .(y))) 
+  chep <- sort(unique(na.omit(data$time)))
   
+  G <- if(missing(mod)) { lapply(chep, function(y) bquote(time == .(y))) 
+    
   } else {
     
-  s <- substitute(mod)
-  lapply(unique(na.omit(data$time)), function(x) bquote(.(s) & time == .(x)))
+    s <- substitute(mod)
+    lapply(chep, function(x) bquote(.(s) & time == .(x)))
   }
   
   go <- length(G)
@@ -4650,7 +4653,7 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
   for(a in seq_len(so)) z[[a]] <- f2(j = k[[a]], tau.prior = tau.prior)
   
   setNames(z, as.character(unique(na.omit(data$time))))
-}             
+}                        
 
 #===============================================================================================================================
          
