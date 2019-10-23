@@ -4652,7 +4652,7 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
   
   for(a in seq_len(so)) z[[a]] <- f2(j = k[[a]], tau.prior = tau.prior)
   
-  setNames(z, as.character(unique(na.omit(data$time))))
+  setNames(z, as.character(chep))
 }                        
 
 #===============================================================================================================================
