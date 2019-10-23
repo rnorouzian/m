@@ -4676,7 +4676,15 @@ d
 #===============================================================================================================================
                                       
                                       
-fold <- function(x, breaks, labels = seq_len(length(breaks)+1), xlab = "Time", ylab = "Frequency", lend = 1, na.rm = FALSE, ...){
+fold <- function(x, breaks, labels = seq_len(length(breaks)+1), xlab = "Time", ylab = "Frequency", lend = 1, na.rm = FALSE, plot = FALSE, ...){
+ 
+  if(na.rm) x <- na.omit(x)
+  
+  cats <- cut(x, breaks = c(-Inf, breaks, Inf), include.lowest = TRUE, labels = labels)
+  tab <- table(x, dnn = NULL)
+  cattab <- table(cats, dnn = NULL)
+  
+if(plot){
   
   graphics.off()
   org.par <- par(no.readonly = TRUE)
@@ -4684,14 +4692,7 @@ fold <- function(x, breaks, labels = seq_len(length(breaks)+1), xlab = "Time", y
   par(mfrow = c(2, 1))
   set.margin() 
   
-  if(na.rm) x <- na.omit(x)
-  
-  cats <- cut(x, breaks = c(-Inf, breaks, Inf), include.lowest = TRUE, labels = labels)
-  
   cols <- colorRampPalette(c(4, 2))(length(unique(cats)))
-  
-  tab <- table(x, dnn = NULL)
-  cattab <- table(cats, dnn = NULL)    
   
   grp <- cut(as.numeric(names(tab)), 
              breaks = c(-Inf, breaks, Inf), 
@@ -4702,9 +4703,10 @@ fold <- function(x, breaks, labels = seq_len(length(breaks)+1), xlab = "Time", y
   plot(cattab, xlab = xlab, ylab = ylab, main = "Categorized", panel.f = abline(h = 0, col = 8), col = cols, lend = lend, ...)
   
   box()
-  
+} 
   list(Original = tab, Categorized = cattab, cats = as.numeric(cats))
 } 
+ 
                                                       
                                       
 #===============================================================================================================================
