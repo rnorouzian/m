@@ -4720,9 +4720,11 @@ rm.allrowNA2 <- function(X) {
 dinto <- function(data = NULL)
 {
   
+  data$study.name <- trimws(data$study.name)
+  
   m <- split(data, data$study.name)         
   
-  m <- Filter(NROW, rm.allrowNA2(m)) 
+  m <- Filter(NROW, rm.allrowNA2(m))
   
   if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
   
@@ -4741,7 +4743,9 @@ dinto <- function(data = NULL)
 
 test.sheet <- function(data){
   
-  L <- split(data, data$study.name)
+  data$study.name <- trimws(data$study.name)
+  
+  L <- split(data, data$study.name)         
   L <- Filter(NROW, rm.allrowNA2(L))
   
   f <- function(number){
@@ -4753,7 +4757,7 @@ test.sheet <- function(data){
     if(inherits(z, "try-error")) message("Error: coding problem in: *", toString(dQuote(ns)), "* detected.") else message("OK: No coding problem detected.")
   }
   invisible(lapply(seq_along(L), function(i) f(i)))
-}        
+}       
                      
 #===============================================================================================================================
                
