@@ -1979,30 +1979,34 @@ dintB <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
 #=======================================================================================================================================
              
              
-dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
+dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, breaks = c(0, 2, 4))
 {
   
+  cats <- as.numeric(cut(data$time, breaks = c(-Inf, breaks, Inf), include.lowest = TRUE))
+  
+  data$time <- cats
+  
   data$study.name <- trimws(data$study.name)
-    
+  
   m <- split(data, data$study.name)         
   
   m <- Filter(NROW, rm.allrowNA2(m)) 
   
   if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
-    
+  
   if(impute) {  
     ar <- formalArgs(rdif)[c(-7, -9)]
-
-   args <- lapply(m, function(x) unclass(x[ar]))
-
-   argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
-
-   f <- do.call(Map, c(f = rdif, argsT))
-
-   f <- lapply(f, na.locf0)
-                             
-   m <- Map(function(x, y) transform(x, r = na.locf0(y, fromLast = TRUE)), m, f) 
-   }     
+    
+    args <- lapply(m, function(x) unclass(x[ar]))
+    
+    argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
+    
+    f <- do.call(Map, c(f = rdif, argsT))
+    
+    f <- lapply(f, na.locf0)
+    
+    m <- Map(function(x, y) transform(x, r = na.locf0(y, fromLast = TRUE)), m, f) 
+  }     
   
   ar <- formalArgs(d.prepos)[-c(21, 22)]
   
