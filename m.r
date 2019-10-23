@@ -1984,27 +1984,11 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
   
   m <- split(data, data$study.name)         
   
-  m[[1]] <- NULL  
+  m <- Filter(NROW, rm.allrowNA2(m)) 
   
   if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
   
-  if(impute) {  
-    
-    ar <- formalArgs(rdif)[c(-7, -9)]
-    
-    args <- lapply(m, function(x) unclass(x[ar]))
-    
-    argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
-    
-    f <- do.call(Map, c(f = rdif, argsT))
-    
-    f <- lapply(f, na.locf0)
-    
-    m <- Map(function(x, y) transform(x, r = na.locf0(y, fromLast = TRUE)), m, f) 
-  }
-  
-  
-  ar <- head(formalArgs(d.prepos), -1)
+  ar <- formalArgs(d.prepos)[-c(21, 22)]
   
   dot.names <- names(data)[!names(data) %in% ar]
   
@@ -2030,7 +2014,6 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
     g <- lapply(L[names(h)], function(x) subset(x, control))
     L <- Map(rbind, h, g)   
   }
-  
   G <- function(m, n.sim)
   {
     
@@ -2308,7 +2291,7 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
   }
   
   setNames(lapply(L, G, n.sim = n.sim), names(L))
-}             
+}            
              
              
 #=======================================================================================================================================
@@ -4705,7 +4688,37 @@ box()
 list(Original = tab, Categorized = cattab, cats = cats)
 }                                      
                                       
+#===============================================================================================================================
                                       
+rm.allrowNA2 <- function(X) { 
+  
+  if(inherits(X, "list")){
+    
+    lapply(X, function(i) if(NROW(i) != 0) Filter(NROW, i[rowSums(is.na(i) | i == "") != ncol(i), ]) else Filter(NROW, i))
+    
+  } else { X[rowSums(is.na(X) | X == "") != ncol(X), ] }
+}                                      
+  
+#===============================================================================================================================
+           
+test.sheet <- function(sheet, number){
+  
+  number <- if(number <= 1) 2 else number 
+  
+  L <- split(sheet, sheet$study.name) ; L <- Filter(NROW, rm.allrowNA2(L))
+  
+  ns <- names(L)[seq_len(number)]
+  
+  H <- setNames(lapply(seq_len(number), function(i) L[[i]]), ns)
+  
+  B <- do.call(rbind, c(H, make.row.names = FALSE))
+  
+  z <- try(dint(B), silent = TRUE)
+  
+  if(inherits(z, "try-error")) message("Error: coding problem in: ", toString(dQuote(ns)), " detected :-(") else message("metaling: No coding problem detected :-)")
+}           
+           
+           
 #===============================================================================================================================
                
 need <- c("bayesmeta", "distr", "zoo") # "metafor"
