@@ -1982,7 +1982,7 @@ dintB <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
 dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
 {
   
-  m <- split(data, data$study.name)         
+  m <- split(data, trimws(data$study.name))         
   
   m <- Filter(NROW, rm.allrowNA2(m)) 
   
