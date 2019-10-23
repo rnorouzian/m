@@ -4715,11 +4715,34 @@ rm.allrowNA2 <- function(X) {
   
 #===============================================================================================================================
            
-test.sheet <- function(sheet, number){
+dinto <- function(data = NULL)
+{
   
-  number <- if(number <= 1) 2 else number 
+  m <- split(data, data$study.name)         
   
-  L <- split(sheet, sheet$study.name) ; L <- Filter(NROW, rm.allrowNA2(L))
+  m <- Filter(NROW, rm.allrowNA2(m)) 
+  
+  if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
+  
+  ar <- formalArgs(d.prepos)[-c(21, 22)]
+  
+  dot.names <- names(data)[!names(data) %in% ar]
+  
+  args <- lapply(m, function(x) unclass(x[c(ar, dot.names)]))
+  
+  argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
+  
+  do.call(Map, c(f = d.prepos, argsT))
+}
+
+#===============================================================================================================================
+
+test.sheet <- function(data){
+  
+L <- split(data, data$study.name)
+L <- Filter(NROW, rm.allrowNA2(L))
+
+f <- function(number){
   
   ns <- names(L)[seq_len(number)]
   
@@ -4727,10 +4750,12 @@ test.sheet <- function(sheet, number){
   
   B <- do.call(rbind, c(H, make.row.names = FALSE))
   
-  z <- try(dint(B), silent = TRUE)
+  z <- try(dinto(B), silent = TRUE)
   
-  if(inherits(z, "try-error")) message("Error: coding problem in: ", toString(dQuote(ns)), " detected :-(") else message("metaling: No coding problem detected :-)")
-}           
+  if(inherits(z, "try-error")) message("Error: coding problem in: ", toString(dQuote(ns[number])), "* detected*.") else message("metaling: No coding problem detected.")
+}
+invisible(lapply(seq_along(L), function(i) f(i)))
+}         
            
            
 #===============================================================================================================================
