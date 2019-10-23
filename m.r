@@ -4676,7 +4676,7 @@ d
 #===============================================================================================================================
                                       
                                       
-fold <- function(x, breaks, labels = NULL, xlab = "Time", ylab = "Frequency", lend = 1, na.rm = TRUE, ...){
+fold <- function(x, breaks, labels = seq_len(length(breaks)+1), xlab = "Time", ylab = "Frequency", lend = 1, na.rm = FALSE, ...){
   
   graphics.off()
   org.par <- par(no.readonly = TRUE)
@@ -4703,8 +4703,9 @@ fold <- function(x, breaks, labels = NULL, xlab = "Time", ylab = "Frequency", le
   
   box()
   
-  list(Original = tab, Categorized = cattab, cats = cats)
-}                                                      
+  list(Original = tab, Categorized = cattab, cats = as.numeric(cats))
+} 
+                                                      
                                       
 #===============================================================================================================================
                                       
