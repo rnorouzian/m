@@ -1979,12 +1979,8 @@ dintB <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
 #=======================================================================================================================================
              
              
-dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, breaks = c(0, 2, 4))
+dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e4)
 {
-  
-  cats <- as.numeric(cut(data$time, breaks = c(-Inf, breaks, Inf), include.lowest = TRUE))
-  
-  data$time <- cats
   
   data$study.name <- trimws(data$study.name)
   
@@ -1994,7 +1990,8 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, breaks = c(0, 2, 
   
   if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
   
-  if(impute) {  
+  if(impute) { 
+    
     ar <- formalArgs(rdif)[c(-7, -9)]
     
     args <- lapply(m, function(x) unclass(x[ar]))
@@ -2034,9 +2031,9 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, breaks = c(0, 2, 
     g <- lapply(L[names(h)], function(x) subset(x, control))
     L <- Map(rbind, h, g)   
   }
+  
   G <- function(m, n.sim)
   {
-    
     
     cdel3 <- reget(m, control & post == 4 & outcome == 1)
     cdel1 <- reget(m, control & post == 2 & outcome == 1)
@@ -2311,11 +2308,10 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, breaks = c(0, 2, 
   }
   
   setNames(lapply(L, G, n.sim = n.sim), names(L))
-}            
+} 
              
              
 #=======================================================================================================================================
-
 
               
 meta.within5 <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, n.sim = 1e5){
@@ -4601,8 +4597,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
                         
 #===============================================================================================================================
       
-             
-metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, n.sim = 1e5, option = 2, r = .5){
+metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, n.sim = 1e4, option = 2, r = .5){
   
   f1 <- function(data, zy, impute, n.sim, option, r){ 
     
@@ -4657,7 +4652,7 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
   for(a in seq_len(so)) z[[a]] <- f2(j = k[[a]], tau.prior = tau.prior)
   
   setNames(z, as.character(chep))
-}                        
+}                                    
 
 #===============================================================================================================================
          
