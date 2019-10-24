@@ -4467,7 +4467,7 @@ is.unique <- function(X, which){
                                                                           
 #===============================================================================================================================
            
-                        
+                                   
 interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = FALSE, lwd = 5)
 {
   
@@ -4489,7 +4489,9 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
   
-  r <- lapply(r, function(x) do.call(rbind, c(split(x, x$study.name), make.row.names = FALSE)))
+  r <- lapply(r, function(i) {i$study.name <- trimws(i$study.name); i})
+  
+  r <- lapply(r, function(x) do.call(rbind, c(split(x, trimws(x$study.name)), make.row.names = FALSE)))
   
   
   if(by.group.name){
@@ -4500,7 +4502,9 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     
     if(!is.unique(r, "group.name")) { stop("Each 'group.name' in each row must be distinct.", call. = FALSE) 
       
-    } else { r <- lapply(r, function(x) do.call(rbind, c(split(x, x$group.name), make.row.names = FALSE))) }
+    } else { r <- lapply(r, function(i) {i$group.name <- trimws(i$group.name); i})
+      
+      r <- lapply(r, function(x) do.call(rbind, c(split(x, x$group.name), make.row.names = FALSE))) }
   }
   
   drop <- if(!by.group.name) setdiff(drop, "study.name") else setdiff(drop, c("study.name", "group.name"))
@@ -4593,7 +4597,8 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) names(i)[which.min(i)]), 
                      n.rater = n.rater, study.level = study.level)))
-}                        
+}                                  
+                        
                         
 #===============================================================================================================================
       
