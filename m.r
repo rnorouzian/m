@@ -4731,23 +4731,17 @@ rm.allrowNA2 <- function(X) {
 dinto <- function(data = NULL)
 {
   
-  data$study.name <- trimws(data$study.name)
-  
-  m <- split(data, data$study.name)         
-  
-  m <- Filter(NROW, rm.allrowNA2(m))
-  
-  if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
+  if(is.null(reget(data, control))) stop("Required 'control' group not found.", call. = FALSE)
   
   ar <- formalArgs(d.prepos)[-c(21, 22)]
   
   dot.names <- names(data)[!names(data) %in% ar]
   
-  args <- lapply(m, function(x) unclass(x[c(ar, dot.names)]))
+  args <- unclass(data[c(ar, dot.names)])
   
-  argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
+  argsT <- setNames(args, names(args))
   
-  do.call(Map, c(f = d.prepos, argsT))
+  do.call(d.prepos, argsT)
 }
 
 #===============================================================================================================================
