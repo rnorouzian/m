@@ -4659,8 +4659,10 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
 
 long.form <- function(data){
   
+  data$study.name <- trimws(data$study.name)
+    
   L <- dint(data)
-  
+    
   d <- do.call(rbind, 
                Map(cbind, Filter(Negate(is.null), lapply(L, function(x) 
                  do.call(rbind, x))), 
