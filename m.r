@@ -796,10 +796,10 @@ d.prepos4 <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = N
 #================================================================================================================================       
        
        
-d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA, stder = NA, mpre = NA, mpos = NA, sdpre = NA, sdpos = NA, r = NA, rev.sign = FALSE, rev.group = FALSE, autoreg = FALSE, t.pair = NA, df = NA, sdif = NA, post, control, outcome, time, ...) 
+d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA, stder = NA, mpre = NA, mpos = NA, sdpre = NA, sdpos = NA, r = NA, rev.sign = FALSE, rev.group = FALSE, autoreg = FALSE, t.pair = NA, df = NA, sdif = NA, post = NA, control = NA, outcome = NA, time = NA, ...) 
 {
   
-  if(missing(control) || missing(post) || missing(outcome) || missing(time)) stop("'post', 'outcome', 'time', or 'control' missing in the EXCEL sheet.", call. = FALSE)
+  if(anyNA(control) || anyNA(post) || anyNA(outcome) || anyNA(time)) stop("'post', 'outcome', 'time', or 'control' missing in the EXCEL sheet.", call. = FALSE)
   
   rev.sign <- ifelse(is.na(rev.sign), FALSE, rev.sign)
   rev.group <- ifelse(is.na(rev.group), FALSE, rev.group)
