@@ -1982,7 +1982,11 @@ dintB <- function(data = NULL, by, impute = FALSE, n.sim = 1e5)
 dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e4)
 {
   
+  check <- "study.name" %in% trimws(names(data))
+  if(!check) stop("Add a new column named 'study.name'.", call. = FALSE) 
+  
   data$study.name <- trimws(data$study.name)
+  if(!is.unique(data, "study.name")) stop("Each 'study.name' must be distinct.", call. = FALSE) 
   
   m <- split(data, data$study.name)         
   
