@@ -1986,12 +1986,12 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e4)
   if(!check) stop("Add a new column named 'study.name'.", call. = FALSE) 
   
   data$study.name <- trimws(data$study.name)
-  if(!is.unique(data, "study.name")) stop("Each 'study.name' must be distinct.", call. = FALSE) 
+  data <- rm.allrowNA(data) 
   
   m <- split(data, data$study.name)         
-  
   m <- Filter(NROW, rm.allrowNA2(m)) 
-  
+  if(!(length(unique(data$study.name)) == length(m))) stop("Each 'study.name' must be distinct.", call. = FALSE)
+    
   if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
   
   if(impute) { 
