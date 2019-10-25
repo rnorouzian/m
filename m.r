@@ -4668,24 +4668,51 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
 
 long.form <- function(data){
   
-  data$study.name <- trimws(data$study.name)
-    
   L <- dint(data)
-    
+  
+  data$study.name <- trimws(data$study.name)
+  
   d <- do.call(rbind, 
-               Map(cbind, Filter(Negate(is.null), lapply(L, function(x) 
-                 do.call(rbind, x))), 
-                          id = seq_along(L)))
+               Map(cbind, lapply(L, function(x) 
+                 do.call(rbind, x)), 
+                 id = seq_along(L)))
   
-  ar <- formalArgs(d.prepos)[-c(21, 22)]
+  h <- cbind(study.name = sub("(.*)\\.(SHORT|DEL(1|2|3))(\\.+\\d.*)?", "\\1", rownames(d)), d)
+  rownames(h) <- NULL
   
-  mod.names <- names(data)[!names(data) %in% ar]
+  n <- split(h, h$study.name)  
+  hh <- setNames(lapply(n, NROW), names(n))
   
-  mods <- subset(data[order(data$study.name), ], !control, select = mod.names)
+  D <- rm.allrowNA(data)
   
-  d <- cbind(study.name = sub("(.*)\\.(SHORT|DEL(1|2))(\\.+\\d.*)?", "\\1", rownames(d)), d, mods)
-  rownames(d) <- NULL
-  d
+  m <- split(D, D$study.name)
+  m <- Filter(NROW, rm.allrowNA2(m))
+  
+  ff <- setNames(lapply(seq_along(m), function(i) NROW(subset(m[[i]], !control))), names(m))
+  
+  eq <- identical(ff, hh)
+  
+  if(eq){
+    
+    message(paste0("'dints' computed, reshaped, and saved as an EXCEL file named 'dat.csv'. Use getwd() to locate it."))
+            
+    ar <- formalArgs(d.prepos)[-c(21, 22)]
+    
+    mod.names <- names(D)[!names(D) %in% ar]
+    
+    mods <- subset(D[order(D$study.name), ], !control, select = mod.names)
+    
+    H <- cbind(h, mods)
+    
+    write.csv(dat, "dat.csv", row.names = FALSE)
+    
+    return(H)
+    
+  } else {
+    
+    message(paste0("Problem in coding sheet detected. Error analysis running..."))
+    test.sheet(D)
+  }
 }         
          
 #===============================================================================================================================
