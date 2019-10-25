@@ -4760,10 +4760,12 @@ test.sheet <- function(data){
   check <- "study.name" %in% trimws(names(data))
   if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)  
   data$study.name <- trimws(data$study.name)
-  if(!is.unique(data, "study.name")) stop("Each 'study.name' must be distinct.", call. = FALSE)  
   
+  data <- rm.allrowNA(data)
   L <- split(data, data$study.name)         
   L <- Filter(NROW, rm.allrowNA2(L))
+  
+  if(!(length(unique(data$study.name)) == length(L))) stop("Each 'study.name' must be distinct.", call. = FALSE)
   
   f <- function(number){
     
@@ -4774,7 +4776,7 @@ test.sheet <- function(data){
     if(inherits(z, "try-error")) message("Error: coding problem in: *", toString(dQuote(ns)), "* detected.") else message("OK: No coding problem detected.")
   }
   invisible(lapply(seq_along(L), function(i) f(i)))
-}       
+}      
  
 #===============================================================================================================================
                    
