@@ -4711,7 +4711,7 @@ long.form <- function(data, file = FALSE){
   } else {
     
     message(paste0("Problem in coding sheet detected. See error analysis below:\n"))
-    test.sheet(D)
+    test.sheet(data)
   }
 }                  
          
