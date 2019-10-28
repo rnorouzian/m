@@ -4808,6 +4808,98 @@ test.sheet <- function(data){
 #===============================================================================================================================
                    
 dint.norm <- function(dint) noquote(paste0(round(pnorm(dint) - pnorm(0), 4)*1e2, "%"))                   
+
+#================================================================================================================================
+                     
+meta.withinb <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 2, r = .5){
+  
+  L <- eval(substitute(dint(data = data, by = by, impute = impute, n.sim = n.sim)))
+  
+  study.name <- names(L)
+  
+  G <- function(m)
+  {
+    
+    d1 <- m$SHORT$dint
+    d1..2 <- m$SHORT..2$dint
+    d1..3 <- m$SHORT..3$dint
+    d1..4 <- m$SHORT..4$dint
+    
+    sd1 <- m$SHORT$SD
+    sd1..2 <- m$SHORT..2$SD
+    sd1..3 <- m$SHORT..3$SD
+    sd1..4 <- m$SHORT..4$SD
+    
+    d2 <- m$DEL1$dint
+    d2..2 <- m$DEL1..2$dint
+    d2..3 <- m$DEL1..3$dint
+    d2..4 <- m$DEL1..4$dint
+    
+    sd2 <- m$DEL1$SD
+    sd2..2 <- m$DEL1..2$SD
+    sd2..3 <- m$DEL1..3$SD
+    sd2..4 <- m$DEL1..4$SD
+    
+    d3 <- m$DEL2$dint
+    d3..2 <- m$DEL2..2$dint
+    d3..3 <- m$DEL2..3$dint
+    d3..4 <- m$DEL2..4$dint
+    
+    sd3 <- m$DEL2$SD
+    sd3..2 <- m$DEL2..2$SD
+    sd3..3 <- m$DEL2..3$SD
+    sd3..4 <- m$DEL2..4$SD
+    
+    d4 <- m$DEL3$dint
+    d4..2 <- m$DEL3..2$dint
+    d4..3 <- m$DEL3..3$dint
+    d4..4 <- m$DEL3..4$dint
+    
+    sd4 <- m$DEL3$SD
+    sd4..2 <- m$DEL3..2$SD
+    sd4..3 <- m$DEL3..3$SD
+    sd4..4 <- m$DEL3..4$SD
+    
+    d1s <- c(d1, d1..2, d1..3, d1..4)
+    sd1s <- c(sd1, sd1..2, sd1..3, sd1..4)
+    
+    d2s <- c(d2, d2..2, d2..3, d2..4)
+    sd2s <- c(sd2, sd2..2, sd2..3, sd2..4)
+    
+    d3s <- c(d3, d3..2, d3..3, d3..4)
+    sd3s <- c(sd3, sd3..2, sd3..3, sd3..4)
+    
+    d4s <- c(d4, d4..2, d4..3, d4..4)
+    sd4s <- c(sd4, sd4..2, sd4..3, sd4..4)
+    
+    Short <- !is.null(d1s) ; Del1 <- !is.null(d2s) ; Del2 <- !is.null(d3s) ; Del3 <- !is.null(d4s)
+    
+    res <- if(option == 1)  option1(d1s, sd1s, r = r) else if(option == 2 & Short) option2(d1s, sd1s, r = r) else NA
+    
+    short <- c(Mean.dint.short = res[1], SD.dint.short = res[2])
+    
+    res1 <- if(option == 1)  option1(d2s, sd2s, r = r) else if(option == 2 & Del1) option2(d2s, sd2s, r = r) else NA
+    
+    del1  <- c(Mean.dint.del1 = res1[1], SD.dint.del1 = res1[2])
+    
+    res2 <- if(option == 1) option1(d3s, sd3s, r = r) else if(option == 2 & Del2) option2(d3s, sd3s, r = r) else NA
+    
+    del2  <- c(Mean.dint.del2 = res2[1], SD.dint.del2 = res2[2])
+    
+    res2 <- if(option == 1) option1(d4s, sd4s, r = r) else if(option == 2 & Del3) option2(d4s, sd4s, r = r) else NA
+    
+    del3  <- c(Mean.dint.del3 = res2[1], SD.dint.del3 = res2[2])
+    
+    out <- data.frame(Mean.dint.short = if(Short)short[1] else NA, SD.dint.short = if(Short) short[2]else NA,
+                      Mean.dint.del1 = if(Del1)del1[1]else NA, SD.dint.del1 = if(Del1)del1[2]else NA,
+                      Mean.dint.del2 = if(Del2)del2[1]else NA, SD.dint.del2 = if(Del2)del2[2]else NA, 
+                      Mean.dint.del3 = if(Del3)del3[1]else NA, SD.dint.del3 = if(Del3)del3[2]else NA,
+                      row.names = NULL)
+    return(out)
+    
+  }
+setNames(lapply(L, G), study.name)
+}                   
                    
 #===============================================================================================================================
                
