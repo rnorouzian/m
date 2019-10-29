@@ -147,7 +147,29 @@ find.stud <- function(data, what, timevar = TRUE){
   setNames(lapply(seq_along(G), function(j) unique(as.vector(subset(data, eval(G[[j]]))$study.name))), as.character(chep))
   }
 }             
-              
+
+                  
+#===============================================================================================================================
+                  
+f <- function(data, what){
+  
+unique(na.omit(unlist(data[paste0(substitute(what))])))
+  
+}
+
+#===============================================================================================================================
+                  
+mod.level <- function(data){
+  
+f <- function(data, what)unique(na.omit(unlist(data[what])))
+
+  ar <- formalArgs(d.prepos)[-c(21, 22)]
+  
+  dot.names <- names(data)[!names(data) %in% ar]
+  
+setNames(lapply(seq_along(dot.names), function(i) f(data = data, what = dot.names[i])), dot.names)
+}                  
+                  
 #===============================================================================================================================
               
               
