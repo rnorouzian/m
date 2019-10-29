@@ -1685,7 +1685,7 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
   
   if(L > 1L) { par(mfrow = n2mfrow(L)) ; set.margin() }
   
-  G <- function(fit, main){  
+  G <- function(fit, main, labels){  
     
     L <- length(fit)  
     
@@ -1697,7 +1697,7 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
     x <- 0:(L-1)
     
     plot(x, mu, type = "l", xlim = range(x)+c(-.05, .05), ylim = range(lo, hi), ylab = ylab, lwd = 2, lty = 2, lend = 1, font.lab = 2, 
-         xaxt = "n", xlab = xlab, panel.last = axis(1, at = x, labels = if(!is.null(labels)) labels else names(fit)), main = main, las = 1, cex.axis = .9, padj = .3)
+         xaxt = "n", xlab = xlab, panel.last = axis(1, at = x, labels = labels), main = main, las = 1, cex.axis = .9, padj = .3)
     
     invisible(lapply(seq_len(L), function(i) if(!is.na(mu[i])) lines(c(i-1, i-1), c(lo[i], hi[i]), lwd = 4, lend = 1, col = 2)))
     
@@ -1709,8 +1709,8 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
          round(c(lo, mu, hi), 3), cex = .9, font = 2, xpd = NA)
   }
   
-  invisible(lapply(seq_len(L), function(i) G(m[[i]], main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i])))
-}               
+  invisible(lapply(seq_len(L), function(i) G(m[[i]], main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i], labels = if(is.null(labels)) names(m[[i]]) else labels[[i]])))
+}           
                                      
 #===============================================================================================================================
                   
