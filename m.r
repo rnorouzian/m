@@ -1675,11 +1675,13 @@ dint.plot2 <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (din
 dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint)", labels = NULL){
   
   m <-list(...)
+  m <- lapply(seq_along(m), function(i) Filter(Negate(is.null), m[[i]]))
   L <- length(m)
   n <- substitute(...())
   graphics.off()
   org.par <- par(no.readonly = TRUE)
   on.exit(par(org.par))
+  
   
   if(L > 1L) { par(mfrow = n2mfrow(L)) ; set.margin() }
   
@@ -1708,7 +1710,7 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
   }
   
   invisible(lapply(seq_len(L), function(i) G(m[[i]], main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i])))
-}                  
+}               
                                      
 #===============================================================================================================================
                   
