@@ -1680,10 +1680,11 @@ dint.plot2 <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (din
    
 #===============================================================================================================================                  
  
+                  
 dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint)", labels = NULL){
   
   m <-list(...)
-  m <- lapply(seq_along(m), function(i) Filter(Negate(is.null), m[[i]]))
+  m <- Filter(NROW, lapply(m, function(x) x[!is.na(x)]))
   L <- length(m)
   n <- substitute(...())
   graphics.off()
@@ -1718,7 +1719,7 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
   }
   
   invisible(lapply(seq_len(L), function(i) G(m[[i]], main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i], labels = if(is.null(labels)) names(m[[i]]) else labels[[i]])))
-}           
+}              
                                      
 #===============================================================================================================================
                   
@@ -4643,7 +4644,7 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
     
     test <- length(ds) >= 2
     
-    if(!test) return(NULL)
+    if(!test) return(NA)
     
     res <- bayesmeta(        y = ds,
                              sigma = sds,
@@ -4676,7 +4677,7 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
   
   for(a in seq_len(so)) z[[a]] <- f2(j = k[[a]], tau.prior = tau.prior)
   
-  setNames(z, as.character(chep))
+  setNames(z, chep)
 }                                   
 
 #===============================================================================================================================
