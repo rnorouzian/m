@@ -135,10 +135,18 @@ get.gen <- function(data, what){
               
 #===============================================================================================================================
               
-find.stud <- function(data, what){ 
+find.stud <- function(data, what, timevar = TRUE){
+  
   s <- substitute(what)
-  unique(as.vector(subset(data, eval(s))$study.name))
-}            
+  
+  if(!timevar) { unique(as.vector(subset(data, eval(s))$study.name))
+  
+  } else {
+  chep <- sort(unique(na.omit(data$time)))
+  G <- lapply(chep, function(x) bquote(.(s) & time == .(x)))
+  setNames(lapply(seq_along(G), function(j) unique(as.vector(subset(data, eval(G[[j]]))$study.name))), as.character(chep))
+  }
+}             
               
 #===============================================================================================================================
               
