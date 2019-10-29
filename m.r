@@ -4665,8 +4665,7 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
 
 #===============================================================================================================================
          
-
-long.form <- function(data, file = FALSE){
+long.form <- function(data, file = NULL){
   
   L <- dint(data)
   
@@ -4704,14 +4703,14 @@ long.form <- function(data, file = FALSE){
     
     H <- cbind(h, mods)
     
-    if(file) write.csv(H, "dat.csv", row.names = FALSE)
+    if(!is.null(file)) write.csv(H, paste0(substitute(file), ".csv"), row.names = FALSE)
     
     return(H)
     
   } else {
     
     message(paste0("Problem in coding sheet detected. See error analysis below:\n"))
-    test.sheet(data)
+    test.sheet(D)
   }
 }                  
          
