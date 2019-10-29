@@ -4633,7 +4633,7 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
     
     test <- length(ds) >= 2
     
-    if(!test) stop("Insufficient studies to meta-analyze either 'short-' or 'long-term' effects.", call. = FALSE)
+    if(!test) return(NULL)
     
     res <- bayesmeta(        y = ds,
                              sigma = sds,
@@ -4658,7 +4658,7 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
   
   k <- vector("list", go)
   
-  for(w in seq_len(go)) k[[w]] <- f1(data = data, zy = G[[w]], impute = impute, n.sim = n.sim, option = option, r = r)
+  for(w in seq_len(go)) k[[w]] <- try(f1(data = data, zy = G[[w]], impute = impute, n.sim = n.sim, option = option, r = r), silent = TRUE)
   
   so <- length(k)
   
@@ -4667,7 +4667,7 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
   for(a in seq_len(so)) z[[a]] <- f2(j = k[[a]], tau.prior = tau.prior)
   
   setNames(z, as.character(chep))
-}                                    
+}                                   
 
 #===============================================================================================================================
          
