@@ -151,7 +151,7 @@ find.stud <- function(data, what, timevar = TRUE){
                   
 #===============================================================================================================================
                   
-f <- function(data, what){
+mod.level <- function(data, what){
   
 unique(na.omit(unlist(data[paste0(substitute(what))])))
   
@@ -159,7 +159,7 @@ unique(na.omit(unlist(data[paste0(substitute(what))])))
 
 #===============================================================================================================================
                   
-mod.level <- function(data){
+mods.level <- function(data){
   
 f <- function(data, what)unique(na.omit(unlist(data[what])))
 
