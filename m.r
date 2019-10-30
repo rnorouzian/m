@@ -4170,9 +4170,9 @@ meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)},
 #===============================================================================================================================
           
                  
-meta.robust <- function(f = NULL, data, small = TRUE, raw = TRUE){
+meta.robust <- function(f = NULL, data, small = TRUE){
   
- d <- long.form(data = data, raw = raw)
+ d <- long.form(data = data)
   
   mods <- if(is.null(f)) { formula(~as.factor(time)) } else {
     
