@@ -1705,8 +1705,7 @@ dint.plot2 <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (din
                   
 dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint)", labels = NULL){
   
-  m <-list(...)
-  m <- Filter(NROW, lapply(m, function(x) x[!is.na(x)]))
+  m <- Filter(NROW, lapply(list(...), function(x) x[!is.na(x)]))
   L <- length(m)
   n <- substitute(...())
   graphics.off()
