@@ -4844,8 +4844,25 @@ test.sheet <- function(data){
  
 #===============================================================================================================================
                    
-dint.norm <- function(dint) noquote(paste0(round(pnorm(dint) - pnorm(0), 4)*1e2, "%"))                   
-                  
+dint.norm <- function(dint) noquote(paste0(round(pnorm(dint) - pnorm(0), 4)*1e2, "%"))   
+                   
+#===============================================================================================================================                   
+                   
+do.factor <- function(data, drop = NULL){
+
+data <- rm.allrowNA(data)   
+  
+if(!is.null(drop)) data <- drop.col(data, drop) 
+    
+ar <- formalArgs(d.prepos)[-c(21, 22)]
+
+dot.names <- names(data)[!names(data) %in% ar]
+
+data[dot.names] <- lapply(data[dot.names], as.factor)
+
+return(data)
+}                   
+                                  
 #===============================================================================================================================
                
 need <- c("bayesmeta", "distr", "zoo") # "metafor"
