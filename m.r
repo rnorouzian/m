@@ -4864,7 +4864,43 @@ return(data)
 }                   
                                   
 #===============================================================================================================================
-               
+
+meta.in <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 2, r = .5){ 
+  
+  L <- eval(substitute(dint(data = data, by = by, impute = impute, n.sim = n.sim)))
+  
+  ds <- Filter(Negate(is.null), lapply(L, function(x) do.call(rbind, x)$dint))
+  sds <- Filter(Negate(is.null), lapply(L, function(x) do.call(rbind, x)$SD))   
+  
+  f <- if(option == 1) option1 else option2
+  
+  mapply(f, ds = ds, sds = sds, r = r, SIMPLIFY = FALSE)
+}
+
+#========================================================================================
+
+
+meta.out <- function(j, tau.prior = function(x){dhalfnormal(x)}){  
+  
+  j <- eval(substitute(meta.in(data = data, by = by, impute = impute, n.sim = n.sim, option = option, r = r)))
+  
+  ds <- sapply(seq_along(j), function(i) j[[i]][1])
+  sds <- sapply(seq_along(j), function(i) j[[i]][2])
+  
+  test <- length(ds) >= 2
+  
+  if(!test) return(NA)
+  
+  res <- bayesmeta(                y = ds,
+                                   sigma = sds,
+                                   labels = names(j), tau.prior = tau.prior)
+  res$call <- match.call(expand.dots = FALSE)
+  
+  return(res)
+}  
+                
+#======================================================================================== 
+                
 need <- c("bayesmeta", "distr", "zoo") # "metafor"
 have <- need %in% rownames(installed.packages())
 if(any(!have)){ install.packages( need[!have] ) }
