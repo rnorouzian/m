@@ -4854,7 +4854,7 @@ data <- rm.allrowNA(data)
   
 if(!is.null(drop)) data <- drop.col(data, drop) 
     
-ar <- formalArgs(d.prepos)[-c(21, 22)]
+ar <- formalArgs(d.prepos)[-22]
 
 dot.names <- names(data)[!names(data) %in% ar]
 
