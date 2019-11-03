@@ -4769,7 +4769,7 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
 
 #===============================================================================================================================
          
-long.form <- function(data, file = NULL){
+long.form <- function(data, file = NULL, na = ""){
   
   L <- dint(data)
   
@@ -4799,7 +4799,7 @@ long.form <- function(data, file = NULL){
     
     message(paste0("OK: 'dints' successfully computed and reshaped into 'long form'."))
     
-    ar <- formalArgs(d.prepos)[-c(21, 22)]
+    ar <- formalArgs(d.prepos)[-(20:22)]
     
     mod.names <- names(D)[!names(D) %in% ar]
     
@@ -4807,7 +4807,7 @@ long.form <- function(data, file = NULL){
     
     H <- cbind(h, mods)
     
-    if(!is.null(file)) write.csv(H, paste0(substitute(file), ".csv"), row.names = FALSE)
+    if(!is.null(file)) write.csv(H, paste0(substitute(file), ".csv"), row.names = FALSE, na = na)
     
     return(H)
     
