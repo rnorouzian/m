@@ -97,32 +97,33 @@ odiag <- function(x) x[(n <- nrow(x))^2-(1:n)*(n-1)]
 #===============================================================================================================================
               
 get.uni <- function(data, what){
-
+  
+  data$study.name <- trimws(data$study.name)
   m <- split(data, data$study.name)
   m[[1]] <- NULL
   
-G <- substitute(what)
-E <- quote(x$x)
-E[[3]] <- G[[2]]
-G[[2]] <- E
-
-f <- sapply(m, function(x) sum(eval(G)) == nrow(x))
-
-h <- m[names(f)[f]]
-
-res <- Filter(NROW, h)
-
-if(length(res) == 0) NULL else res
+  G <- substitute(what)
+  E <- quote(x$x)
+  E[[3]] <- G[[2]]
+  G[[2]] <- E
+  
+  f <- sapply(m, function(x) sum(eval(G)) == nrow(x))
+  
+  h <- m[names(f)[f]]
+  
+  res <- Filter(NROW, h)
+  
+  if(length(res) == 0) NULL else res
 }
 
 
 #===============================================================================================================================
-            
-            
+
+
 get.gen <- function(data, what){
   
   s <- substitute(what)  
-  
+  data$study.name <- trimws(data$study.name)
   m <- split(data, data$study.name)
   m[[1]] <- NULL
   
@@ -132,21 +133,21 @@ get.gen <- function(data, what){
   
   if(length(res) == 0) NULL else res
 }
-              
+
 #===============================================================================================================================
-              
+
 find.stud <- function(data, what, timevar = TRUE){
   
   s <- substitute(what)
-  
+  data$study.name <- trimws(data$study.name)
   if(!timevar) { unique(as.vector(subset(data, eval(s))$study.name))
-  
+    
   } else {
-  chep <- sort(unique(na.omit(data$time)))
-  G <- lapply(chep, function(x) bquote(.(s) & time == .(x)))
-  setNames(lapply(seq_along(G), function(j) unique(as.vector(subset(data, eval(G[[j]]))$study.name))), as.character(chep))
+    chep <- sort(unique(na.omit(data$time)))
+    G <- lapply(chep, function(x) bquote(.(s) & time == .(x)))
+    setNames(lapply(seq_along(G), function(j) unique(as.vector(subset(data, eval(G[[j]]))$study.name))), as.character(chep))
   }
-}             
+}       
 
                   
 #===============================================================================================================================
