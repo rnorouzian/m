@@ -4916,7 +4916,7 @@ dint.norm <- function(dint) noquote(paste0(round(pnorm(dint) - pnorm(0), 4)*1e2,
                    
 #===============================================================================================================================                   
                    
-do.factor <- function(data, exclude = NULL){
+do.factor <- function(data, exclude = NULL, char = TRUE){
   
   data <- rm.allrowNA(data) 
   
@@ -4924,7 +4924,7 @@ do.factor <- function(data, exclude = NULL){
   
   dot.names <- names(data)[!names(data) %in% ar]
   
-  data[dot.names] <- lapply(data[dot.names], as.factor)
+  data[dot.names] <- lapply(data[dot.names], if(char) as.character else as.factor)
   
   return(data)
 }                   
