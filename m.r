@@ -4916,19 +4916,17 @@ dint.norm <- function(dint) noquote(paste0(round(pnorm(dint) - pnorm(0), 4)*1e2,
                    
 #===============================================================================================================================                   
                    
-do.factor <- function(data, drop = NULL){
-
-data <- rm.allrowNA(data)   
+do.factor <- function(data, exclude = NULL){
   
-if(!is.null(drop)) data <- drop.col(data, drop) 
-    
-ar <- formalArgs(d.prepos)[-22]
-
-dot.names <- names(data)[!names(data) %in% ar]
-
-data[dot.names] <- lapply(data[dot.names], as.factor)
-
-return(data)
+  data <- rm.allrowNA(data) 
+  
+  ar <- c(formalArgs(d.prepos)[-(20:22)], exclude)
+  
+  dot.names <- names(data)[!names(data) %in% ar]
+  
+  data[dot.names] <- lapply(data[dot.names], as.factor)
+  
+  return(data)
 }                   
                                   
 #===============================================================================================================================
