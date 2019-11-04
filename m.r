@@ -4710,7 +4710,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
                         
 #===============================================================================================================================
       
-metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, n.sim = 1e4, option = 2, r = .5){
+metal <- function(data = NULL, mod, mu.prior = c("mean" = NA, "sd" = NA), tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, n.sim = 1e4, option = 2, r = .5){
   
   f1 <- function(data, zy, impute, n.sim, option, r){ 
     
@@ -4736,7 +4736,8 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
     res <- bayesmeta(        y = ds,
                              sigma = sds,
                              labels = names(j), 
-                             tau.prior = tau.prior)
+                             tau.prior = tau.prior,
+                             mu.prior = mu.prior)
     res$call <- match.call(expand.dots = FALSE)
     
     return(res)
@@ -4765,7 +4766,8 @@ metal <- function(data = NULL, mod, tau.prior = function(x){dhalfnormal(x)}, imp
   for(a in seq_len(so)) z[[a]] <- f2(j = k[[a]], tau.prior = tau.prior)
   
   setNames(z, chep)
-}                                   
+}       
+            
 
 #===============================================================================================================================
          
@@ -4945,7 +4947,7 @@ meta.in <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 2, r 
 
 #========================================================================================
 
-meta.out <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 2, r = .5, tau.prior = function(x){dhalfnormal(x)}){  
+meta.out <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 2, r = .5, mu.prior = c("mean" = NA, "sd" = NA), tau.prior = function(x){dhalfnormal(x)}){  
   
   j <- eval(substitute(meta.in(data = data, by = by, impute = impute, n.sim = n.sim, option = option, r = r)))
   
@@ -4958,11 +4960,13 @@ meta.out <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 2, r
   
   res <- bayesmeta(                y = ds,
                                    sigma = sds,
-                                   labels = names(j), tau.prior = tau.prior)
+                                   labels = names(j), 
+                                   tau.prior = tau.prior,
+                                   mu.prior = mu.prior)
   res$call <- match.call(expand.dots = FALSE)
   
   return(res)
-}                                        
+}                                         
                  
 #======================================================================================== 
                 
