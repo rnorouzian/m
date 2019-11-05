@@ -5133,12 +5133,30 @@ find.norm <- function(low, high, cover = .99, digits = 6){
 #========================================================================================
                 
 
-stats.bayes <- function(fit, stat = median){
+meta.stats <- function(..., stat = "median"){
+
+m <- list(...)
+n <- substitute(...())
+
+f <- function(fit, stat = "median"){
   
-  stat <- deparse(substitute(stat))
-  if(!inherits(fit, "bayesmeta")) stop("Non-Bayesian meta-analysis detected.", call. = FALSE)
+  if(inherits(fit, "bayesmeta")){
   
-  list(bayesfactor = fit$bayesfactor, I2 = fit$I2(fit$summary[stat,1]))
+    c(posterior.I2 = fit$I2(fit$summary[stat,1]), posterior.tau = fit$summary[stat,1])
+    
+  } else if(inherits(fit, "robu")){
+    
+    c(I2 = as.vector(fit$mod_info$I.2), tau = sqrt(as.vector(fit$mod_info$tau.sq)))
+    
+  } else {
+    
+    c(I2 = fit$I2, tau = sqrt(fit$tau2))
+  }
+} 
+out <- setNames(lapply(m, f, stat = stat), n)
+d <- data.frame(out)
+d[] <- lapply(d, as.list)
+data.frame(t(d))
 }                
                 
                 
