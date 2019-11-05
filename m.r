@@ -5027,6 +5027,52 @@ funnel.dint <- function(x, xlab = "effect size (dint)", ylab = "SD", refline = x
                                                legend = legend, shrink = shrink, show.mu = show.mu, ...) 
     }
 }                
+            
+#========================================================================================
+                
+                
+norm.id <- function(Low, High, Cover = NA, digits = 6)
+{
+  UseMethod("norm.id")
+}
+
+norm.id.default <- Vectorize(function(Low, High, Cover = NA, digits = 6){
+  
+  options(warn = -1)
+  
+  coverage <- if(is.character(Cover)) as.numeric(substr(Cover, 1, nchar(Cover)-1)) / 1e2 else if(is.na(Cover)) .95 else Cover
+  
+  p1 <- (1 - coverage) / 2 
+  p2 <- 1 - p1
+  
+  q <- c(Low, High)  
+  alpha <- c(p1, p2)
+  
+  is.df <- function(a, b, sig = 4) (round(a, sig) != round(b, sig))
+  
+  if( p1 <= 0 || p2 >= 1 || q[1] >= q[2] || p1 >= p2 ) {
+    
+    stop("\n\tUnable to find such a prior, make sure you have selected the correct values.")
+    
+  } else {
+    
+    beta <- qnorm(alpha)
+    
+    parm <- solve(cbind(1, beta), q)
+    
+    q <- qnorm(c(p1, p2), parm[[1]], parm[[2]])
+  }
+  
+  if(is.df(Low, q[[1]]) || is.df(High, q[[2]])) {
+    
+    stop("\n\tUnable to find such a prior, make sure you have selected the correct values.")
+  } else {
+    
+    return(c(mean = round(parm[[1]], digits = digits), sd = round(parm[[2]], digits = digits)))
+    
+  }
+})                
+                
                 
 #======================================================================================== 
                 
