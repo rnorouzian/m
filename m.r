@@ -649,7 +649,7 @@ funnel.bayesmeta <- function(x,
                              main = deparse(substitute(x)),
                              xlab = "Effect Size (dint)",
                              ylab = "SD", study.name = TRUE,
-                             FE = FALSE, legend = FE, shrink = FALSE, show.mu = TRUE, ...)
+                             FE = FALSE, legend = FALSE, shrink = FALSE, show.mu = TRUE, ...)
 {
   
   
