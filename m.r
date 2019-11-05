@@ -5128,7 +5128,20 @@ find.norm <- function(low, high, cover = .99, digits = 6){
     return(round(c(mean = parm[[1]], sd = parm[[2]]), digits = digits))
   }
 }                
-                              
+  
+                
+#========================================================================================
+                
+
+stats.bayes <- function(fit, stat = median){
+  
+  stat <- deparse(substitute(stat))
+  if(!inherits(fit, "bayesmeta")) stop("Non-Bayesian meta-analysis detected.", call. = FALSE)
+  
+  list(bayesfactor = fit$bayesfactor, I2 = fit$I2(fit$summary[stat,1]))
+}                
+                
+                
 #======================================================================================== 
                 
 need <- c("bayesmeta", "distr", "zoo", "robumeta")
