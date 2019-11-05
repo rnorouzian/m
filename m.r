@@ -4995,13 +4995,13 @@ forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex = 1, lev
 
 #========================================================================================
 
-forest.dint <- function(x, xlab = "effect size (dint)", refline = 0, cex = 1, level = .95, col = 1, col.by.cluster = FALSE, ...){
+forest.dint <- function(x, xlab = "effect size (dint)", refline = 0, cex, level = .95, col = 1, col.by.cluster = FALSE, ...){
   
-if(inherits(x, "robu")) {  forest.rob(x = x, xlab = xlab, refline = refline, cex = cex, level = level, col.by.cluster = col.by.cluster, col = col, ...)
+  if(inherits(x, "robu")) {  forest.rob(x = x, xlab = xlab, refline = refline, cex = cex, level = level, col.by.cluster = col.by.cluster, col = col, ...)
   }else{
-    forest(x = x, xlab = xlab, refline = refline, cex = cex, level = level, col = col, ...)
+    forest(x = x, xlab = xlab, refline = refline, cex = cex, col = col, ...)
   }
-}                
+}               
 
 #========================================================================================
                 
