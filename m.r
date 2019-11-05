@@ -4235,23 +4235,16 @@ meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)},
                  
 #===============================================================================================================================
           
-                 
-meta.robust <- function(f = NULL, data, small = TRUE){
+meta.robust <- function(f, data, by, adjust = FALSE){ 
   
- d <- long.form(data = data)
-  
-  mods <- if(is.null(f)) { formula(~as.factor(time)) } else {
-    
-    f[[2]] <- f[[3]]
-    f[[3]] <- NULL
-    
-    update(f, ~as.factor(time) +.)
-  }
-  
-  res <- metafor::robust(rma.uni(yi = dint, sei = SD, data = d, mods = mods, slab = d$study.name), cluster = d$id, adjust = small)
-  
-  return(res)
-}                 
+s <- substitute(by)
+
+f <- if(missing(f)) formula(dint~1) else formula(f)
+
+m <- robu(f, data = if(missing(by)) data else subset(data, eval(s)), studynum = study.name, var = SD^2, small = adjust)
+m$ml <- f
+m
+}                                  
     
 #===============================================================================================================================
                                       
