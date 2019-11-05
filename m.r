@@ -5029,6 +5029,49 @@ funnel.dint <- function(x, xlab = "effect size (dint)", ylab = "SD", refline = x
 }                
             
 #========================================================================================
+              
+                
+meta.bayes <- function(data = NULL, by, option = 1, r = .5, mu.prior = c("mean" = NA, "sd" = NA), tau.prior = function(x){dhalfnormal(x)}){  
+  
+  data$study.name <- trimws(data$study.name)
+  
+  metain <- function(data = NULL, by, option = 1, r = .5){ 
+    
+    m <- split(data, data$study.name)
+    m <- Filter(NROW, rm.allrowNA2(m)) 
+    
+    L <- if(missing(by)) m else { s <- substitute(by) ; h <- lapply(m, function(x) do.call("subset", list(x, s))) ;
+    res <- Filter(NROW, h) ; if(length(res) == 0) NULL else res}
+    
+    ds <- Filter(Negate(is.null), lapply(seq_along(L), function(i) L[[i]]$dint))
+    sds <- Filter(Negate(is.null), lapply(seq_along(L), function(i) L[[i]]$SD))
+    
+    f <- if(option == 1) option1 else option2
+    
+    setNames(mapply(f, ds = ds, sds = sds, r = r, SIMPLIFY = FALSE), names(L))
+  }
+  
+  j <- eval(substitute(metain(data = data, by = by, option = option, r = r)))
+  
+  ds <-  sapply(seq_along(j), function(i) j[[i]][1])
+  sds <- sapply(seq_along(j), function(i) j[[i]][2])
+  
+  test <- length(ds) >= 2
+  
+  if(!test) return(NA)
+  
+  res <- bayesmeta(                y = ds,
+                                   sigma = sds,
+                                   labels = names(j), 
+                                   tau.prior = tau.prior,
+                                   mu.prior = mu.prior)
+  res$call <- match.call(expand.dots = FALSE)
+  
+  return(res)
+}                
+                
+                
+#==============================================================================================================================================   
                 
                 
 norm.id <- function(Low, High, Cover = NA, digits = 6)
