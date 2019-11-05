@@ -5160,8 +5160,72 @@ data.frame(t(d))
 }                
                 
 #================================================================================================================================================================
+    
                 
-
+metal.dint <- function(data = NULL, by, mu.prior = c("mean" = NA, "sd" = NA), tau.prior = function(x){dhalfnormal(x)}, option = 1, r = .5){
+  
+  
+  data$study.name <- trimws(data$study.name)
+  
+  f1 <- function(data = NULL, zy, option = 1, r = .5){ 
+    
+    m <- split(data, data$study.name)
+    m <- Filter(NROW, rm.allrowNA2(m)) 
+    
+    L <- if(missing(zy)) m else { s <- substitute(zy) ; h <- lapply(m, function(x) do.call("subset", list(x, s))) ;
+    res <- Filter(NROW, h) ; if(length(res) == 0) NULL else res}
+    
+    ds <- Filter(Negate(is.null), lapply(seq_along(L), function(i) L[[i]]$dint))
+    sds <- Filter(Negate(is.null), lapply(seq_along(L), function(i) L[[i]]$SD))
+    
+    f <- if(option == 1) option1 else option2
+    
+    setNames(mapply(f, ds = ds, sds = sds, r = r, SIMPLIFY = FALSE), names(L))
+  }
+  
+  f2 <- function(j, tau.prior, mu.prior){  
+    
+    ds <- sapply(seq_along(j), function(i) j[[i]][1])
+    sds <- sapply(seq_along(j), function(i) j[[i]][2])
+    
+    test <- length(ds) >= 2
+    
+    if(!test) return(NA)
+    
+    res <- bayesmeta(        y = ds,
+                             sigma = sds,
+                             labels = names(j), 
+                             tau.prior = tau.prior,
+                             mu.prior = mu.prior)
+    res$call <- match.call(expand.dots = FALSE)
+    
+    return(res)
+  }  
+  
+  chep <- sort(unique(na.omit(data$time)))
+  
+  G <- if(missing(by)) { lapply(chep, function(y) bquote(time == .(y))) 
+    
+  } else {
+    
+    s <- substitute(by)
+    lapply(chep, function(x) bquote(.(s) & time == .(x)))
+  }
+  
+  go <- length(G)
+  
+  k <- vector("list", go)
+  
+  for(w in seq_len(go)) k[[w]] <- f1(data = data, zy = eval(G[[w]]), option = option, r = r)
+  
+  so <- length(k)
+  
+  z <- vector("list", so)
+  
+  for(a in seq_len(so)) z[[a]] <- f2(j = k[[a]], tau.prior = tau.prior, mu.prior = mu.prior)
+  
+  setNames(z, chep)
+} 
            
 #================================================================================================================================================================ 
                 
