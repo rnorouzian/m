@@ -5162,9 +5162,9 @@ data.frame(t(d))
 #================================================================================================================================================================
     
                 
-metal.dint <- function(data = NULL, by, mu.prior = c("mean" = NA, "sd" = NA), tau.prior = function(x){dhalfnormal(x)}, option = 1, r = .5){
+metal.dint <- function(data = NULL, by, over = time, mu.prior = c("mean" = NA, "sd" = NA), tau.prior = function(x){dhalfnormal(x)}, option = 1, r = .5){
   
-  
+  over <- deparse(substitute(over))
   data$study.name <- trimws(data$study.name)
   
   f1 <- function(data = NULL, zy, option = 1, r = .5){ 
@@ -5202,14 +5202,15 @@ metal.dint <- function(data = NULL, by, mu.prior = c("mean" = NA, "sd" = NA), ta
     return(res)
   }  
   
-  chep <- sort(unique(na.omit(data$time)))
+  chep <- sort(unique(na.omit(data[[over]])))
   
-  G <- if(missing(by)) { lapply(chep, function(y) bquote(time == .(y))) 
+  
+  G <- if(missing(by)) { lapply(chep, function(y) bquote(.(as.name(noquote(over))) == .(y))) 
     
   } else {
     
     s <- substitute(by)
-    lapply(chep, function(x) bquote(.(s) & time == .(x)))
+    lapply(chep, function(x) bquote(.(s) & .(as.name(noquote(over))) == .(x)))
   }
   
   go <- length(G)
@@ -5222,9 +5223,9 @@ metal.dint <- function(data = NULL, by, mu.prior = c("mean" = NA, "sd" = NA), ta
   
   z <- vector("list", so)
   
-  for(a in seq_len(so)) z[[a]] <- f2(j = k[[a]], tau.prior = tau.prior, mu.prior = mu.prior)
+ for(a in seq_len(so)) z[[a]] <- f2(j = k[[a]], tau.prior = tau.prior, mu.prior = mu.prior)
   
-  setNames(z, chep)
+ setNames(z, chep)
 } 
            
 #================================================================================================================================================================ 
