@@ -5074,12 +5074,12 @@ meta.bayes <- function(data = NULL, by, option = 1, r = .5, mu.prior = c("mean" 
 #==============================================================================================================================================   
                 
                 
-norm.id <- function(Low, High, Cover = NA, digits = 6)
+find.norms <- function(Low, High, Cover = NA, digits = 6)
 {
-  UseMethod("norm.id")
+  UseMethod("find.norms")
 }
 
-norm.id.default <- Vectorize(function(Low, High, Cover = NA, digits = 6){
+find.norms.default <- Vectorize(function(Low, High, Cover = NA, digits = 6){
   
   options(warn = -1)
   
@@ -5116,7 +5116,43 @@ norm.id.default <- Vectorize(function(Low, High, Cover = NA, digits = 6){
   }
 })                
                 
+#====================================================================================================
                 
+find.norm <- function(low, high, cover = .99, digits = 6){
+  
+  options(warn = -1)
+  
+  p1 <- (1 - cover) / 2 
+  p2 <- 1 - p1
+  
+  q <- c(low, high)  
+  alpha <- c(p1, p2)
+  
+  is.df <- function(a, b, sig = 4) (round(a, sig) != round(b, sig))
+  
+  if (p1 <= 0 || p2 >= 1 || q[1] >= q[2] || p1 >= p2) {
+    
+    stop("Incorrect 'low' and/or 'high' values.", call. = FALSE)
+    
+  } else {
+    
+    beta <- qnorm(alpha)
+    
+    parm <- solve(cbind(1, beta), q)
+    
+    q <- qnorm(c(p1, p2), parm[[1]], parm[[2]])
+  }
+  
+  if(is.df(low, q[[1]]) || is.df(high, q[[2]])) {
+    
+    stop("Change 'low' and/or 'high' values.", call. = FALSE)
+    
+  } else {
+    
+    return(round(c(mean = parm[[1]], sd = parm[[2]]), digits = digits))
+  }
+}                
+                              
 #======================================================================================== 
                 
 need <- c("bayesmeta", "distr", "zoo", "robumeta")
