@@ -4966,7 +4966,43 @@ meta.out <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 2, r
   
   return(res)
 }                                         
-                 
+
+#========================================================================================
+                
+                
+forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex = 1, level = .95, col.by.cluster = FALSE, col = NULL, ...)
+{
+  
+  cols <- colorRampPalette(c(2, 4))(x$N)
+  grp <- x$data.full$study
+  
+  col <- if(!is.null(col)) col else if(is.null(col) & !col.by.cluster) 1 else cols[grp]
+  
+  forest.default(x = x$data.full$effect.size, vi = x$data.full$var.eff.size,
+                          level = level,           
+                          refline = refline,
+                          xlab = xlab,
+                          slab = as.vector(x$study_orig_id),
+                          cex = cex, efac = 0, col = col, ...)
+  
+  grand.ES <- x$reg_table$b.r
+  grand.CI.L <- x$reg_table$CI.L
+  grand.CI.U <- x$reg_table$CI.U
+  
+ addpoly(grand.ES, ci.lb = grand.CI.L, ci.ub = grand.CI.U, mlab = expression(bold("mean effect ("*mu*")")), 
+         level = level, cex = cex, col = "cyan", rows = -.7, font = 2)
+}
+
+#========================================================================================
+
+forest.dint <- function(x, xlab = "effect size (dint)", refline = 0, cex = 1, level = .95, col = par("col"), col.by.cluster = FALSE, ...){
+  
+if(inherits(x, "robu")) {  forest.rob(x = x, xlab = xlab, refline = refline, cex = cex, level = level, col.by.cluster = col.by.cluster, ...)
+  }else{
+    forest(x = x, xlab = xlab, refline = refline, cex = cex, level = level, col = col, ...)
+  }
+}                
+                
 #======================================================================================== 
                 
 need <- c("bayesmeta", "distr", "zoo") # "metafor"
