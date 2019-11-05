@@ -4235,15 +4235,15 @@ meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)},
                  
 #===============================================================================================================================
           
-meta.robust <- function(f, data, by, adjust = FALSE){ 
+meta.robust <- function(f, data, by, small = FALSE){ 
   
-s <- substitute(by)
-
-f <- if(missing(f)) formula(dint~1) else formula(f)
-
-m <- robu(f, data = if(missing(by)) data else subset(data, eval(s)), studynum = study.name, var = SD^2, small = adjust)
-m$ml <- f
-m
+  s <- substitute(by)
+  
+  f <- if(missing(f)) formula(dint~1) else formula(f)
+  
+  m <- robu(f, data = if(missing(by)) data else subset(data, eval(s)), studynum = study.name, var = SD^2, small = small)
+  m$ml <- f
+  m
 }                                  
     
 #===============================================================================================================================
