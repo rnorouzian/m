@@ -5002,10 +5002,35 @@ if(inherits(x, "robu")) {  forest.rob(x = x, xlab = xlab, refline = refline, cex
     forest(x = x, xlab = xlab, refline = refline, cex = cex, level = level, col = col, ...)
   }
 }                
+
+#========================================================================================
+                
+                
+funnel.dint <- function(x, xlab = "effect size (dint)", ylab = "SD", refline = x$reg_table$b.r, 
+                        cex = 1, level = .95, col = "magenta", main = deparse(substitute(x)),
+                        back = adjustcolor(8, .1), shade = 0, hlines = 0, 
+                        pch = 21, bg = "cyan", study.name = TRUE,
+                        FE = FALSE, legend = FALSE, shrink = FALSE, show.mu = TRUE,
+                        ...){
+  
+  if(inherits(x, "robu")) { funnel.default(x = x$data.full$effect.size, 
+                                  vi = x$data.full$var.eff.size,
+                                  level = level,           
+                                   refline = refline,
+                                   xlab = xlab,
+                                   cex = cex, col = col, ylab = ylab, 
+                                   back = back, shade = shade, hlines = hlines, 
+                                  pch = pch, bg = bg, ...)
+    box()
+    
+  } else { funnel(x = x, main = main, study.name = study.name, FE = FE, 
+                                               legend = legend, shrink = shrink, show.mu = show.mu, ...) 
+    }
+}                
                 
 #======================================================================================== 
                 
-need <- c("bayesmeta", "distr", "zoo") # "metafor"
+need <- c("bayesmeta", "distr", "zoo", "robumeta")
 have <- need %in% rownames(installed.packages())
 if(any(!have)){ install.packages( need[!have] ) }
  
@@ -5013,6 +5038,7 @@ options(warn = -1)
 suppressMessages({ 
     library("distr")
     library("bayesmeta")
+    library("robumeta")
     library("zoo")
 })               
                
