@@ -4914,7 +4914,7 @@ do.factor <- function(data, exclude = NULL, char = TRUE){
   
   data <- rm.allrowNA(data) 
   
-  ar <- c(formalArgs(d.prepos)[-(20:22)], exclude)
+  ar <- c(formalArgs(d.prepos)[-(20:22)], c("SD", "dint", "id"), exclude)
   
   dot.names <- names(data)[!names(data) %in% ar]
   
