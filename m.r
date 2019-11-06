@@ -1797,10 +1797,10 @@ dintA <- function(data = NULL, by, impute = FALSE, n.sim = 1e4)
     H <- lapply(L, function(x) do.call("subset", list(x, s)))
     
     H <- Filter(NROW, H)
-    h <- if(length(H) == 0) stop("No study with the requested moderators found.", call. = FALSE) else H
+    L <- if(length(H) == 0) stop("No study with the requested moderators found.", call. = FALSE) else H
     
-    g <- lapply(L[names(h)], function(x) subset(x, control))
-    L <- Map(rbind, h, g)   
+  #  g <- lapply(L[names(h)], function(x) subset(x, control)) # Current `L` used to be `h`
+  #  L <- Map(rbind, h, g)   
   }
   
   G <- function(m, n.sim)
@@ -2135,10 +2135,10 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e4)
     H <- lapply(L, function(x) do.call("subset", list(x, s)))
     
     H <- Filter(NROW, H)
-    h <- if(length(H) == 0) stop("No study with the requested moderators found.", call. = FALSE) else H
+    L <- if(length(H) == 0) stop("No study with the requested moderators found.", call. = FALSE) else H
     
-    g <- lapply(L[names(h)], function(x) subset(x, control))
-    L <- Map(rbind, h, g)   
+   # g <- lapply(L[names(h)], function(x) subset(x, control)) # Current `L` used to be `h`
+   # L <- Map(rbind, h, g)   
   }
   
   G <- function(m, n.sim)
