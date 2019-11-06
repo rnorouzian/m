@@ -1797,10 +1797,14 @@ dintA <- function(data = NULL, by, impute = FALSE, n.sim = 1e4)
     H <- lapply(L, function(x) do.call("subset", list(x, s)))
     
     H <- Filter(NROW, H)
-    L <- if(length(H) == 0) stop("No study with the requested moderators found.", call. = FALSE) else H
+    h <- if(length(H) == 0) stop("No study with the requested moderators found.", call. = FALSE) else H
     
-  #  g <- lapply(L[names(h)], function(x) subset(x, control)) # Current `L` used to be `h`
-  #  L <- Map(rbind, h, g)   
+  nms <- names(which(!sapply(h, function(x) any(x$control))))
+  
+  if(length(nm1) > 0) {
+    h[nms]  <- Map(function(x, y) rbind(y, x[x$control, ]), List[nms], h[nms])
+  }
+   L <- h
   }
   
   G <- function(m, n.sim)
@@ -2135,10 +2139,14 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e4)
     H <- lapply(L, function(x) do.call("subset", list(x, s)))
     
     H <- Filter(NROW, H)
-    L <- if(length(H) == 0) stop("No study with the requested moderators found.", call. = FALSE) else H
+    h <- if(length(H) == 0) stop("No study with the requested moderators found.", call. = FALSE) else H
     
-   # g <- lapply(L[names(h)], function(x) subset(x, control)) # Current `L` used to be `h`
-   # L <- Map(rbind, h, g)   
+    nms <- names(which(!sapply(h, function(x) any(x$control))))
+  
+  if(length(nm1) > 0) {
+    h[nms]  <- Map(function(x, y) rbind(y, x[x$control, ]), List[nms], h[nms])
+  }
+   L <- h               
   }
   
   G <- function(m, n.sim)
