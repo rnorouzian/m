@@ -1801,7 +1801,7 @@ dintA <- function(data = NULL, by, impute = FALSE, n.sim = 1e4)
     
   nms <- names(which(!sapply(h, function(x) any(x$control))))
   
-  if(length(nm1) > 0) {
+  if(length(nms) > 0) {
     h[nms]  <- Map(function(x, y) rbind(y, x[x$control, ]), List[nms], h[nms])
   }
    L <- h
@@ -2143,7 +2143,7 @@ dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e4)
     
     nms <- names(which(!sapply(h, function(x) any(x$control))))
   
-  if(length(nm1) > 0) {
+  if(length(nms) > 0) {
     h[nms]  <- Map(function(x, y) rbind(y, x[x$control, ]), List[nms], h[nms])
   }
    L <- h               
