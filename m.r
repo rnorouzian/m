@@ -5132,32 +5132,35 @@ find.norm <- function(low, high, cover = .99, digits = 6){
                 
 #========================================================================================
                 
-
 meta.stats <- function(..., stat = "median"){
-
-m <- list(...)
-n <- substitute(...())
-
-f <- function(fit, stat = "median"){
   
-  if(inherits(fit, "bayesmeta")){
+  m <- list(...)
+  cl <- class(...)
+  len <- length(m)
+  m <- if(cl == "list" & len == 1) as.list(...) else m
+  n <- substitute(...())
   
-    c(posterior.I2 = fit$I2(fit$summary[stat,1]), posterior.tau = fit$summary[stat,1])
+  f <- function(fit, stat = "median"){
     
-  } else if(inherits(fit, "robu")){
-    
-    c(I2 = as.vector(fit$mod_info$I.2), tau = sqrt(as.vector(fit$mod_info$tau.sq)))
-    
-  } else {
-    
-    c(I2 = fit$I2, tau = sqrt(fit$tau2))
+    if(inherits(fit, "bayesmeta")){
+      
+      c(I2 = fit$I2(fit$summary[stat,1]), tau = fit$summary[stat,1])
+      
+    } else if(inherits(fit, "robu")){
+      
+      c(I2 = as.vector(fit$mod_info$I.2), tau = sqrt(as.vector(fit$mod_info$tau.sq)))
+      
+    } else {
+      
+      c(I2 = fit$I2, tau = sqrt(fit$tau2))
+    }
   }
-} 
-out <- setNames(lapply(m, f, stat = stat), n)
-d <- data.frame(out)
-d[] <- lapply(d, as.list)
-data.frame(t(d))
-}                
+  m <- m[!is.na(m)]
+  out <- setNames(lapply(m, f, stat = stat), if(cl == "list" & len == 1) names(m) else n)
+  d <- data.frame(out)
+  d[] <- lapply(d, as.list)
+  data.frame(t(d))
+}             
                 
 #================================================================================================================================================================
     
