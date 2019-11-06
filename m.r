@@ -4910,7 +4910,11 @@ dint.norm <- function(dint) noquote(paste0(round(pnorm(dint) - pnorm(0), 4)*1e2,
                    
 #===============================================================================================================================                   
                    
-do.factor <- function(data, exclude = NULL, char = TRUE){
+do.factor <- function(data, exclude = NULL, char = TRUE, drop = NULL){
+  
+  colnames(data) <- trimws(colnames(data))
+  
+  if(!is.null(drop)) data <- drop.col(data, c("study.name", "id", "SD", drop))
   
   data <- rm.allrowNA(data) 
   
@@ -4921,7 +4925,7 @@ do.factor <- function(data, exclude = NULL, char = TRUE){
   data[dot.names] <- lapply(data[dot.names], if(char) as.character else as.factor)
   
   return(data)
-}                   
+}                  
                                   
 #===============================================================================================================================
 
