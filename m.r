@@ -4927,7 +4927,7 @@ do.factor <- function(data, exclude = NULL, char = TRUE, drop = NULL){
   
   colnames(data) <- trimws(colnames(data))
   
-  if(!is.null(drop)) data <- drop.col(data, c("study.name", "id", "SD", drop))
+  if(!is.null(drop)) data <- drop.col(data, drop)
   
   data <- rm.allrowNA(data) 
   
