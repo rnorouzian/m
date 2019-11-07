@@ -4778,7 +4778,7 @@ metal <- function(data = NULL, mod, mu.prior = c("mean" = NA, "sd" = NA), tau.pr
 
 #===============================================================================================================================
          
- long.form <- function(data, file = NULL, na = ""){
+ data.set <- long.form <- function(data, file = NULL, na = ""){
    
    L <- dint(data)
    
