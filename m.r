@@ -4995,9 +4995,9 @@ forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex = 1, lev
                           slab = as.vector(x$study_orig_id),
                           cex = cex, efac = 0, col = col, ...)
   
-  grand.ES <- x$reg_table$b.r
-  grand.CI.L <- x$reg_table$CI.L
-  grand.CI.U <- x$reg_table$CI.U
+  grand.ES <- x$reg_table$b.r[[1]]
+  grand.CI.L <- x$reg_table$CI.L[[1]]
+  grand.CI.U <- x$reg_table$CI.U[[1]]
   
  addpoly(grand.ES, ci.lb = grand.CI.L, ci.ub = grand.CI.U, mlab = expression(bold("mean effect ("*mu*")")), 
          level = level, cex = cex, col = "cyan", rows = -.7, font = 2)
@@ -5111,7 +5111,7 @@ data.frame(t(f(low = low, high = high, cover = cover, digits = digits)))
                 
 #====================================================================================================
                 
-find.norm <- function(low, high, cover = .99, digits = 6){
+mu.norm <- find.norm <- function(low, high, cover = .99, digits = 6){
   
   options(warn = -1)
   
