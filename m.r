@@ -5162,7 +5162,7 @@ meta.stats <- function(..., stat = "median"){
 #================================================================================================================================================================
     
                 
-metal.dint <- function(data = NULL, by, over = time, mu.prior = c("mean" = NA, "sd" = NA), tau.prior = function(x){dhalfnormal(x)}, option = 1, r = .5){
+metal.dint <- function(data = NULL, by, over = time, mu.prior = mu.norm(-6, 6), tau.prior = function(x){dhalfnormal(x)}, option = 1, r = .5){
   
   over <- deparse(substitute(over))
   data$study.name <- trimws(data$study.name)
