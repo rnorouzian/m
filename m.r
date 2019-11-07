@@ -4600,7 +4600,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   r <- full.clean(r, ar, all)
   
-  check <- all(sapply(r, function(i) "study.name" %in% names(i)))
+  check <- all(sapply(r, function(i) "study.name" %in% trimws(names(i))))
   
   if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
   
@@ -4611,7 +4611,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   if(by.group.name){
     
-    check <- all(sapply(r, function(i) "group.name" %in% names(i)))
+    check <- all(sapply(r, function(i) "group.name" %in% trimws(names(i))))
     
     if(!check) stop("Add a new column named 'group.name' with distinct names for groups in each row.", call. = FALSE)
     
