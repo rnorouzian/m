@@ -1746,344 +1746,346 @@ dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint
 #===============================================================================================================================
                   
                   
-dintA <- function(data = NULL, by, impute = FALSE, n.sim = 1e4)
-{
-  
-  check <- "study.name" %in% trimws(names(data))
-  if(!check) stop("Add a new column named 'study.name'.", call. = FALSE) 
-  
-  data$study.name <- trimws(data$study.name)
-  data <- rm.allrowNA(data) 
-  
-  m <- split(data, data$study.name)         
-  m <- Filter(NROW, rm.allrowNA2(m)) 
-  if(!(length(unique(data$study.name)) == length(m))) stop("Each 'study.name' must be distinct.", call. = FALSE)
-  
-  if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
-  
-  if(impute) { 
-    
-    ar <- formalArgs(rdif)[c(-7, -9)]
-    
-    args <- lapply(m, function(x) unclass(x[ar]))
-    
-    argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
-    
-    f <- do.call(Map, c(f = rdif, argsT))
-    
-    f <- lapply(f, na.locf0)
-    
-    m <- Map(function(x, y) transform(x, r = na.locf0(y, fromLast = TRUE)), m, f) 
-  }     
-  
-  ar <- formalArgs(d.prepos)[-c(21, 22)]
-  
-  dot.names <- names(data)[!names(data) %in% ar]
-  
-  args <- lapply(m, function(x) unclass(x[c(ar, dot.names)]))
-  
-  argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
-  
-  L <- do.call(Map, c(f = d.prepos, argsT))
-  
-  
-  if(!missing(by)){ 
-    
-    s <- substitute(by)
-    k <- as.list(s)
-    
-    if("control" %in% k || "!control" %in% k) stop("'control' can't be a moderating variable either alone or with other variables.", call. = FALSE)
-    
-    H <- lapply(L, function(x) do.call("subset", list(x, s)))
-    
-    H <- Filter(NROW, H)
-    h <- if(length(H) == 0) stop("No study with the requested moderators found.", call. = FALSE) else H
-    
-  nms <- names(which(!sapply(h, function(x) any(x$control))))
-  
-  if(length(nms) > 0) {
-    h[nms]  <- Map(function(x, y) rbind(y, x[x$control, ]), List[nms], h[nms])
-  }
-   L <- h
-  }
-  
-  G <- function(m, n.sim)
-  {
-    
-    cdel3 <- reget(m, control & post == 4 & outcome == 1)
-    cdel1 <- reget(m, control & post == 2 & outcome == 1)
-    cdel2 <- reget(m, control & post == 3 & outcome == 1)
-    cs <- reget(m, control & post == 1 & outcome == 1)
-    
-    tdel3 <- reget(m, !control & post == 4 & outcome == 1)
-    tdel1 <- reget(m, !control & post == 2 & outcome == 1)
-    tdel2 <- reget(m, !control & post == 3 & outcome == 1)
-    ts <- reget(m, !control & post == 1 & outcome == 1) 
-    
-    if(all(sapply(list(cdel1, cdel2, cdel3, tdel1, tdel2, tdel3, ts, cs), is.null))) stop("Either 'control' or 'post' incorrectly coded.", call. = FALSE)
-    
-    short <- all(sapply(list(cs, ts), function(x) !is.null(x)))
-    
-    del1 <- all(sapply(list(cdel1, tdel1), function(x) !is.null(x)))
-    
-    del2 <- all(sapply(list(cdel2, tdel2), function(x) !is.null(x)))
-    
-    del3 <- all(sapply(list(cdel3, tdel3), function(x) !is.null(x)))
-    
-    cdel3..2 <- reget(m, control & post == 4 & outcome == 2)
-    cdel1..2 <- reget(m, control & post == 2 & outcome == 2)
-    cdel2..2 <- reget(m, control & post == 3 & outcome == 2)
-    cs..2 <- reget(m, control & post == 1 & outcome == 2)
-    
-    tdel3..2 <- reget(m, !control & post == 4 & outcome == 2)
-    tdel1..2 <- reget(m, !control & post == 2 & outcome == 2)
-    tdel2..2 <- reget(m, !control & post == 3 & outcome == 2)
-    ts..2 <- reget(m, !control & post == 1 & outcome == 2)
-    
-    
-    short..2 <- all(sapply(list(cs..2, ts..2), function(x) !is.null(x)))
-    
-    del1..2 <- all(sapply(list(cdel1..2, tdel1..2), function(x) !is.null(x)))
-    
-    del2..2 <- all(sapply(list(cdel2..2, tdel2..2), function(x) !is.null(x)))
-    
-    del3..2 <- all(sapply(list(cdel3..2, tdel3..2), function(x) !is.null(x)))
-    
-    
-    cdel3..3 <- reget(m, control & post == 4 & outcome == 3)
-    cdel1..3 <- reget(m, control & post == 2 & outcome == 3)
-    cdel2..3 <- reget(m, control & post == 3 & outcome == 3)
-    cs..3 <- reget(m, control & post == 1 & outcome == 3)
-    
-    tdel3..3 <- reget(m, !control & post == 4 & outcome == 3)
-    tdel1..3 <- reget(m, !control & post == 2 & outcome == 3)
-    tdel2..3 <- reget(m, !control & post == 3 & outcome == 3)
-    ts..3 <- reget(m, !control & post == 1 & outcome == 3)
-    
-    short..3 <- all(sapply(list(cs..3, ts..3), function(x) !is.null(x)))
-    
-    del1..3 <- all(sapply(list(cdel1..3, tdel1..3), function(x) !is.null(x)))
-    
-    del2..3 <- all(sapply(list(cdel2..3, tdel2..3), function(x) !is.null(x))) 
-    
-    del3..3 <- all(sapply(list(cdel3..3, tdel3..3), function(x) !is.null(x)))
-    
-    
-    cdel3..4 <- reget(m, control & post == 4 & outcome == 4)
-    cdel1..4 <- reget(m, control & post == 2 & outcome == 4)
-    cdel2..4 <- reget(m, control & post == 3 & outcome == 4)
-    cs..4 <- reget(m, control & post == 1 & outcome == 4)
-    
-    tdel3..4 <- reget(m, !control & post == 4 & outcome == 4)
-    tdel1..4 <- reget(m, !control & post == 2 & outcome == 4)
-    tdel2..4 <- reget(m, !control & post == 3 & outcome == 4)
-    ts..4 <- reget(m, !control & post == 1 & outcome == 4)
-    
-    short..4 <- all(sapply(list(cs..4, ts..4), function(x) !is.null(x)))
-    
-    del1..4 <- all(sapply(list(cdel1..4, tdel1..4), function(x) !is.null(x)))
-    
-    del2..4 <- all(sapply(list(cdel2..4, tdel2..4), function(x) !is.null(x)))         
-    
-    del3..4 <- all(sapply(list(cdel3..4, tdel3..4), function(x) !is.null(x)))
-    
-    
-    if(short){
-      nc1 <- m$n[m$control & m$post == 1 & m$outcome == 1]
-      nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 1]
-      dps <- pair(cs, ts)  
-      dppc1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][1])
-      dppt1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][2])
-      rv <- m$rev.sign[m$post == 1 & m$outcome == 1]
-      
-      SHORT <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
-    }
-    
-    
-    if(short..2){
-      nc1 <- m$n[m$control & m$post == 1 & m$outcome == 2]
-      nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 2]
-      dps <- pair(cs..2, ts..2)  
-      dppc1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][1])
-      dppt1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][2])
-      rv <- m$rev.sign[m$post == 1 & m$outcome == 2]
-      
-      SHORT..2 <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
-    }
-    
-    
-    if(short..3){
-      nc1 <- m$n[m$control & m$post == 1 & m$outcome == 3]
-      nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 3]
-      dps <- pair(cs..3, ts..3)  
-      dppc1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][1])
-      dppt1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][2])
-      rv <- m$rev.sign[m$post == 1 & m$outcome == 3]
-      
-      SHORT..3 <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
-    }
-    
-    
-    if(short..4){
-      nc1 <- m$n[m$control & m$post == 1 & m$outcome == 4]
-      nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 4]
-      dps <- pair(cs..4, ts..4)  
-      dppc1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][1])
-      dppt1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][2])
-      rv <- m$rev.sign[m$post == 1 & m$outcome == 4]
-      
-      SHORT..4 <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
-    }
-    
-    
-    if(del1){
-      nc2 <- m$n[m$control & m$post == 2 & m$outcome == 1]
-      nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 1]
-      dpdel1 <- pair(cdel1, tdel1)
-      dppc2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][1])
-      dppt2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][2])
-      rv <- m$rev.sign[m$post == 2 & m$outcome == 1]
-      
-      DEL1 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, rev.sign = pairup(rv))))
-    }
-    
-    
-    if(del1..2){
-      nc2 <- m$n[m$control & m$post == 2 & m$outcome == 2]
-      nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 2]
-      dpdel1 <- pair(cdel1..2, tdel1..2)
-      dppc2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][1])
-      dppt2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][2])
-      rv <- m$rev.sign[m$post == 2 & m$outcome == 2]
-      
-      DEL1..2 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, rev.sign = pairup(rv))))
-    }
-    
-    
-    if(del1..3){
-      nc2 <- m$n[m$control & m$post == 2 & m$outcome == 3]
-      nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 3]
-      dpdel1 <- pair(cdel1..3, tdel1..3)
-      dppc2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][1])
-      dppt2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][2])
-      rv <- m$rev.sign[m$post == 2 & m$outcome == 3]
-      
-      DEL1..3 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, rev.sign = pairup(rv))))
-    }
-    
-    
-    if(del1..4){
-      nc2 <- m$n[m$control & m$post == 2 & m$outcome == 4]
-      nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 4]
-      dpdel1 <- pair(cdel1..4, tdel1..4)
-      dppc2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][1])
-      dppt2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][2])
-      rv <- m$rev.sign[m$post == 2 & m$outcome == 4]
-      
-      DEL1..4 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, rev.sign = pairup(rv))))
-    }
-    
-    
-    if(del2){
-      nc3 <- m$n[m$control & m$post == 3 & m$outcome == 1]
-      nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 1]
-      dpdel2 <- pair(cdel2, tdel2)
-      dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
-      dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
-      rv <- m$rev.sign[m$post == 3 & m$outcome == 1]
-      
-      DEL2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
-    }
-    
-    if(del2..2){
-      nc3 <- m$n[m$control & m$post == 3 & m$outcome == 2]
-      nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 2]
-      dpdel2 <- pair(cdel2..2, tdel2..2)
-      dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
-      dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
-      rv <- m$rev.sign[m$post == 3 & m$outcome == 2]
-      
-      DEL2..2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
-    }
-    
-    
-    if(del2..3){
-      nc3 <- m$n[m$control & m$post == 3 & m$outcome == 3]
-      nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 3]
-      dpdel2 <- pair(cdel2..3, tdel2..3)
-      dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
-      dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
-      rv <- m$rev.sign[m$post == 3 & m$outcome == 3]
-      
-      DEL2..3 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
-    }
-    
-    
-    if(del2..4){
-      nc3 <- m$n[m$control & m$post == 3 & m$outcome == 4]
-      nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 4]
-      dpdel2 <- pair(cdel2..4, tdel2..4)
-      dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
-      dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
-      rv <- m$rev.sign[m$post == 3 & m$outcome == 4]
-      
-      DEL2..4 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
-    }
-    
-    if(del3){
-      nc3 <- m$n[m$control & m$post == 4 & m$outcome == 1]
-      nt3 <- m$n[m$control == FALSE & m$post == 4 & m$outcome == 1]
-      dpdel2 <- pair(cdel3, tdel3)
-      dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
-      dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
-      rv <- m$rev.sign[m$post == 4 & m$outcome == 1]
-      
-      DEL3 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
-    }
-    
-    if(del3..2){
-      nc3 <- m$n[m$control & m$post == 4 & m$outcome == 2]
-      nt3 <- m$n[m$control == FALSE & m$post == 4 & m$outcome == 2]
-      dpdel2 <- pair(cdel3..2, tdel3..2)
-      dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
-      dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
-      rv <- m$rev.sign[m$post == 4 & m$outcome == 2]
-      
-      DEL3..2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
-    }
-    
-    
-    if(del3..3){
-      nc3 <- m$n[m$control & m$post == 4 & m$outcome == 3]
-      nt3 <- m$n[m$control == FALSE & m$post == 4 & m$outcome == 3]
-      dpdel2 <- pair(cdel3..3, tdel3..3)
-      dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
-      dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
-      rv <- m$rev.sign[m$post == 4 & m$outcome == 3]
-      
-      DEL3..3 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
-    }
-    
-    
-    if(del3..4){
-      nc3 <- m$n[m$control & m$post == 4 & m$outcome == 4]
-      nt3 <- m$n[m$control == FALSE & m$post == 4 & m$outcome == 4]
-      dpdel2 <- pair(cdel3..4, tdel3..4)
-      dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
-      dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
-      rv <- m$rev.sign[m$post == 4 & m$outcome == 4]
-      
-      DEL3..4 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
-    }
-    
-    list(SHORT = if(short) SHORT else NULL, SHORT..2 = if(short..2) SHORT..2 else NULL, SHORT..3 = if(short..3) SHORT..3 else NULL, SHORT..4 = if(short..4) SHORT..4 else NULL,
-         DEL1 = if(del1) DEL1 else NULL, DEL1..2 = if(del1..2) DEL1..2 else NULL, DEL1..3 = if(del1..3) DEL1..3 else NULL, DEL1..4 = if(del1..4) DEL1..4 else NULL, 
-         DEL2 = if(del2) DEL2 else NULL, DEL2..2 = if(del2..2) DEL2..2 else NULL, DEL2..3 = if(del2..3) DEL2..3 else NULL, DEL2..4 = if(del2..4) DEL2..4 else NULL,
-         DEL3 = if(del3) DEL3 else NULL, DEL3..2 = if(del3..2) DEL3..2 else NULL, DEL3..3 = if(del3..3) DEL3..3 else NULL, DEL3..4 = if(del3..4) DEL3..4 else NULL) 
-  }
-  
-  setNames(lapply(L, G, n.sim = n.sim), names(L))
-}                               
+ dintA <- function(data = NULL, by, impute = FALSE, n.sim = 1e4)
+ {
+   
+   check <- "study.name" %in% trimws(names(data))
+   if(!check) stop("Add a new column named 'study.name'.", call. = FALSE) 
+   
+   data$study.name <- trimws(data$study.name)
+   data <- rm.allrowNA(data) 
+   
+   m <- split(data, data$study.name)         
+   m <- Filter(NROW, rm.allrowNA2(m)) 
+   if(!(length(unique(data$study.name)) == length(m))) stop("Each 'study.name' must be distinct.", call. = FALSE)
+   
+   if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
+
+   if(!missing(by)){ 
+     
+     s <- substitute(by)
+     k <- as.list(s)
+     
+     if("control" %in% k || "!control" %in% k) stop("'control' can't be a moderating variable either alone or with other variables.", call. = FALSE)
+     
+     H <- lapply(m, function(x) do.call("subset", list(x, s)))
+     
+     H <- Filter(NROW, H)
+     h <- if(length(H) == 0) stop("No study with the requested moderators found.", call. = FALSE) else H
+     
+     nms <- names(which(!sapply(h, function(x) any(x$control))))
+     
+     if(length(nms) > 0) {
+       h[nms]  <- Map(function(x, y) rbind(y, x[x$control, ]), m[nms], h[nms])
+     }
+     m <- h
+   }
+   
+   
+   if(impute) { 
+     
+     ar <- formalArgs(rdif)[c(-7, -9)]
+     
+     args <- lapply(m, function(x) unclass(x[ar]))
+     
+     argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
+     
+     f <- do.call(Map, c(f = rdif, argsT))
+     
+     f <- lapply(f, na.locf0)
+     
+     m <- Map(function(x, y) transform(x, r = na.locf0(y, fromLast = TRUE)), m, f) 
+   }     
+   
+   
+   ar <- formalArgs(d.prepos)[-c(21, 22)]
+   
+   dot.names <- names(data)[!names(data) %in% ar]
+   
+   args <- lapply(m, function(x) unclass(x[c(ar, dot.names)]))
+   
+   argsT <- setNames(lapply(names(args[[1]]), function(i) lapply(args, `[[`, i)), names(args[[1]]))
+   
+   L <- do.call(Map, c(f = d.prepos, argsT))
+   
+   
+   G <- function(m, n.sim)
+   {
+     
+     cdel3 <- reget(m, control & post == 4 & outcome == 1)
+     cdel1 <- reget(m, control & post == 2 & outcome == 1)
+     cdel2 <- reget(m, control & post == 3 & outcome == 1)
+     cs <- reget(m, control & post == 1 & outcome == 1)
+     
+     tdel3 <- reget(m, !control & post == 4 & outcome == 1)
+     tdel1 <- reget(m, !control & post == 2 & outcome == 1)
+     tdel2 <- reget(m, !control & post == 3 & outcome == 1)
+     ts <- reget(m, !control & post == 1 & outcome == 1) 
+     
+     if(all(sapply(list(cdel1, cdel2, cdel3, tdel1, tdel2, tdel3, ts, cs), is.null))) stop("Either 'control' or 'post' incorrectly coded.", call. = FALSE)
+     
+     short <- all(sapply(list(cs, ts), function(x) !is.null(x)))
+     
+     del1 <- all(sapply(list(cdel1, tdel1), function(x) !is.null(x)))
+     
+     del2 <- all(sapply(list(cdel2, tdel2), function(x) !is.null(x)))
+     
+     del3 <- all(sapply(list(cdel3, tdel3), function(x) !is.null(x)))
+     
+     cdel3..2 <- reget(m, control & post == 4 & outcome == 2)
+     cdel1..2 <- reget(m, control & post == 2 & outcome == 2)
+     cdel2..2 <- reget(m, control & post == 3 & outcome == 2)
+     cs..2 <- reget(m, control & post == 1 & outcome == 2)
+     
+     tdel3..2 <- reget(m, !control & post == 4 & outcome == 2)
+     tdel1..2 <- reget(m, !control & post == 2 & outcome == 2)
+     tdel2..2 <- reget(m, !control & post == 3 & outcome == 2)
+     ts..2 <- reget(m, !control & post == 1 & outcome == 2)
+     
+     
+     short..2 <- all(sapply(list(cs..2, ts..2), function(x) !is.null(x)))
+     
+     del1..2 <- all(sapply(list(cdel1..2, tdel1..2), function(x) !is.null(x)))
+     
+     del2..2 <- all(sapply(list(cdel2..2, tdel2..2), function(x) !is.null(x)))
+     
+     del3..2 <- all(sapply(list(cdel3..2, tdel3..2), function(x) !is.null(x)))
+     
+     
+     cdel3..3 <- reget(m, control & post == 4 & outcome == 3)
+     cdel1..3 <- reget(m, control & post == 2 & outcome == 3)
+     cdel2..3 <- reget(m, control & post == 3 & outcome == 3)
+     cs..3 <- reget(m, control & post == 1 & outcome == 3)
+     
+     tdel3..3 <- reget(m, !control & post == 4 & outcome == 3)
+     tdel1..3 <- reget(m, !control & post == 2 & outcome == 3)
+     tdel2..3 <- reget(m, !control & post == 3 & outcome == 3)
+     ts..3 <- reget(m, !control & post == 1 & outcome == 3)
+     
+     short..3 <- all(sapply(list(cs..3, ts..3), function(x) !is.null(x)))
+     
+     del1..3 <- all(sapply(list(cdel1..3, tdel1..3), function(x) !is.null(x)))
+     
+     del2..3 <- all(sapply(list(cdel2..3, tdel2..3), function(x) !is.null(x))) 
+     
+     del3..3 <- all(sapply(list(cdel3..3, tdel3..3), function(x) !is.null(x)))
+     
+     
+     cdel3..4 <- reget(m, control & post == 4 & outcome == 4)
+     cdel1..4 <- reget(m, control & post == 2 & outcome == 4)
+     cdel2..4 <- reget(m, control & post == 3 & outcome == 4)
+     cs..4 <- reget(m, control & post == 1 & outcome == 4)
+     
+     tdel3..4 <- reget(m, !control & post == 4 & outcome == 4)
+     tdel1..4 <- reget(m, !control & post == 2 & outcome == 4)
+     tdel2..4 <- reget(m, !control & post == 3 & outcome == 4)
+     ts..4 <- reget(m, !control & post == 1 & outcome == 4)
+     
+     short..4 <- all(sapply(list(cs..4, ts..4), function(x) !is.null(x)))
+     
+     del1..4 <- all(sapply(list(cdel1..4, tdel1..4), function(x) !is.null(x)))
+     
+     del2..4 <- all(sapply(list(cdel2..4, tdel2..4), function(x) !is.null(x)))         
+     
+     del3..4 <- all(sapply(list(cdel3..4, tdel3..4), function(x) !is.null(x)))
+     
+     
+     if(short){
+       nc1 <- m$n[m$control & m$post == 1 & m$outcome == 1]
+       nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 1]
+       dps <- pair(cs, ts)  
+       dppc1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][1])
+       dppt1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][2])
+       rv <- m$rev.sign[m$post == 1 & m$outcome == 1]
+       
+       SHORT <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
+     }
+     
+     
+     if(short..2){
+       nc1 <- m$n[m$control & m$post == 1 & m$outcome == 2]
+       nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 2]
+       dps <- pair(cs..2, ts..2)  
+       dppc1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][1])
+       dppt1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][2])
+       rv <- m$rev.sign[m$post == 1 & m$outcome == 2]
+       
+       SHORT..2 <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
+     }
+     
+     
+     if(short..3){
+       nc1 <- m$n[m$control & m$post == 1 & m$outcome == 3]
+       nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 3]
+       dps <- pair(cs..3, ts..3)  
+       dppc1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][1])
+       dppt1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][2])
+       rv <- m$rev.sign[m$post == 1 & m$outcome == 3]
+       
+       SHORT..3 <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
+     }
+     
+     
+     if(short..4){
+       nc1 <- m$n[m$control & m$post == 1 & m$outcome == 4]
+       nt1 <- m$n[m$control == FALSE & m$post == 1 & m$outcome == 4]
+       dps <- pair(cs..4, ts..4)  
+       dppc1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][1])
+       dppt1 <- sapply(1:lengths(dps), function(i) dps[[1]][[i]][2])
+       rv <- m$rev.sign[m$post == 1 & m$outcome == 4]
+       
+       SHORT..4 <- data.frame(t(dit(dppc = dppc1, dppt = dppt1, nc = nc1, nt = nt1, n.sim = n.sim, rev.sign = pairup(rv))))
+     }
+     
+     
+     if(del1){
+       nc2 <- m$n[m$control & m$post == 2 & m$outcome == 1]
+       nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 1]
+       dpdel1 <- pair(cdel1, tdel1)
+       dppc2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][1])
+       dppt2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][2])
+       rv <- m$rev.sign[m$post == 2 & m$outcome == 1]
+       
+       DEL1 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, rev.sign = pairup(rv))))
+     }
+     
+     
+     if(del1..2){
+       nc2 <- m$n[m$control & m$post == 2 & m$outcome == 2]
+       nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 2]
+       dpdel1 <- pair(cdel1..2, tdel1..2)
+       dppc2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][1])
+       dppt2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][2])
+       rv <- m$rev.sign[m$post == 2 & m$outcome == 2]
+       
+       DEL1..2 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, rev.sign = pairup(rv))))
+     }
+     
+     
+     if(del1..3){
+       nc2 <- m$n[m$control & m$post == 2 & m$outcome == 3]
+       nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 3]
+       dpdel1 <- pair(cdel1..3, tdel1..3)
+       dppc2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][1])
+       dppt2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][2])
+       rv <- m$rev.sign[m$post == 2 & m$outcome == 3]
+       
+       DEL1..3 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, rev.sign = pairup(rv))))
+     }
+     
+     
+     if(del1..4){
+       nc2 <- m$n[m$control & m$post == 2 & m$outcome == 4]
+       nt2 <- m$n[m$control == FALSE & m$post == 2 & m$outcome == 4]
+       dpdel1 <- pair(cdel1..4, tdel1..4)
+       dppc2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][1])
+       dppt2 <- sapply(1:lengths(dpdel1), function(i) dpdel1[[1]][[i]][2])
+       rv <- m$rev.sign[m$post == 2 & m$outcome == 4]
+       
+       DEL1..4 <- data.frame(t(dit(dppc = dppc2, dppt = dppt2, nc = nc2, nt = nt2, n.sim = n.sim, rev.sign = pairup(rv))))
+     }
+     
+     
+     if(del2){
+       nc3 <- m$n[m$control & m$post == 3 & m$outcome == 1]
+       nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 1]
+       dpdel2 <- pair(cdel2, tdel2)
+       dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
+       dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
+       rv <- m$rev.sign[m$post == 3 & m$outcome == 1]
+       
+       DEL2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
+     }
+     
+     if(del2..2){
+       nc3 <- m$n[m$control & m$post == 3 & m$outcome == 2]
+       nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 2]
+       dpdel2 <- pair(cdel2..2, tdel2..2)
+       dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
+       dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
+       rv <- m$rev.sign[m$post == 3 & m$outcome == 2]
+       
+       DEL2..2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
+     }
+     
+     
+     if(del2..3){
+       nc3 <- m$n[m$control & m$post == 3 & m$outcome == 3]
+       nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 3]
+       dpdel2 <- pair(cdel2..3, tdel2..3)
+       dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
+       dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
+       rv <- m$rev.sign[m$post == 3 & m$outcome == 3]
+       
+       DEL2..3 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
+     }
+     
+     
+     if(del2..4){
+       nc3 <- m$n[m$control & m$post == 3 & m$outcome == 4]
+       nt3 <- m$n[m$control == FALSE & m$post == 3 & m$outcome == 4]
+       dpdel2 <- pair(cdel2..4, tdel2..4)
+       dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
+       dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
+       rv <- m$rev.sign[m$post == 3 & m$outcome == 4]
+       
+       DEL2..4 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
+     }
+     
+     if(del3){
+       nc3 <- m$n[m$control & m$post == 4 & m$outcome == 1]
+       nt3 <- m$n[m$control == FALSE & m$post == 4 & m$outcome == 1]
+       dpdel2 <- pair(cdel3, tdel3)
+       dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
+       dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
+       rv <- m$rev.sign[m$post == 4 & m$outcome == 1]
+       
+       DEL3 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
+     }
+     
+     if(del3..2){
+       nc3 <- m$n[m$control & m$post == 4 & m$outcome == 2]
+       nt3 <- m$n[m$control == FALSE & m$post == 4 & m$outcome == 2]
+       dpdel2 <- pair(cdel3..2, tdel3..2)
+       dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
+       dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
+       rv <- m$rev.sign[m$post == 4 & m$outcome == 2]
+       
+       DEL3..2 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
+     }
+     
+     
+     if(del3..3){
+       nc3 <- m$n[m$control & m$post == 4 & m$outcome == 3]
+       nt3 <- m$n[m$control == FALSE & m$post == 4 & m$outcome == 3]
+       dpdel2 <- pair(cdel3..3, tdel3..3)
+       dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
+       dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
+       rv <- m$rev.sign[m$post == 4 & m$outcome == 3]
+       
+       DEL3..3 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
+     }
+     
+     
+     if(del3..4){
+       nc3 <- m$n[m$control & m$post == 4 & m$outcome == 4]
+       nt3 <- m$n[m$control == FALSE & m$post == 4 & m$outcome == 4]
+       dpdel2 <- pair(cdel3..4, tdel3..4)
+       dppc3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][1])
+       dppt3 <- sapply(1:lengths(dpdel2), function(i) dpdel2[[1]][[i]][2])
+       rv <- m$rev.sign[m$post == 4 & m$outcome == 4]
+       
+       DEL3..4 <- data.frame(t(dit(dppc = dppc3, dppt = dppt3, nc = nc3, nt = nt3, n.sim = n.sim, rev.sign = pairup(rv))))
+     }
+     
+     list(SHORT = if(short) SHORT else NULL, SHORT..2 = if(short..2) SHORT..2 else NULL, SHORT..3 = if(short..3) SHORT..3 else NULL, SHORT..4 = if(short..4) SHORT..4 else NULL,
+          DEL1 = if(del1) DEL1 else NULL, DEL1..2 = if(del1..2) DEL1..2 else NULL, DEL1..3 = if(del1..3) DEL1..3 else NULL, DEL1..4 = if(del1..4) DEL1..4 else NULL, 
+          DEL2 = if(del2) DEL2 else NULL, DEL2..2 = if(del2..2) DEL2..2 else NULL, DEL2..3 = if(del2..3) DEL2..3 else NULL, DEL2..4 = if(del2..4) DEL2..4 else NULL,
+          DEL3 = if(del3) DEL3 else NULL, DEL3..2 = if(del3..2) DEL3..2 else NULL, DEL3..3 = if(del3..3) DEL3..3 else NULL, DEL3..4 = if(del3..4) DEL3..4 else NULL) 
+   }
+   
+   setNames(lapply(L, G, n.sim = n.sim), names(L))
+ }
 
 #=======================================================================================================================================
              
