@@ -100,7 +100,7 @@ get.uni <- function(data, what){
   
   data$study.name <- trimws(data$study.name)
   m <- split(data, data$study.name)
-  m[[1]] <- NULL
+  m <- Filter(NROW, rm.allrowNA2(m)) 
   
   G <- substitute(what)
   E <- quote(x$x)
@@ -125,7 +125,7 @@ get.gen <- function(data, what){
   s <- substitute(what)  
   data$study.name <- trimws(data$study.name)
   m <- split(data, data$study.name)
-  m[[1]] <- NULL
+  m <- Filter(NROW, rm.allrowNA2(m)) 
   
   h <- lapply(m, function(x) do.call("subset", list(x, s)))
   
