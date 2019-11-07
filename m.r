@@ -4956,7 +4956,7 @@ meta.in <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 1, r 
 
 #========================================================================================
 
-meta.out <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 1, r = .5, mu.prior = c("mean" = NA, "sd" = NA), tau.prior = function(x){dhalfnormal(x)}){  
+meta.out <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 1, r = .5, mu.prior = mu.norm(-6, 6), tau.prior = function(x){dhalfnormal(x)}){  
   
   j <- eval(substitute(meta.in(data = data, by = by, impute = impute, n.sim = n.sim, option = option, r = r)))
   
@@ -5041,7 +5041,7 @@ funnel.dint <- function(x, xlab = "effect size (dint)", ylab = "SD", refline = x
 #========================================================================================
               
                 
-meta.bayes <- function(data = NULL, by, option = 1, r = .5, mu.prior = c("mean" = NA, "sd" = NA), tau.prior = function(x){dhalfnormal(x)}){  
+meta.bayes <- function(data = NULL, by, option = 1, r = .5, mu.prior = mu.norm(-6, 6), tau.prior = function(x){dhalfnormal(x)}){  
   
   data$study.name <- trimws(data$study.name)
   
