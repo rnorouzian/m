@@ -4778,54 +4778,54 @@ metal <- function(data = NULL, mod, mu.prior = c("mean" = NA, "sd" = NA), tau.pr
 
 #===============================================================================================================================
          
-long.form <- function(data, file = NULL, na = ""){
-  
-  L <- dint(data)
-  
-  data$study.name <- trimws(data$study.name)
-  
-  d <- do.call(rbind, 
-               Map(cbind, pp <- Filter(Negate(is.null), lapply(L, function(x) 
-                 do.call(rbind, x))), 
-                 id = seq_along(pp)))
-  
-  h <- cbind(study.name = sub("(.*)\\.(SHORT|DEL(1|2|3))(\\.+\\d.*)?", "\\1", rownames(d)), d)
-  rownames(h) <- NULL
-  
-  n <- split(h, h$study.name)  
-  hh <- setNames(lapply(n, NROW), names(n))
-  
-  D <- rm.allrowNA(data)
-  
-  m <- split(D, D$study.name)
-  m <- Filter(NROW, rm.allrowNA2(m))
-  
-  ff <- setNames(lapply(seq_along(m), function(i) NROW(subset(m[[i]], !control))), names(m))
-  
-  eq <- identical(ff, hh)
-  
-  if(eq){
-    
-    message(paste0("OK: 'dints' successfully computed and reshaped into 'long form'."))
-    
-    ar <- formalArgs(d.prepos)[-(20:22)]
-    
-    mod.names <- names(D)[!names(D) %in% ar]
-    
-    mods <- subset(D[order(D$study.name), ], !control, select = mod.names)
-    
-    H <- cbind(h, mods)
-    
-    if(!is.null(file)) write.csv(H, paste0(substitute(file), ".csv"), row.names = FALSE, na = na)
-    
-    return(H)
-    
-  } else {
-    
-    message(paste0("Problem in coding sheet detected. See error analysis below:\n"))
-    test.sheet(D)
-  }
-}                  
+ long.form <- function(data, file = NULL, na = ""){
+   
+   L <- dint(data)
+   
+   d <- do.call(rbind, 
+                Map(cbind, pp <- Filter(Negate(is.null), lapply(L, function(x) 
+                  do.call(rbind, x))), 
+                  id = seq_along(pp)))
+   
+   h <- cbind(study.name = sub("(.*)\\.(SHORT|DEL(1|2|3))(\\.+\\d.*)?", "\\1", rownames(d)), d)
+   rownames(h) <- NULL
+   
+   n <- split(h, h$study.name)  
+   hh <- setNames(lapply(n, NROW), names(n))
+   
+   data$study.name <- trimws(data$study.name)
+   
+   D <- rm.allrowNA(data)
+   
+   m <- split(D, D$study.name)
+   m <- Filter(NROW, rm.allrowNA2(m))
+   
+   ff <- setNames(lapply(seq_along(m), function(i) NROW(subset(m[[i]], !control))), names(m))
+   
+   eq <- identical(ff, hh)
+   
+   if(eq){
+     
+     message(paste0("OK: 'dints' successfully computed and reshaped into 'long form'."))
+     
+     ar <- formalArgs(d.prepos)[-(20:22)]
+     
+     mod.names <- names(D)[!names(D) %in% ar]
+     
+     mods <- subset(D[order(D$study.name), ], !control, select = mod.names)
+     
+     H <- cbind(h, mods)
+     
+     if(!is.null(file)) write.csv(H, paste0(file, ".csv"), row.names = FALSE, na = na)
+     
+     return(H)
+     
+   } else {
+     
+     message(paste0("Problem in coding sheet detected. See error analysis below:\n"))
+     test.sheet(D)
+   }
+ }               
          
 #===============================================================================================================================
                                       
