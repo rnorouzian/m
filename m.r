@@ -5234,6 +5234,21 @@ metal.dint <- function(data = NULL, by, over = time, mu.prior = mu.norm(-6, 6), 
   
  setNames(z, chep)
 } 
+
+#================================================================================================================================================================           
+           
+best.model <- function(mod.names, data, n.best = 10, small = FALSE, model = c("CORR", "HIER"), rho = .8){
+   
+ f <- unlist(lapply(seq_along(mod.names), function(n) combn(mod.names, n, FUN = function(i) paste0("dint~", paste0(i, collapse = "+")))))
+ 
+ res <- sapply(f, function(j) as.double(robu(formula(j), data = data, study = study.name, var = SD^2, small = small, model = model, rho = rho)$mod_info$I.2))
+ 
+ len <- length(res)
+ 
+ if(n.best > len) n.best <- len
+ 
+ data.frame(I2 = sort(res)[seq_len(n.best)])
+}           
            
 #================================================================================================================================================================ 
                 
