@@ -149,7 +149,14 @@ find.stud <- function(data, what, timevar = TRUE){
   }
 }       
 
-                  
+#===============================================================================================================================
+                    
+find.miss <- function(data, space = FALSE, all = FALSE){    
+ 
+res <- Filter(length, lapply(data, function(x) which(if(!space & !all) is.na(x) else if(space & !all) x == "" else is.na(x) | x == "")))
+if(length(res) == 0) NA else res
+}                    
+                    
 #===============================================================================================================================
                   
 mod.level <- function(data, what){
