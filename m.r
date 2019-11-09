@@ -5249,7 +5249,48 @@ best.model <- function(mod.names, data, n.best = 10, small = FALSE, model = c("C
    
    data.frame(Tau.sq = sort(res)[seq_len(n.best)])
  }           
-           
+
+#================================================================================================================================================================
+                 
+tplot <- function(y, main, lwd = 5){
+  
+  x <- seq_len(length(y))
+  
+  plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*max(x)),
+        ylab = "Frequency", axes = FALSE, xlab = "Category", lend = 1, lwd = lwd,
+        col = colorRampPalette(c(4, 2))(length(y)), font.lab = 2, 
+        panel.first = abline(h = 0, col = 8), las = 1, cex.axis = .9, padj = .3)
+  box()
+     axis(1, at = x, labels = names(y))
+     axis(2, at = pretty(y), cex.axis = .86)
+}
+
+#================================================================================================================================================================
+                 
+                 
+plot.mods <- function(data, exclude = NULL, lwd = 3){
+  
+  names(data) <- trimws(names(data))
+  
+  data <- rm.allrowNA(data) 
+  
+  ar <- c(formalArgs(d.prepos)[-(20:22)], c("SD", "dint", "id", "study.name"), exclude)
+  
+  mods <- names(data)[!names(data) %in% ar]
+  
+  n <- length(mods)
+  
+  graphics.off()
+  org.par <- par(no.readonly = TRUE)
+  on.exit(par(org.par))
+  if(n > 1L) { par(mfrow = n2mfrow(n)) ; set.margin() }
+  
+  A <- setNames(lapply(seq_along(mods), function(i) table(data[[mods[i]]])), mods)
+  
+  invisible(mapply(tplot, y = A, main = names(A), lwd = lwd))
+  return(A)
+}  
+                 
 #================================================================================================================================================================ 
                 
 need <- c("bayesmeta", "distr", "zoo", "robumeta")
