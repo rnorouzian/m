@@ -5293,10 +5293,9 @@ plot.mods <- function(data, exclude = NULL, lwd = 3){
 }  
 
 #================================================================================================================================================================
-                       
-
+                                             
 across <- function(data, exclude = NULL){
-
+  
   names(data) <- trimws(names(data))
   data$study.name <- trimws(data$study.name)
   data <- rm.allrowNA(data) 
@@ -5304,22 +5303,23 @@ across <- function(data, exclude = NULL){
   ar <- c(formalArgs(d.prepos)[-c(2,20:22)], c("SD", "dint", "id"), exclude)
   
   d <- drop.col(data, ar)
-
-m <- split(d, d$study.name)
-m <- Filter(NROW, rm.allrowNA2(m))
-
-input.order <- unsplit(m, d$study.name)
-
-molten <- data.frame(input.order[, 1, drop = FALSE], stack(input.order[, -1]))
-
-res <- molten[as.logical(ave(molten[['values']], molten[['ind']], 
-                             FUN = function(x) !duplicated(x) & !duplicated(x, fromLast = TRUE))), ]
-vec <- res$values
-names(vec) <- res$ind
-
-split(vec, as.character(res$study.name))
+  
+  m <- split(d, d$study.name)
+  m <- Filter(NROW, rm.allrowNA2(m))
+  
+  input.order <- unsplit(m, d$study.name)
+  
+  molten <- data.frame(input.order[, 1, drop = FALSE], stack(input.order[, -1]))
+  
+  res <- molten[as.logical(ave(molten[['values']], molten[['ind']], 
+                               FUN = function(x) !duplicated(x) & !duplicated(x, fromLast = TRUE))), ]
+  vec <- res$values
+  names(vec) <- res$ind
+  
+ h <- Filter(NROW, split(vec, as.character(res$study.name)))
+ 
+ if(length(h) == 0) NA else h
 }                       
-                       
                        
 #================================================================================================================================================================ 
                 
