@@ -5254,15 +5254,16 @@ best.model <- function(mod.names, data, n.best = 10, small = FALSE, model = c("C
                  
 tplot <- function(y, main, lwd = 5){
   
-  x <- seq_len(length(y))
+  z <- length(y)  
+  x <- seq_len(z)
   
   plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*max(x)),
-        ylab = "Frequency", axes = FALSE, xlab = "Category", lend = 1, lwd = lwd,
-        col = colorRampPalette(c(4, 2))(length(y)), font.lab = 2, 
-        panel.first = abline(h = 0, col = 8), las = 1, cex.axis = .9, padj = .3)
+       ylab = "Frequency", axes = FALSE, xlab = "Category", lend = 1, lwd = lwd,
+       col = colorRampPalette(c(4, 2))(z), font.lab = 2, 
+       panel.first = abline(h = 0, col = 8))
   box()
-     axis(1, at = x, labels = names(y))
-     axis(2, at = pretty(y), cex.axis = .86)
+  axis(1, at = x, labels = names(y), cex.axis = .9)
+  axis(2, at = pretty(y), cex.axis = .85, las = 1, padj = .3)
 }
 
 #================================================================================================================================================================
