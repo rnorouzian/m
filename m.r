@@ -4511,12 +4511,12 @@ set.margin <- function()
 
 #===============================================================================================================================                                                          
  
-splot <- function(y, main, lwd = 5){
+splot <- function(y, main, lwd = 5, lend = 1){
   
   x <- seq_len(length(y))
   
   plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*max(x)), ylim = 0:1,
-       ylab = "%SA", xaxt = "n", xlab = "Category", lend = 1, lwd = lwd,
+       ylab = "%SA", xaxt = "n", xlab = "Category", lend = lend, lwd = lwd,
        col = colorRampPalette(c(4, 2))(length(y)), font.lab = 2, 
        panel.first = abline(h = 0, col = 8), las = 1, cex.axis = .9, padj = .3)
   
@@ -4590,7 +4590,7 @@ is.unique <- function(X, which){
 #===============================================================================================================================
            
                                    
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = FALSE, lwd = 5)
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = FALSE, lwd = 5, lend = 1)
 {
   
   r <- list(...) 
@@ -4716,7 +4716,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     on.exit(par(org.par))
     if(n > 1L) { par(mfrow = n2mfrow(n)) ; set.margin() }
     
-    invisible(mapply(splot, y = A, main = names(A), lwd = lwd))
+    invisible(mapply(splot, y = A, main = names(A), lwd = lwd, lend = lend))
   }
   
   data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) names(i)[which.min(i)]), 
