@@ -5258,9 +5258,8 @@ tplot <- function(y, main, lwd = 4){
   x <- seq_len(z)
   
   plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*max(x)),
-       ylab = "Frequency", axes = FALSE, xlab = "Category", lend = 1, lwd = lwd,
-       col = colorRampPalette(c(4, 2))(z), font.lab = 2, 
-       panel.first = abline(h = 0, col = 8))
+       ylab = "Frequency", axes = FALSE, xlab = "Category", lwd = lwd,
+       col = colorRampPalette(c(4, 2))(z), font.lab = 2)
   box()
   axis(1, at = x, labels = names(y), cex.axis = .9)
   axis(2, at = pretty(y), cex.axis = .85, las = 1, padj = .3)
