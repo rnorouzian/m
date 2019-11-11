@@ -5252,7 +5252,7 @@ best.model <- function(mod.names, data, n.best = 10, small = FALSE, model = c("C
 
 #================================================================================================================================================================
                  
-tplot <- function(y, main, lwd = 4, lend = 1){
+tplot <- function(y, main, lwd = 4, lend = 0){
   
   z <- length(y)  
   x <- seq_len(z)
@@ -5268,7 +5268,7 @@ tplot <- function(y, main, lwd = 4, lend = 1){
 #================================================================================================================================================================
                  
                  
-plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 1){
+plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 0){
   
   names(data) <- trimws(names(data))
   
