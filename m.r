@@ -5294,12 +5294,30 @@ plot.mods <- function(data, exclude = NULL, lwd = 3){
 
 #================================================================================================================================================================
                                              
-across <- function(data, exclude = NULL){
+study.level <- function(data, exclude = NULL){
+    
+  ar <- c(formalArgs(d.prepos)[-c(20:22)], c("SD", "dint", "id"), exclude)  
   
-  names(data) <- trimws(names(data))
-  data$study.name <- trimws(data$study.name)
-  data <- rm.allrowNA(data) 
+  mods <- names(data)[!names(data) %in% ar]
   
+  tmp <- do.call(rbind, lapply(mods, function(x){
+    d <- setNames(unique(data[c("study.name", x)]), c("study.name", "val"))
+    transform(d, nm = x)
+  }))
+  
+  tmp <- tmp[ave(as.numeric(as.factor(tmp$val)), tmp$val, FUN = length) == 1,]
+  
+  h <- Filter(length, lapply(split(tmp, tmp$study.name), function(a){
+    setNames(a$val, a$nm)
+  }))
+  
+  if(length(h) == 0) NA else h
+}                     
+
+#================================================================================================================================================================
+                       
+group.level <- function(data, exclude = NULL){
+
   ar <- c(formalArgs(d.prepos)[-c(2,20:22)], c("SD", "dint", "id"), exclude)
   
   d <- drop.col(data, ar)
@@ -5316,11 +5334,34 @@ across <- function(data, exclude = NULL){
   vec <- res$values
   names(vec) <- res$ind
   
- h <- Filter(NROW, split(vec, as.character(res$study.name)))
- 
- if(length(h) == 0) NA else h
-}                       
-                       
+  h <- Filter(NROW, split(vec, as.character(res$study.name)))
+  
+  if(length(h) == 0) NA else h
+}                                   
+
+#================================================================================================================================================================
+                               
+exam.code <- function(data, exclude = NULL, study.level = FALSE){
+  
+  names(data) <- trimws(names(data))
+  
+  check <- "study.name" %in% names(data)
+  if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
+  
+  data$study.name <- trimws(data$study.name)
+  data <- rm.allrowNA(data)  
+  
+  m <- split(data, data$study.name)         
+  m <- Filter(NROW, rm.allrowNA2(m)) 
+  if(!(length(unique(data$study.name)) == length(m))) stop("Each 'study.name' must be distinct.", call. = FALSE)
+  
+  excl <- setdiff(exclude, "study.name")
+  
+  exclude <- if(!is.null(excl) & length(excl) != 0) exclude else NULL
+  
+  if(!study.level) group.level(data = data, exclude = exclude) else study.level(data = data, exclude = exclude)
+}
+                               
 #================================================================================================================================================================ 
                 
 need <- c("bayesmeta", "distr", "zoo", "robumeta")
