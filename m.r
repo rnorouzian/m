@@ -5311,9 +5311,30 @@ study.level <- function(data, exclude = NULL){
   }))
   
   if(length(h) == 0) NA else h
-}                     
+} 
+                       
+#================================================================================================================================================================
+                       
+mix.level <- function(data, exclude = NULL){
+  
+  ar <- c(formalArgs(d.prepos)[-c(20:22)], c("SD", "dint", "id"), exclude)  
+  
+  mods <- names(data)[!names(data) %in% ar]
+  
+  tmp <- do.call(rbind, lapply(mods, function(x){
+    d <- setNames(unique(data[c("study.name", x)]), c("study.name", "code"))
+    transform(d, mod.name = x)
+  }))
+  
+  res <- tmp[with(tmp, ave(code, code, mod.name, FUN = length) == 1),]
+  
+  h <- Filter(length, lapply(split(res, res$study.name, drop = TRUE), `row.names<-`, NULL))
+  
+  if(length(h) == 0) NA else h
+}    
 
 #================================================================================================================================================================
+   
                        
 group.level <- function(data, exclude = NULL){
 
@@ -5338,9 +5359,10 @@ group.level <- function(data, exclude = NULL){
   if(length(h) == 0) NA else h
 }                                   
 
+                               
 #================================================================================================================================================================
                                
-exam.code <- function(data, exclude = NULL, study.level = FALSE){
+exam.code <- function(data, exclude = NULL, mix.level = TRUE){
   
   names(data) <- trimws(names(data))
   
@@ -5352,13 +5374,13 @@ exam.code <- function(data, exclude = NULL, study.level = FALSE){
   
   m <- split(data, data$study.name)         
   m <- Filter(NROW, rm.allrowNA2(m)) 
-  if(!(length(unique(data$study.name)) == length(m))) stop("Each 'study.name' must be distinct.", call. = FALSE)
+  if(length(unique(data$study.name)) != length(m)) stop("Each 'study.name' must be distinct.", call. = FALSE)
   
   excl <- setdiff(exclude, "study.name")
   
   exclude <- if(!is.null(excl) & length(excl) != 0) exclude else NULL
   
-  if(!study.level) group.level(data = data, exclude = exclude) else study.level(data = data, exclude = exclude)
+  if(mix.level) mix.level(data = data, exclude = exclude) else group.level(data = data, exclude = exclude)
 }
                                
 #================================================================================================================================================================ 
