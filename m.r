@@ -5256,14 +5256,15 @@ best.model <- function(mod.names, data, n.best = 10, small = FALSE, model = c("C
 
 #================================================================================================================================================================
                  
-tplot <- function(y, main, lwd = 4, lend = 2){
+tplot <- function(y, main, lwd = 4, lend = 2, cat.level = NULL){
   
   z <- length(y)  
   x <- seq_len(z)
   
+if(!is.null(cat.level)) main <- if(z >= cat.level) bquote(bold(.(main)~symbol(("\326")))) else main
   plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*max(x)),
        ylab = "Frequency", axes = FALSE, xlab = "Category", lwd = lwd,
-       col = colorRampPalette(c(4, 2))(z), font.lab = 2, lend = lend)
+       col = colorRampPalette(c(4, 2))(z), font.lab = 2, lend = lend, col.main = if(!is.null(cat.level) & z >= cat.level) "magenta" else 1)
   box()
   axis(1, at = x, labels = names(y), cex.axis = .9)
   axis(2, at = pretty(y), cex.axis = .85, las = 1, padj = .3)
@@ -5271,8 +5272,7 @@ tplot <- function(y, main, lwd = 4, lend = 2){
 
 #================================================================================================================================================================
                  
-                 
-plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2){
+plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 6){
   
   names(data) <- trimws(names(data))
   
@@ -5291,9 +5291,9 @@ plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2){
   
   A <- setNames(lapply(seq_along(mods), function(i) table(data[[mods[i]]])), mods)
   
-  invisible(mapply(tplot, y = A, main = names(A), lwd = lwd, lend = lend))
+  invisible(mapply(tplot, y = A, main = names(A), lwd = lwd, lend = lend, cat.level = cat.level))
   return(A)
-}  
+}                   
 
 #================================================================================================================================================================
                                              
