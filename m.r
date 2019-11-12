@@ -5474,7 +5474,8 @@ exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.lev
   m <- Filter(NROW, rm.allrowNA2(m)) 
   if(length(unique(data$study.name)) != length(m)) stop("Each 'study.name' must be distinct.", call. = FALSE)
   
-  excl <- setdiff(trimws(exclude), "study.name")
+  exclude <- trimws(exclude)  
+  excl <- setdiff(exclude, "study.name")
   
   exclude <- if(!is.null(excl) & length(excl) != 0) exclude else NULL
   
