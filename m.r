@@ -5298,23 +5298,31 @@ plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 0){
 #================================================================================================================================================================
                                              
 study.level <- function(data, exclude = NULL){
-    
+  
   ar <- c(formalArgs(d.prepos)[-c(20:22)], c("SD", "dint", "id"), exclude)  
   
   mods <- names(data)[!names(data) %in% ar]
   
   tmp <- do.call(rbind, lapply(mods, function(x){
-    d <- setNames(unique(data[c("study.name", x)]), c("study.name", "val"))
-    transform(d, nm = x)
+    d <- setNames(unique(data[c("study.name", x)]), c("study.name", "code"))
+    transform(d, mod.name = x)
   }))
   
-  tmp <- tmp[ave(as.numeric(as.factor(tmp$val)), tmp$val, FUN = length) == 1,]
+  res <- tmp[with(tmp, ave(code, code, mod.name, FUN = length) == 1),]
   
-  h <- Filter(length, lapply(split(tmp, tmp$study.name), function(a){
-    setNames(a$val, a$nm)
-  }))
+  h <- Filter(length, lapply(split(res, res$study.name, drop = TRUE), `row.names<-`, NULL))
   
-  if(length(h) == 0) NA else h
+  mix <- if(length(h) == 0) NA else h
+  grp <- group.level(data = data, exclude = exclude)
+  
+  if(!is.na(grp) & !is.na(mix)) { 
+    
+    mix[names(grp)] <- Map(function(x, y) {y1 <- stack(y); 
+    subset(x, !(mod.name %in% y1$ind & code %in% y1$values))}, mix[names(grp)], grp)
+    h <- Filter(nrow, mix) 
+    if(length(h) == 0) NA else h
+    
+  } else NA
 } 
                        
 #================================================================================================================================================================
@@ -5339,7 +5347,6 @@ mix.level <- function(data, exclude = NULL){
 
 #================================================================================================================================================================
    
-                       
 group.level <- function(data, exclude = NULL){
 
   ar <- c(formalArgs(d.prepos)[-c(2,20:22)], c("SD", "dint", "id"), exclude)
@@ -5363,13 +5370,11 @@ group.level <- function(data, exclude = NULL){
   if(length(h) == 0) NA else h
 }                                   
 
-                               
 #================================================================================================================================================================
                                
-exam.code <- function(data, exclude = NULL, mix.level = TRUE){
+exam.code <- function(data, exclude = NULL, study.level = TRUE){
   
   names(data) <- trimws(names(data))
-  
   check <- "study.name" %in% names(data)
   if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
   
@@ -5384,7 +5389,7 @@ exam.code <- function(data, exclude = NULL, mix.level = TRUE){
   
   exclude <- if(!is.null(excl) & length(excl) != 0) exclude else NULL
   
-  if(mix.level) mix.level(data = data, exclude = exclude) else group.level(data = data, exclude = exclude)
+  if(study.level) study.level(data = data, exclude = exclude) else group.level(data = data, exclude = exclude)
 }
                                
 #================================================================================================================================================================ 
