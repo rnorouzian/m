@@ -4633,6 +4633,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
       r <- lapply(r, function(x) do.call(rbind, c(split(x, x$group.name), make.row.names = FALSE))) }
   }
   
+  drop <- trimws(drop)                
   drop <- if(!by.group.name) setdiff(drop, "study.name") else setdiff(drop, c("study.name", "group.name"))
   
   if(!is.null(drop) & length(drop) != 0) r <- drop.col(r, drop)   
@@ -5473,7 +5474,7 @@ exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.lev
   m <- Filter(NROW, rm.allrowNA2(m)) 
   if(length(unique(data$study.name)) != length(m)) stop("Each 'study.name' must be distinct.", call. = FALSE)
   
-  excl <- setdiff(exclude, "study.name")
+  excl <- setdiff(trimws(exclude), "study.name")
   
   exclude <- if(!is.null(excl) & length(excl) != 0) exclude else NULL
   
