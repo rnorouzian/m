@@ -5257,15 +5257,15 @@ best.model <- function(mod.names, data, n.best = 10, small = FALSE, model = c("C
 
 #================================================================================================================================================================
                  
-tplot <- function(y, main, lwd = 4, lend = 2, cat.level = NULL){
+tplot <- function(y, main, lwd = 4, lend = 2, cat.level = 0){
   
   z <- length(y)  
   x <- seq_len(z)
   
-if(!is.null(cat.level)) main <- if(z >= cat.level) bquote(bold(.(main)~symbol(("\326")))) else main
+  if(cat.level != 0 & z >= cat.level) { main <- bquote(bold(.(main)~symbol(("\326")))) ; col.main <- "magenta"} else { main <- main ; col.main <- 1} 
   plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*max(x)),
        ylab = "Frequency", axes = FALSE, xlab = "Category", lwd = lwd,
-       col = colorRampPalette(c(4, 2))(z), font.lab = 2, lend = lend, col.main = if(!is.null(cat.level) & z >= cat.level) "magenta" else 1)
+       col = colorRampPalette(c(4, 2))(z), font.lab = 2, lend = lend, col.main = col.main)
   box()
   axis(1, at = x, labels = names(y), cex.axis = .9)
   axis(2, at = pretty(y), cex.axis = .85, las = 1, padj = .3)
@@ -5273,7 +5273,7 @@ if(!is.null(cat.level)) main <- if(z >= cat.level) bquote(bold(.(main)~symbol(("
 
 #================================================================================================================================================================
                  
-plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 6){
+plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 0){
   
   names(data) <- trimws(names(data))
   
@@ -5283,18 +5283,20 @@ plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 6){
   
   mods <- names(data)[!names(data) %in% ar]
   
-  n <- length(mods)
+  A <- setNames(lapply(seq_along(mods), function(i) table(data[[mods[i]]])), mods)
+  
+  if(cat.level != 0) A <- A[lapply(A, length) >= cat.level]
+  
+  n <- length(A)
   
   graphics.off()
   org.par <- par(no.readonly = TRUE)
   on.exit(par(org.par))
   if(n > 1L) { par(mfrow = n2mfrow(n)) ; set.margin() }
   
-  A <- setNames(lapply(seq_along(mods), function(i) table(data[[mods[i]]])), mods)
-  
   invisible(mapply(tplot, y = A, main = names(A), lwd = lwd, lend = lend, cat.level = cat.level))
   return(A)
-}                   
+}            
 
 #================================================================================================================================================================
                                              
