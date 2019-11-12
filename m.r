@@ -5460,7 +5460,7 @@ study.level <- function(data, exclude = NULL){
 
 #================================================================================================================================================================
                                
-exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2){
+exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 6){
   
   names(data) <- trimws(names(data))
   check <- "study.name" %in% names(data)
@@ -5479,7 +5479,7 @@ exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2){
   
   if(rule == 1) study.level(data = data, exclude = exclude) else
   if(rule == 2) group.level(data = data, exclude = exclude) else
-  plot.mods(data = data, exclude = exclude, lwd = lwd, lend = lend)  
+  plot.mods(data = data, exclude = exclude, lwd = lwd, lend = lend, cat.level = cat.level)  
 }                               
                                
 #================================================================================================================================================================ 
