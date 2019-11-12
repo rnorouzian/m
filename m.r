@@ -4513,7 +4513,7 @@ set.margin <- function()
 
 #===============================================================================================================================                                                          
  
-splot <- function(y, main, lwd = 5, lend = 1){
+splot <- function(y, main, lwd = 5, lend = 2){
   
   x <- seq_len(length(y))
   
@@ -4592,7 +4592,7 @@ is.unique <- function(X, which){
 #===============================================================================================================================
            
                                    
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = FALSE, lwd = 5, lend = 1)
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = FALSE, lwd = 5, lend = 2)
 {
   
   r <- list(...) 
@@ -5256,7 +5256,7 @@ best.model <- function(mod.names, data, n.best = 10, small = FALSE, model = c("C
 
 #================================================================================================================================================================
                  
-tplot <- function(y, main, lwd = 4, lend = 0){
+tplot <- function(y, main, lwd = 4, lend = 2){
   
   z <- length(y)  
   x <- seq_len(z)
@@ -5272,7 +5272,7 @@ tplot <- function(y, main, lwd = 4, lend = 0){
 #================================================================================================================================================================
                  
                  
-plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 0){
+plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2){
   
   names(data) <- trimws(names(data))
   
@@ -5297,7 +5297,7 @@ plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 0){
 
 #================================================================================================================================================================
                                              
-study.level <- function(data, exclude = NULL){
+study.level1 <- function(data, exclude = NULL){
   
   ar <- c(formalArgs(d.prepos)[-c(20:22)], c("SD", "dint", "id"), exclude)  
   
@@ -5347,7 +5347,7 @@ mix.level <- function(data, exclude = NULL){
 
 #================================================================================================================================================================
    
-group.level <- function(data, exclude = NULL){
+group.level1 <- function(data, exclude = NULL){
 
   ar <- c(formalArgs(d.prepos)[-c(2,20:22)], c("SD", "dint", "id"), exclude)
   
@@ -5372,7 +5372,7 @@ group.level <- function(data, exclude = NULL){
 
 #================================================================================================================================================================
                                
-exam.code <- function(data, exclude = NULL, study.level = TRUE){
+exam.code1 <- function(data, exclude = NULL, study.level = TRUE){
   
   names(data) <- trimws(names(data))
   check <- "study.name" %in% names(data)
@@ -5391,6 +5391,76 @@ exam.code <- function(data, exclude = NULL, study.level = TRUE){
   
   if(study.level) study.level(data = data, exclude = exclude) else group.level(data = data, exclude = exclude)
 }
+ 
+#================================================================================================================================================================
+                               
+group.level <- function(data, exclude = NULL){
+  
+  ar <- c(formalArgs(d.prepos)[-c(2,20:22)], c("SD", "dint", "id"), exclude)
+  
+  d <- drop.col(data, ar)
+  
+  molten <- data.frame(d[, 1, drop = FALSE], stack(d[, -1]))
+  
+  res <- molten[as.logical(ave(molten[['values']], molten[['ind']], 
+                               FUN = function(x) !duplicated(x) & !duplicated(x, fromLast = TRUE))), ]
+  
+  if(nrow(res) == 0) return(NULL)
+  res <- setNames(res[order(res$study.name),], c("study.name", "code", "mod.name"))
+  rownames(res) <- NULL
+  res
+}                               
+
+#================================================================================================================================================================
+                               
+study.level <- function(data, exclude = NULL){
+  
+  ar <- c(formalArgs(d.prepos)[-c(20:22)], c("SD", "dint", "id"), exclude)  
+  
+  mods <- names(data)[!names(data) %in% ar]
+  
+  tmp <- do.call(rbind, lapply(mods, function(x){
+    d <- setNames(unique(data[c("study.name", x)]), c("study.name", "code"))
+    transform(d, mod.name = x)
+  }))
+  
+  h <- tmp[with(tmp, ave(code, code, mod.name, FUN = length) == 1),]
+  
+  mix <- if(nrow(h) == 0) NULL else h
+  grp <- group.level(data = data, exclude = exclude)
+  
+  if(!is.null(grp) & !is.null(mix)) { 
+    
+    res <- subset(h, !((study.name %in% grp$study.name) & (code %in% grp$code) & (mod.name %in% grp$mod.name)))
+    res <- res[order(res$study.name),]    
+    rownames(res) <- NULL
+    res
+  } else { NULL }
+}                                                              
+
+#================================================================================================================================================================
+                               
+exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2){
+  
+  names(data) <- trimws(names(data))
+  check <- "study.name" %in% names(data)
+  if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
+  
+  data$study.name <- trimws(data$study.name)
+  data <- rm.allrowNA(data)  
+  
+  m <- split(data, data$study.name)         
+  m <- Filter(NROW, rm.allrowNA2(m)) 
+  if(length(unique(data$study.name)) != length(m)) stop("Each 'study.name' must be distinct.", call. = FALSE)
+  
+  excl <- setdiff(exclude, "study.name")
+  
+  exclude <- if(!is.null(excl) & length(excl) != 0) exclude else NULL
+  
+  if(rule == 1) study.level(data = data, exclude = exclude) else
+  if(rule == 2) group.level(data = data, exclude = exclude) else
+  plot.mods(data = data, exclude = exclude, lwd = lwd, lend = lend)  
+}                               
                                
 #================================================================================================================================================================ 
                 
