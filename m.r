@@ -5327,7 +5327,7 @@ study.level1 <- function(data, exclude = NULL){
                        
 #================================================================================================================================================================
                        
-mix.level <- function(data, exclude = NULL){
+mix.level1 <- function(data, exclude = NULL){
   
   ar <- c(formalArgs(d.prepos)[-c(20:22)], c("SD", "dint", "id"), exclude)  
   
@@ -5345,6 +5345,26 @@ mix.level <- function(data, exclude = NULL){
   if(length(h) == 0) NA else h
 }    
 
+#================================================================================================================================================================
+                       
+mix.level <- function(data, exclude = NULL){
+  
+  ar <- c(formalArgs(d.prepos)[-c(20:22)], c("SD", "dint", "id"), exclude)  
+  
+  mods <- names(data)[!names(data) %in% ar]
+  
+  tmp <- do.call(rbind, lapply(mods, function(x){
+    d <- setNames(unique(data[c("study.name", x)]), c("study.name", "code"))
+    transform(d, mod.name = x)
+  }))
+  
+  res <- tmp[with(tmp, ave(code, code, mod.name, FUN = length) == 1),]
+  if(nrow(res) == 0) return(NULL)
+  res <- res[order(res$study.name),]
+  rownames(res) <- NULL
+  res
+}                           
+                       
 #================================================================================================================================================================
    
 group.level1 <- function(data, exclude = NULL){
