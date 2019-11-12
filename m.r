@@ -5482,8 +5482,8 @@ exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.lev
   exclude <- if(!is.null(excl) & length(excl) != 0) exclude else NULL
   
   if(rule == 1) study.level(data = data, exclude = exclude) else
-    if(rule == 2) group.level(data = data, exclude = exclude) else
-      invisible(plot.mods(data = data, exclude = exclude, lwd = lwd, lend = lend, cat.level = cat.level))  
+    if(rule == 2) group.level(data = data, exclude = exclude) else 
+      plot.mods(data = data, exclude = exclude, lwd = lwd, lend = lend, cat.level = cat.level)
 }                               
                                
 #================================================================================================================================================================ 
