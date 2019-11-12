@@ -4366,15 +4366,17 @@ full.clean1 <- function(X, which)
 #================================================================================================================================
   
 drop.col <- function(dat, vec){
-
-f <- function(dat, vec) {
-  i1 <- !names(dat) %in% vec
-  setNames(dat[i1], names(dat)[i1])
-}
-
-if(inherits(dat, "list")) { lapply(dat, f, vec = vec)
+  
+  vec <- trimws(vec)
+  
+  f <- function(dat, vec) {
+    i1 <- !names(dat) %in% vec
+    setNames(dat[i1], names(dat)[i1])
+  }
+  
+  if(inherits(dat, "list")) { lapply(dat, f, vec = vec)
   } else { f(dat, vec) }
-}              
+}               
               
 #================================================================================================================================              
               
