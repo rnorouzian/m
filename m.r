@@ -5275,7 +5275,9 @@ tplot <- function(y, main, lwd = 4, lend = 2, cat.level = 0){
 
 #================================================================================================================================================================
                  
-plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 0){
+plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 0, code = NULL){
+
+  cod <- deparse(substitute(code))
   
   names(data) <- trimws(names(data))
   
@@ -5285,15 +5287,20 @@ plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 0){
   
   mods <- names(data)[!names(data) %in% ar]
   
-  A <- setNames(lapply(seq_along(mods), function(i) table(data[[mods[i]]])), mods)
+  A <- setNames(lapply(seq_along(mods), function(i) table(data[[mods[i]]], dnn = NULL)), mods)
   Ls <- lapply(A, length)
   
   bad <- Ls < 2
   bad.names <- names(A[bad])
   A <- A[!bad]
   
-  if(cat.level != 0) A <- A[Ls >= cat.level]
+  if(cat.level != 0 & is.null(code)) A <- A[Ls >= cat.level]
   if(length(A) == 0) stop(paste("No variable with cat.level >=", if(cat.level != 0) cat.level else 2, "found."), call. = FALSE)  
+  
+  if(!is.null(code)){
+  target <- sapply(seq_along(A), function(i) any(names(A[[i]]) == cod))
+  A <- A[target]
+  }
   
   n <- length(A)
   graphics.off()
