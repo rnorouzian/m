@@ -5446,23 +5446,12 @@ group.level <- function(data, exclude = NULL){
                                
 study.level <- function(data, exclude = NULL){
   
-  ar <- c(formalArgs(d.prepos)[-c(20:22)], c("SD", "dint", "id"), exclude)  
-  
-  mods <- names(data)[!names(data) %in% ar]
-  
-  tmp <- do.call(rbind, lapply(mods, function(x){
-    d <- setNames(unique(data[c("study.name", x)]), c("study.name", "code"))
-    transform(d, mod.name = x)
-  }))
-  
-  h <- tmp[with(tmp, ave(code, code, mod.name, FUN = length) == 1),]
-  
-  mix <- if(nrow(h) == 0) NULL else { h <- h[order(h$study.name),] ; rownames(h) <- NULL ; h}
+  mix <- mix.level(data = data, exclude = exclude)
   grp <- group.level(data = data, exclude = exclude)
   
   if(!is.null(grp) & !is.null(mix)) { 
     
-    res <- subset(h, !((study.name %in% grp$study.name) & (code %in% grp$code) & (mod.name %in% grp$mod.name)))
+    res <- subset(mix, !((study.name %in% grp$study.name) & (code %in% grp$code) & (mod.name %in% grp$mod.name)))
     res <- res[order(res$study.name),]    
     rownames(res) <- NULL
     res
