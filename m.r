@@ -5288,23 +5288,23 @@ plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 0){
   A <- setNames(lapply(seq_along(mods), function(i) table(data[[mods[i]]])), mods)
   Ls <- lapply(A, length)
   
- bad <- Ls < 2
- bad.names <- names(A[bad])
- A <- A[!bad]
- 
- if(cat.level != 0) A <- A[Ls >= cat.level]
- if(length(A) == 0) stop(paste("No variable with cat.level >=", if(cat.level != 0) cat.level else 2, "found."), call. = FALSE)  
-
+  bad <- Ls < 2
+  bad.names <- names(A[bad])
+  A <- A[!bad]
+  
+  if(cat.level != 0) A <- A[Ls >= cat.level]
+  if(length(A) == 0) stop(paste("No variable with cat.level >=", if(cat.level != 0) cat.level else 2, "found."), call. = FALSE)  
+  
   n <- length(A)
   graphics.off()
   org.par <- par(no.readonly = TRUE)
   on.exit(par(org.par))
   if(n > 1L) { par(mfrow = n2mfrow(n)) ; set.margin() }
   
- invisible(mapply(tplot, y = A, main = names(A), lwd = lwd, lend = lend, cat.level = cat.level))
- if(length(bad) != 0) message(paste(toString(dQuote(bad.names)), "ignored due to insufficient category levels."))
- return(A)
-} 
+  invisible(mapply(tplot, y = A, main = names(A), lwd = lwd, lend = lend, cat.level = cat.level))
+  if(length(bad.names) != 0) message("Note: ", toString(dQuote(bad.names)), "ignored due to insufficient category levels.")
+  return(A)
+}
 
 #================================================================================================================================================================
                                              
