@@ -5504,12 +5504,12 @@ exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.lev
   h <- if(rule == 1) study.level(data = data, exclude = exclude) else
     if(rule == 2) group.level(data = data, exclude = exclude) else 
       plot.mods(data = data, exclude = exclude, lwd = lwd, lend = lend, cat.level = cat.level)
-
-if(rule == 1 | rule == 2){    
-  attr(h, "rclab") <- c("", paste0("Violations of Rule ", rule, ":"))
-  class(h) <- c("labdf", class(h))
-  h } else { h }
-}       
+  
+  if(rule == 1 & !is.null(h) || rule == 2 & !is.null(h)){    
+    attr(h, "rclab") <- c("", paste0("Violations of Rule ", rule, ":"))
+    class(h) <- c("labdf", class(h))
+    h } else { h }
+}   
                                
 #================================================================================================================================================================ 
                 
