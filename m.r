@@ -5457,7 +5457,7 @@ study.level <- function(data, exclude = NULL){
   
   h <- tmp[with(tmp, ave(code, code, mod.name, FUN = length) == 1),]
   
-  mix <- if(nrow(h) == 0) NULL else h
+  mix <- if(nrow(h) == 0) NULL else { h <- h[order(h$study.name),] ; rownames(h) <- NULL ; h}
   grp <- group.level(data = data, exclude = exclude)
   
   if(!is.null(grp) & !is.null(mix)) { 
@@ -5466,8 +5466,8 @@ study.level <- function(data, exclude = NULL){
     res <- res[order(res$study.name),]    
     rownames(res) <- NULL
     res
-  } else { NULL }
-}                                                              
+  } else if(is.null(grp) & !is.null(mix)){ mix } else { NULL }
+}                                                                              
 
 #================================================================================================================================================================
                                
