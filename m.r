@@ -5261,8 +5261,7 @@ best.model <- function(mod.names, data, n.best = 10, small = FALSE, model = c("C
                  
 tplot <- function(y, main, lwd = 4, lend = 2, cat.level = 0){
   
-  z <- length(y)
-  if(z < 2) stop(paste("Insufficient category levels in:", main), call. = FALSE)  
+  z <- length(y) 
   x <- seq_len(z)
   
   if(cat.level != 0 & z >= cat.level) { main <- bquote(bold(.(main)~symbol(("\326")))) ; col.main <- "magenta"} else { main <- main ; col.main <- 1} 
@@ -5287,19 +5286,25 @@ plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 0){
   mods <- names(data)[!names(data) %in% ar]
   
   A <- setNames(lapply(seq_along(mods), function(i) table(data[[mods[i]]])), mods)
+  Ls <- lapply(A, length)
   
-  if(cat.level != 0) A <- A[lapply(A, length) >= cat.level]
-  
+ bad <- Ls < 2
+ bad.names <- names(A[bad])
+ A <- A[!bad]
+ 
+ if(cat.level != 0) A <- A[Ls >= cat.level]
+ if(length(A) == 0) stop(paste("No variable with cat.level >=", if(cat.level != 0) cat.level else 2, "found."), call. = FALSE)  
+
   n <- length(A)
-  
   graphics.off()
   org.par <- par(no.readonly = TRUE)
   on.exit(par(org.par))
   if(n > 1L) { par(mfrow = n2mfrow(n)) ; set.margin() }
   
-  invisible(mapply(tplot, y = A, main = names(A), lwd = lwd, lend = lend, cat.level = cat.level))
-  return(A)
-}            
+ invisible(mapply(tplot, y = A, main = names(A), lwd = lwd, lend = lend, cat.level = cat.level))
+ if(length(bad) != 0) message(paste(toString(dQuote(bad.names)), "ignored due to insufficient category levels."))
+ return(A)
+} 
 
 #================================================================================================================================================================
                                              
@@ -5466,6 +5471,16 @@ study.level <- function(data, exclude = NULL){
 
 #================================================================================================================================================================
                                
+print.labdf <- function(data) {
+  dn <- dimnames(data)
+  names(dn) <- attr(data, "rclab")
+  data <- as.matrix(data)
+  dimnames(data) <- dn
+  print(data, quote = FALSE)
+}                               
+                               
+#================================================================================================================================================================
+                               
 exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 6){
   
   names(data) <- trimws(names(data))
@@ -5473,21 +5488,28 @@ exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.lev
   if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
   
   data$study.name <- trimws(data$study.name)
-  data <- rm.allrowNA(data)  
+  data <- rm.allrowNA(data)
+  z <- length(unique(data$study.name))
+  if(z < 2) stop("At least two coded studies required.", call. = FALSE)
   
   m <- split(data, data$study.name)         
   m <- Filter(NROW, rm.allrowNA2(m)) 
-  if(length(unique(data$study.name)) != length(m)) stop("Each 'study.name' must be distinct.", call. = FALSE)
+  if(z != length(m)) stop("Each 'study.name' must be distinct.", call. = FALSE)
   
   exclude <- trimws(exclude)  
   excl <- setdiff(exclude, "study.name")
   
   exclude <- if(!is.null(excl) & length(excl) != 0) exclude else NULL
   
-  if(rule == 1) study.level(data = data, exclude = exclude) else
+  h <- if(rule == 1) study.level(data = data, exclude = exclude) else
     if(rule == 2) group.level(data = data, exclude = exclude) else 
       plot.mods(data = data, exclude = exclude, lwd = lwd, lend = lend, cat.level = cat.level)
-}                               
+
+if(rule == 1 | rule == 2){    
+  attr(h, "rclab") <- c("", paste0("Violations of Rule ", rule, ":"))
+  class(h) <- c("labdf", class(h))
+  h } else { h }
+}       
                                
 #================================================================================================================================================================ 
                 
