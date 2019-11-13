@@ -5277,7 +5277,7 @@ tplot <- function(y, main, lwd = 4, lend = 2, cat.level = 0){
                  
 plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 0, code = NULL){
 
-  cod <- deparse(substitute(code))
+  cod <- if(is.numeric(code)) deparse(substitute(code)) else code
   
   names(data) <- trimws(names(data))
   
