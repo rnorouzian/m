@@ -5261,7 +5261,8 @@ best.model <- function(mod.names, data, n.best = 10, small = FALSE, model = c("C
                  
 tplot <- function(y, main, lwd = 4, lend = 2, cat.level = 0){
   
-  z <- length(y)  
+  z <- length(y)
+  if(z < 2) stop(paste("Insufficient category levels in:", main), call. = FALSE)  
   x <- seq_len(z)
   
   if(cat.level != 0 & z >= cat.level) { main <- bquote(bold(.(main)~symbol(("\326")))) ; col.main <- "magenta"} else { main <- main ; col.main <- 1} 
