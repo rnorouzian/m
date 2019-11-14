@@ -5261,7 +5261,7 @@ best.model <- function(mod.names, data, n.best = 10, small = FALSE, model = c("C
                  
 tplot <- function(y, main, lwd = 4, lend = 2, cat.level = 0, low = FALSE){
   
- if(!low) low <- NULL
+  if(!low) low <- NULL
   
   z <- length(y) 
   x <- seq_len(z)
@@ -5273,7 +5273,7 @@ tplot <- function(y, main, lwd = 4, lend = 2, cat.level = 0, low = FALSE){
   box()
   axis(1, at = which(!names(y) %in% names(low)), labels = names(y)[!names(y) %in% names(low)], cex.axis = .9)
   if(!is.null(low)) axis(1, at = which(names(y) %in% names(low)), labels = names(low), cex.axis = .9, col = "magenta", col.axis = "magenta", font = 2)
-  if(!is.null(low)) text(which(names(y) %in% names(low)), low, font = 2, cex = .9, pos = 3, col = "magenta")
+  if(!is.null(low)) text(which(names(y) %in% names(low)), low, low, font = 2, cex = .9, pos = 3, col = "magenta")
   axis(2, at = pretty(y), cex.axis = .85, las = 1, padj = .3)
 }
 
