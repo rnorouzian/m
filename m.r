@@ -5299,7 +5299,7 @@ plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 0, co
   bad.names <- names(A[bad])
   A <- A[!bad]
   
-  if(cat.level != 0 & is.null(code)) A <- A[Ls >= cat.level]
+  A <- A[Ls >= cat.level]
   if(length(A) == 0) stop(paste("No variable with cat.level >=", if(cat.level != 0) cat.level else 2, "found."), call. = FALSE)  
   
   if(!is.null(code)){
