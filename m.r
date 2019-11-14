@@ -5259,7 +5259,9 @@ best.model <- function(mod.names, data, n.best = 10, small = FALSE, model = c("C
 
 #================================================================================================================================================================
                  
-tplot <- function(y, main, lwd = 4, lend = 2, cat.level = 0){
+tplot <- function(y, main, lwd = 4, lend = 2, cat.level = 0, low = FALSE){
+  
+ if(!low) low <- NULL
   
   z <- length(y) 
   x <- seq_len(z)
@@ -5269,19 +5271,24 @@ tplot <- function(y, main, lwd = 4, lend = 2, cat.level = 0){
        ylab = "Frequency", axes = FALSE, xlab = "Category", lwd = lwd,
        col = colorRampPalette(c(4, 2))(z), font.lab = 2, lend = lend, col.main = col.main)
   box()
-  axis(1, at = x, labels = names(y), cex.axis = .9)
+  axis(1, at = which(!names(y) %in% names(low)), labels = names(y)[!names(y) %in% names(low)], cex.axis = .9)
+  if(!is.null(low)) axis(1, at = which(names(y) %in% names(low)), labels = names(low), cex.axis = .9, col = "magenta", col.axis = "magenta", font = 2)
+  if(!is.null(low)) text(which(names(y) %in% names(low)), low, font = 2, cex = .9, pos = 3, col = "magenta")
   axis(2, at = pretty(y), cex.axis = .85, las = 1, padj = .3)
 }
 
 #================================================================================================================================================================
                  
-plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 0, code = NULL){
-
+plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 0, code = NULL, low = NULL){
+  
+  lo <- low
+  if(is.null(low)) low <- FALSE
+  
   cod <- if(is.numeric(code)) deparse(substitute(code)) else code
   
   names(data) <- trimws(names(data))
   
-  data <- rm.allrowNA(data) 
+  data <- rm.colrowNA(data) 
   
   ar <- c(formalArgs(d.prepos)[-(20:22)], c("SD", "dint", "id", "study.name"), exclude)
   
@@ -5298,8 +5305,14 @@ plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 0, co
   if(length(A) == 0) stop(paste("No variable with cat.level >=", if(cat.level != 0) cat.level else 2, "found."), call. = FALSE)  
   
   if(!is.null(code)){
-  target <- sapply(seq_along(A), function(i) any(names(A[[i]]) == cod))
-  A <- A[target]
+    target <- sapply(seq_along(A), function(i) any(names(A[[i]]) == cod))
+    A <- A[target]
+  }
+  
+  if(low){
+    target <- sapply(seq_along(A), function(i) any(A[[i]] <= lo))
+    A <- A[target]
+    low <- setNames(lapply(seq_along(A), function(i) A[[i]][which(A[[i]] <= lo)]), names(A))
   }
   
   n <- length(A)
@@ -5308,7 +5321,7 @@ plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 0, co
   on.exit(par(org.par))
   if(n > 1L) { par(mfrow = n2mfrow(n)) ; set.margin() }
   
-  invisible(mapply(tplot, y = A, main = names(A), lwd = lwd, lend = lend, cat.level = cat.level))
+  invisible(mapply(tplot, y = A, main = names(A), lwd = lwd, lend = lend, cat.level = cat.level, low = low))
   if(length(bad.names) != 0) message("Note: ", toString(dQuote(bad.names)), "ignored due to insufficient category levels.")
   return(A)
 }
