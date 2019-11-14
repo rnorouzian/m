@@ -4844,11 +4844,11 @@ metal <- function(data = NULL, mod, mu.prior = c("mean" = NA, "sd" = NA), tau.pr
 #===============================================================================================================================
                                       
                                       
-fold <- function(x, breaks, labels = seq_len(length(breaks)+1), xlab = "Time", ylab = "Frequency", lend = 1, na.rm = FALSE, plot = FALSE, ...){
+fold <- function(x, at, labels = seq_len(length(at)+1), xlab = "Time", ylab = "Frequency", lend = 1, na.rm = FALSE, plot = FALSE, ...){
  
   if(na.rm) x <- na.omit(x)
   
-  cats <- cut(x, breaks = c(-Inf, breaks, Inf), include.lowest = TRUE, labels = labels)
+  cats <- cut(x, breaks = c(-Inf, at, Inf), include.lowest = TRUE, labels = labels)
   tab <- table(x, dnn = NULL)
   cattab <- table(cats, dnn = NULL)
   
@@ -4863,7 +4863,7 @@ if(plot){
   cols <- colorRampPalette(c(4, 2))(length(unique(cats)))
   
   grp <- cut(as.numeric(names(tab)), 
-             breaks = c(-Inf, breaks, Inf), 
+             breaks = c(-Inf, at, Inf), 
              include.lowest = TRUE)
   
   plot(tab, xlab = xlab, ylab = ylab, main = "Original", panel.f = abline(h = 0, col = 8), col = cols[grp], lend = lend, ...)
