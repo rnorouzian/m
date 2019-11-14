@@ -5282,9 +5282,7 @@ tplot <- function(y, main, lwd = 4, lend = 2, cat.level = 0, low = FALSE){
 plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 0, code = NULL, low = NULL){
   
   lo <- low
-  if(is.null(low)) low <- FALSE
-  
-  cod <- if(is.numeric(code)) deparse(substitute(code)) else code
+  low <- if(is.null(low)) FALSE else TRUE
   
   names(data) <- trimws(names(data))
   
@@ -5305,14 +5303,14 @@ plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 0, co
   if(length(A) == 0) stop(paste("No variable with cat.level >=", if(cat.level != 0) cat.level else 2, "found."), call. = FALSE)  
   
   if(!is.null(code)){
-    target <- sapply(seq_along(A), function(i) any(names(A[[i]]) == cod))
+    target <- sapply(seq_along(A), function(i) any(names(A[[i]]) == code))
     A <- A[target]
   }
   
   if(low){
     target <- sapply(seq_along(A), function(i) any(A[[i]] <= lo))
     A <- A[target]
-    low <- setNames(lapply(seq_along(A), function(i) A[[i]][which(A[[i]] <= lo)]), names(A))
+    low <- if(length(A) == 0) FALSE else setNames(lapply(seq_along(A), function(i) A[[i]][which(A[[i]] <= lo)]), names(A))
   }
   
   n <- length(A)
@@ -5321,9 +5319,8 @@ plot.mods <- function(data, exclude = NULL, lwd = 4, lend = 2, cat.level = 0, co
   on.exit(par(org.par))
   if(n > 1L) { par(mfrow = n2mfrow(n)) ; set.margin() }
   
-  invisible(mapply(tplot, y = A, main = names(A), lwd = lwd, lend = lend, cat.level = cat.level, low = low))
   if(length(bad.names) != 0) message("Note: ", toString(dQuote(bad.names)), "ignored due to insufficient category levels.")
-  return(A)
+  if(length(A) > 0) { invisible(mapply(tplot, y = A, main = names(A), lwd = lwd, lend = lend, cat.level = cat.level, low = low)) ; return(A) } else NA
 }
 
 #================================================================================================================================================================
@@ -5522,7 +5519,7 @@ exam.code2 <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.le
 
 #================================================================================================================================================================
     
-exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 6){
+exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 6, code = NULL, low = NULL){
   
   names(data) <- trimws(names(data))
   check <- "study.name" %in% names(data)
@@ -5530,7 +5527,7 @@ exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.lev
   
   data$study.name <- trimws(data$study.name)
   data <- rm.colrowNA(data)
- 
+  
   if(length(unique(data$study.name)) < 2) stop("At least two coded studies required.", call. = FALSE)
   
   exclude <- trimws(exclude)  
@@ -5540,7 +5537,7 @@ exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.lev
   
   h <- if(rule == 1) study.level(data = data, exclude = exclude) else
     if(rule == 2) group.level(data = data, exclude = exclude) else 
-      plot.mods(data = data, exclude = exclude, lwd = lwd, lend = lend, cat.level = cat.level)
+      plot.mods(data = data, exclude = exclude, lwd = lwd, lend = lend, cat.level = cat.level, code = code, low = low)
   
   if(rule == 1 & !is.null(h) || rule == 2 & !is.null(h)){    
     attr(h, "rclab") <- c("", paste0("Violations of Rule ", rule, ":"))
