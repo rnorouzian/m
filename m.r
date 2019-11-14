@@ -5477,7 +5477,7 @@ print.labdf <- function(data) {
                                
 #================================================================================================================================================================
                                
-exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 6){
+exam.code2 <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 6){
   
   names(data) <- trimws(names(data))
   check <- "study.name" %in% names(data)
@@ -5506,7 +5506,35 @@ exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.lev
     class(h) <- c("labdf", class(h))
     h } else { h }
 }   
-                               
+
+#================================================================================================================================================================
+    
+exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 6){
+  
+  names(data) <- trimws(names(data))
+  check <- "study.name" %in% names(data)
+  if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
+  
+  data$study.name <- trimws(data$study.name)
+  data <- rm.colrowNA(data)
+ 
+  if(length(unique(data$study.name)) < 2) stop("At least two coded studies required.", call. = FALSE)
+  
+  exclude <- trimws(exclude)  
+  excl <- setdiff(exclude, "study.name")
+  
+  exclude <- if(!is.null(excl) & length(excl) != 0) exclude else NULL
+  
+  h <- if(rule == 1) study.level(data = data, exclude = exclude) else
+    if(rule == 2) group.level(data = data, exclude = exclude) else 
+      plot.mods(data = data, exclude = exclude, lwd = lwd, lend = lend, cat.level = cat.level)
+  
+  if(rule == 1 & !is.null(h) || rule == 2 & !is.null(h)){    
+    attr(h, "rclab") <- c("", paste0("Violations of Rule ", rule, ":"))
+    class(h) <- c("labdf", class(h))
+    h } else { h }
+}   
+    
 #================================================================================================================================================================ 
                 
 need <- c("bayesmeta", "distr", "zoo", "robumeta")
