@@ -4294,9 +4294,9 @@ rm.allrowNA <- function(X) {
   
   if(inherits(X, "list")){
     
-    lapply(X, function(i) i[rowSums(is.na(i) | i == "") != ncol(i), ])
+    lapply(X, function(i) i[rowSums(is.na(i) | i == "") != ncol(i), , drop = FALSE])
     
-  } else { X[rowSums(is.na(X) | X == "") != ncol(X), ] }
+  } else { X[rowSums(is.na(X) | X == "") != ncol(X), , drop = FALSE] }
 }
 
 #===============================================================================================================================
