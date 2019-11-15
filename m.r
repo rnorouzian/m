@@ -5537,7 +5537,7 @@ res
     
 #================================================================================================================================================================
     
-exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 0, code = NULL, low = 5, suggest = FALSE){
+exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 0, code = NULL, low = 4, suggest = FALSE){
   
   names(data) <- trimws(names(data))
   check <- "study.name" %in% names(data)
