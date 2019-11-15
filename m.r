@@ -4844,7 +4844,7 @@ metal <- function(data = NULL, mod, mu.prior = c("mean" = NA, "sd" = NA), tau.pr
 #===============================================================================================================================
                                       
                                       
-fold <- function(x, at, labels = seq_len(length(at)+1), xlab = "Time", ylab = "Frequency", lend = 2, na.rm = FALSE, plot = FALSE, ...){
+fold <- function(x, at, labels = seq_len(length(at)+1), xlab = "Time", ylab = "Frequency", lend = 1, na.rm = FALSE, plot = FALSE, ...){
  
   if(na.rm) x <- na.omit(x)
   
