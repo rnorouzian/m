@@ -5519,7 +5519,25 @@ exam.code2 <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.le
 
 #================================================================================================================================================================
     
-exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 6, code = NULL, low = NULL){
+suggest <- function(data, exclude = NULL){
+
+  ar <- c(formalArgs(d.prepos)[-c(2,20:22)], c("SD", "dint", "id"), exclude)
+  data <- drop.col(data, ar)
+  
+DF <- data[with(data, ave(as.numeric(study.name), study.name, FUN = length)) >= 3, ]
+long.df <- cbind(DF[1], stack(DF[-1]))
+res <- long.df[with(long.df, ave(values, study.name, ind, values, FUN = length) == 1 &
+               ave(values, study.name, ind, FUN = function(x) length(unique(x))) == 2), ]
+
+if(nrow(res) == 0) return(NULL)
+res <- setNames(res[order(res$study.name),], c("study.name", "code", "mod.name"))   
+rownames(res) <- NULL
+res
+}    
+    
+#================================================================================================================================================================
+    
+exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 0, code = NULL, low = 5, suggest = FALSE){
   
   names(data) <- trimws(names(data))
   check <- "study.name" %in% names(data)
@@ -5535,15 +5553,17 @@ exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.lev
   
   exclude <- if(!is.null(excl) & length(excl) != 0) exclude else NULL
   
-  h <- if(rule == 1) study.level(data = data, exclude = exclude) else
-    if(rule == 2) group.level(data = data, exclude = exclude) else 
-      plot.mods(data = data, exclude = exclude, lwd = lwd, lend = lend, cat.level = cat.level, code = code, low = low)
+h <- if(rule == 1 & !suggest) study.level(data = data, exclude = exclude) else
+      if(rule == 2 & !suggest) group.level(data = data, exclude = exclude) else 
+       if(rule == 3 & !suggest) plot.mods(data = data, exclude = exclude, lwd = lwd, lend = lend, cat.level = cat.level, code = code, low = low) else
+        if(suggest) suggest(data = data, exclude = exclude)
   
-  if(rule == 1 & !is.null(h) || rule == 2 & !is.null(h)){    
-    attr(h, "rclab") <- c("", paste0("Violations of Rule ", rule, ":"))
+  if(rule == 1 & !is.null(h) || rule == 2 & !is.null(h) || suggest & !is.null(h)){    
+    
+    attr(h, "rclab") <- c("", paste0(if(suggest) "Possible Mistakes" else paste("Violations of Rule", rule), ":"))
     class(h) <- c("labdf", class(h))
     h } else { h }
-}   
+}      
     
 #================================================================================================================================================================ 
                 
