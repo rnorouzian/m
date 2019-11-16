@@ -10,7 +10,7 @@ target <- sapply(seq_along(A), function(i) any(A[[i]] <= 4))
 A <- A[target]
 low <- setNames(lapply(seq_along(A), function(i) A[[i]][which(A[[i]] <= 4)]), names(A))
 
-
+# Notice `low` has an entry for "cf.type" with `ind` == 15 and `values` == 2, which is in the `low` above?
 
 lst1 <- Filter(length, lapply(split(data[mods], data$study.name), 
                               function(dat) Filter(nrow, Map(merge, lapply(dat, 
