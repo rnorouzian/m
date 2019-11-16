@@ -5244,7 +5244,7 @@ metal.dint <- function(data = NULL, by, over = time, mu.prior = mu.norm(-6, 6), 
 
 #================================================================================================================================================================           
            
-best.model <- function(mod.names, data, n.best = 10, small = FALSE, model = c("CORR", "HIER"), rho = .8){
+best.model <- function(mod.names, data, n.best = 50, small = FALSE, model = c("CORR", "HIER"), rho = .8){
    
    f <- unlist(lapply(seq_along(mod.names), function(n) combn(mod.names, n, FUN = function(i) paste0("dint~", paste0(i, collapse = "+")))))
    
