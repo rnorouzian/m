@@ -16,7 +16,7 @@ lst1 <- Filter(length, lapply(split(data[mods], data$study.name),
                               function(dat) Filter(nrow, Map(merge, lapply(dat, 
                                function(x) stack(table(x))), lapply(low, stack)))))
 
-# It doesn't show "cf.type" with `ind` == 15 and `values` == 2, which is in the `low` above?
+# The following doesn't show "cf.type" with `ind` == 15 and `values` == 2, which is in the `low` above?
 do.call(rbind, c(Map(cbind, study.name = names(lst1), lapply(lst1, 
                  function(x) do.call(rbind, c(Map(cbind, x, mod.name = names(x)),
                  make.row.names = FALSE)))), make.row.names = FALSE))
