@@ -5537,7 +5537,7 @@ res
     
 #================================================================================================================================================================
     
-exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 0, code = NULL, low = 4, suggest = FALSE){
+exam.code3 <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 0, code = NULL, low = 4, suggest = FALSE){
   
   names(data) <- trimws(names(data))
   check <- "study.name" %in% names(data)
@@ -5564,7 +5564,76 @@ h <- if(rule == 1 & !suggest) study.level(data = data, exclude = exclude) else
     class(h) <- c("labdf", class(h))
     h } else { h }
 }      
+ 
+#================================================================================================================================================================                                     
+ 
+rule3 <- function(data, exclude = NULL, low = 4){
+  
+ar <- c(formalArgs(d.prepos)[-c(20:22)], c("SD", "dint", "id"), exclude)  
+
+mods <- names(data)[!names(data) %in% ar]
+
+A <- setNames(lapply(seq_along(mods), function(i) table(data[[mods[i]]], dnn = NULL)), mods)
+
+target <- sapply(seq_along(A), function(i) any(A[[i]] <= low))
+A <- A[target]
+
+if(length(A) == 0) return(NULL)
+
+lo <- setNames(lapply(seq_along(A), function(i) A[[i]][which(A[[i]] <= low)]), names(A))
+
+lst <- Filter(length, lapply(split(data[names(lo)], data$study.name), 
+                              function(dat) Filter(nrow, Map(function(x, y) 
+                                merge(x, y[setdiff(names(y), "values")], by = "ind"), lapply(dat, 
+                                function(x) stack(table(x))), lapply(lo, stack)))))
+
+res <- do.call(rbind, c(Map(cbind, study.name = names(lst), lapply(lst, 
+                 function(x) do.call(rbind, c(Map(cbind, x, mod.name = names(x)),
+                 make.row.names = FALSE)))), make.row.names = FALSE))
+
+r3 <- setNames(res, c("study.name","code","occurs","mod.name"))[, c(1,2,4,3)]
+r3 <- r3[order(r3$mod.name),]    
+rownames(r3) <- NULL
+
+grp <- group.level(data = data, exclude = exclude)
+
+if(is.null(grp)){ r3 } else {
+res <- subset(r3, !((study.name %in% grp$study.name) & (code %in% grp$code) & (mod.name %in% grp$mod.name)))
+res <- res[order(res$mod.name),]    
+rownames(res) <- NULL
+res
+  } 
+}                                     
+
+#================================================================================================================================================================
+                                                                   
+exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 0, code = NULL, low = NULL, suggest = FALSE){
+  
+  names(data) <- trimws(names(data))
+  check <- "study.name" %in% names(data)
+  if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
+  
+  data$study.name <- trimws(data$study.name)
+  data <- rm.colrowNA(data)
+  
+  if(length(unique(data$study.name)) < 2) stop("At least two coded studies required.", call. = FALSE)
+  
+  exclude <- trimws(exclude)  
+  excl <- setdiff(exclude, "study.name")
+  
+  exclude <- if(!is.null(excl) & length(excl) != 0) exclude else NULL
+  
+  h <- if(rule == 1 & !suggest) study.level(data = data, exclude = exclude) else
+    if(rule == 2 & !suggest) group.level(data = data, exclude = exclude) else 
+      if(rule == 3 & !suggest) {invisible(plot.mods(data = data, exclude = exclude, lwd = lwd, lend = lend, cat.level = cat.level, code = code, low = low)); rule3(data = data, exclude = exclude, low = if(is.null(low)) 4 else low) } else
+        if(suggest) suggest(data = data, exclude = exclude)
+  
+  if(!is.null(h)){    
     
+    attr(h, "rclab") <- c("", paste0(if(suggest) "Possible Mistakes" else paste("Violations of Rule", rule), ":"))
+    class(h) <- c("labdf", class(h)) ; h } else { h }
+}                                                                         
+                                                                   
 #================================================================================================================================================================ 
                 
 need <- c("bayesmeta", "distr", "zoo", "robumeta")
