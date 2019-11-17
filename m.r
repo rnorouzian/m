@@ -5607,32 +5607,35 @@ res
 
 #================================================================================================================================================================
                                                                    
-exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 0, code = NULL, low = NULL, suggest = FALSE){
-  
-  names(data) <- trimws(names(data))
-  check <- "study.name" %in% names(data)
-  if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
-  
-  data$study.name <- trimws(data$study.name)
-  data <- rm.colrowNA(data)
-  
-  if(length(unique(data$study.name)) < 2) stop("At least two coded studies required.", call. = FALSE)
-  
-  exclude <- trimws(exclude)  
-  excl <- setdiff(exclude, "study.name")
-  
-  exclude <- if(!is.null(excl) & length(excl) != 0) exclude else NULL
-  
-  h <- if(rule == 1 & !suggest) study.level(data = data, exclude = exclude) else
-    if(rule == 2 & !suggest) group.level(data = data, exclude = exclude) else 
-      if(rule == 3 & !suggest) {invisible(plot.mods(data = data, exclude = exclude, lwd = lwd, lend = lend, cat.level = cat.level, code = code, low = low)); rule3(data = data, exclude = exclude, low = if(is.null(low)) 4 else low) } else
-        if(suggest) suggest(data = data, exclude = exclude)
-  
-  if(!is.null(h)){    
-    
-    attr(h, "rclab") <- c("", paste0(if(suggest) "Possible Mistakes" else paste("Violations of Rule", rule), ":"))
-    class(h) <- c("labdf", class(h)) ; h } else { h }
-}                                                                         
+exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 0, code = NULL, low = NULL, suggest = FALSE, plot = TRUE){
+   
+   names(data) <- trimws(names(data))
+   check <- "study.name" %in% names(data)
+   if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
+   
+   data$study.name <- trimws(data$study.name)
+   data <- rm.colrowNA(data)
+   
+   if(length(unique(data$study.name)) < 2) stop("At least two coded studies required.", call. = FALSE)
+   
+   exclude <- trimws(exclude)  
+   excl <- setdiff(exclude, "study.name")
+   
+   exclude <- if(!is.null(excl) & length(excl) != 0) exclude else NULL
+   
+   if(plot) invisible(plot.mods(data = data, exclude = exclude, lwd = lwd, lend = lend, cat.level = cat.level, code = code, low = low))
+   
+   h <- if(rule == 1 & !suggest) study.level(data = data, exclude = exclude) else
+     if(rule == 2 & !suggest) group.level(data = data, exclude = exclude) else 
+       if(rule == 3 & !suggest) rule3(data = data, exclude = exclude, low = if(is.null(low)) 4 else low) else
+         if(suggest) suggest(data = data, exclude = exclude)
+   
+   if(!is.null(h)){    
+     
+     attr(h, "rclab") <- c("", paste0(if(suggest) "Possible Mistakes" else paste("Violations of Rule", rule), ":"))
+     class(h) <- c("labdf", class(h)) 
+      h } else { h }
+ }                                                                           
                                                                    
 #================================================================================================================================================================ 
                 
