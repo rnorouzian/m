@@ -15,7 +15,8 @@ lst <- Filter(length, lapply(split(data[names(low)], data$study.name),
                               function(dat) Filter(nrow, Map(function(x, y) 
                                 merge(x, y[setdiff(names(y), "values")], by = "ind"), lapply(dat, 
                                 function(x) stack(table(x))), lapply(low, stack)))))
-                                                                                                    
-do.call(rbind, c(Map(cbind, study.name = names(lst), lapply(lst, 
+
+## Desired Output:                                                                                             
+do.call(rbind, c(Map(cbind, study.name = names(lst), lapply(lst,                              
                  function(x) do.call(rbind, c(Map(cbind, x, mod.name = names(x)),
                  make.row.names = FALSE)))), make.row.names = FALSE))
