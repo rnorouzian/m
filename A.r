@@ -11,7 +11,7 @@ A <- A[target]
                  
 low <- setNames(lapply(seq_along(A), function(i) A[[i]][which(A[[i]] <= 4)]), names(A))
 
-lst <- Filter(length, lapply(split(data[names(lo)], data$study.name), 
+lst <- Filter(length, lapply(split(data[mods], data$study.name), 
                               function(dat) Filter(nrow, Map(function(x, y) 
                                 merge(x, y[setdiff(names(y), "values")], by = "ind"), lapply(dat, 
                                 function(x) stack(table(x))), lapply(low, stack)))))
