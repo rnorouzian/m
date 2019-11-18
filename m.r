@@ -5640,14 +5640,24 @@ exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.lev
                                       
 #================================================================================================================================================================
                                       
-robu.weight <- function(fit){
+robu.weight <- function(...){
+
+  if(!all(sapply(list(...), inherits, "robu"))) stop("Non-robust variance model(s) detected.", call. = FALSE)
+  
+  m <- list(...)
+  n <- substitute(...())
+  
+f <- function(fit){
   
   d <- fit$data  
   tau.sq <- fit$mod_info$tau.sq[[1]]
   k <- table(d$id)[d$id]
   Vbar <- tapply(d$SD^2, d$id, mean)[d$id]
   as.numeric(1/(k * (Vbar + tau.sq)))
-}                                      
+}
+
+setNames(lapply(m, f), n)
+}                                     
                                       
 #================================================================================================================================================================ 
                 
