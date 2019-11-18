@@ -4257,7 +4257,7 @@ meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)},
                  
 #===============================================================================================================================
           
-meta.robust <- function(f, data, by, small = FALSE){ 
+meta.robust <- function(f, data, by, small = TRUE){ 
   
   s <- substitute(by)
   
