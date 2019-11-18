@@ -5636,7 +5636,19 @@ exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.lev
      class(h) <- c("labdf", class(h)) 
       h } else { h }
  }                                                                           
-                                                                   
+  
+                                      
+#================================================================================================================================================================
+                                      
+robu.weight <- function(fit){
+  
+  d <- fit$data  
+  tau.sq <- fit$mod_info$tau.sq[[1]]
+  k <- table(d$id)[d$id]
+  Vbar <- tapply(d$SD^2, d$id, mean)[d$id]
+  as.numeric(1/(k * (Vbar + tau.sq)))
+}                                      
+                                      
 #================================================================================================================================================================ 
                 
 need <- c("bayesmeta", "distr", "zoo", "robumeta")
