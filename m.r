@@ -5029,13 +5029,13 @@ forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex, level =
 
 #========================================================================================
 
-forest.dint <- function(x, xlab = "effect size (dint)", refline = 0, cex, level = .95, col = 1, col.by.cluster = FALSE, id = 8, ...){
+forest.dint <- function(x, xlab = "effect size (dint)", refline = 0, cex = NULL, level = .95, col = NULL, col.by.cluster = FALSE, id = 8, ...){
   
   if(inherits(x, "robu")) {  forest.rob(x = x, xlab = xlab, refline = refline, cex = cex, level = level, col.by.cluster = col.by.cluster, col = col, id = id, ...)
   }else{
     forest(x = x, xlab = xlab, refline = refline, cex = cex, col = col, ...)
   }
-}               
+}              
 
 #========================================================================================
                 
