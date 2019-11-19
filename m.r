@@ -5032,7 +5032,7 @@ forest.dint <- function(x, xlab = "effect size (dint)", refline = 0, cex, level 
                 
 funnel.dint <- function(x, xlab = "effect size (dint)", ylab = "SD", refline = x$reg_table$b.r[[1]], 
                         cex = 1, level = .95, col = "magenta", main = deparse(substitute(x)),
-                        back = adjustcolor(8, .1), shade = 0, hlines = 0, 
+                        back = adjustcolor(8, .1), shade = 0, hlines = NA, 
                         pch = 21, bg = "cyan", study.name = TRUE,
                         FE = FALSE, legend = FALSE, shrink = FALSE, show.mu = TRUE,
                         ...){
