@@ -5030,7 +5030,7 @@ forest.dint <- function(x, xlab = "effect size (dint)", refline = 0, cex, level 
 #========================================================================================
                 
                 
-funnel.dint <- function(x, xlab = "effect size (dint)", ylab = "SD", refline = x$reg_table$b.r, 
+funnel.dint <- function(x, xlab = "effect size (dint)", ylab = "SD", refline = x$reg_table$b.r[[1]], 
                         cex = 1, level = .95, col = "magenta", main = deparse(substitute(x)),
                         back = adjustcolor(8, .1), shade = 0, hlines = 0, 
                         pch = 21, bg = "cyan", study.name = TRUE,
@@ -5418,28 +5418,7 @@ group.level1 <- function(data, exclude = NULL){
   if(length(h) == 0) NA else h
 }                                   
 
-#================================================================================================================================================================
-                               
-exam.code1 <- function(data, exclude = NULL, study.level = TRUE){
-  
-  names(data) <- trimws(names(data))
-  check <- "study.name" %in% names(data)
-  if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
-  
-  data$study.name <- trimws(data$study.name)
-  data <- rm.allrowNA(data)  
-  
-  m <- split(data, data$study.name)         
-  m <- Filter(NROW, rm.allrowNA2(m)) 
-  if(length(unique(data$study.name)) != length(m)) stop("Each 'study.name' must be distinct.", call. = FALSE)
-  
-  excl <- setdiff(exclude, "study.name")
-  
-  exclude <- if(!is.null(excl) & length(excl) != 0) exclude else NULL
-  
-  if(study.level) study.level(data = data, exclude = exclude) else group.level(data = data, exclude = exclude)
-}
- 
+                        
 #================================================================================================================================================================
                                
 group.level <- function(data, exclude = NULL){
