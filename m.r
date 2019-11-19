@@ -5686,7 +5686,7 @@ maxs <- function(x, n = 2){
                                       
 #========================================================================================================================================================
                                       
-outlier <- function(data, n){
+outlier <- function(data, n = 5){
   
 data$study.name <- as.vector(data$study.name)  
 
