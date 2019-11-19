@@ -4994,34 +4994,44 @@ meta.out <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 1, r
 #========================================================================================
                 
                 
-forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex = 1, level = .95, col.by.cluster = FALSE, col = NULL, ...)
+forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex, level = .95, col.by.cluster = FALSE, col = NULL, id = 8, ...)
 {
   
-  cols <- colorRampPalette(c(2, 4))(x$N)
-  grp <- x$data.full$study
+  if(id > 8) id <- 8
+  d <- x$data.full
+  grp <- d$study
+  s <- as.vector(x$study_orig_id)
+  slab <- s[grp <= id]
+  grp <- grp[grp <= id]
+  
+  cols <- c(1:2, "green4", 4, "magenta3", "tan4", "darkred", "gray40")
   
   col <- if(!is.null(col)) col else if(is.null(col) & !col.by.cluster) 1 else cols[grp]
   
-  forest.default(x = x$data.full$effect.size, vi = x$data.full$var.eff.size,
-                          level = level,           
-                          refline = refline,
-                          xlab = xlab,
-                          slab = as.vector(x$study_orig_id),
-                          cex = cex, efac = 0, col = col, ...)
+  y <- d$effect.size
+  vi <- d$var.eff.size
+  
+  f <- forest.default(x = y[which(grp <= id)], vi = vi[which(grp <= id)],
+                 level = level,           
+                 refline = refline,
+                 xlab = xlab,
+                 slab = slab,
+                 cex = cex, efac = 0, col = col, ...)
   
   grand.ES <- x$reg_table$b.r[[1]]
   grand.CI.L <- x$reg_table$CI.L[[1]]
   grand.CI.U <- x$reg_table$CI.U[[1]]
   
- addpoly(grand.ES, ci.lb = grand.CI.L, ci.ub = grand.CI.U, mlab = expression(bold("mean effect ("*mu*")")), 
-         level = level, cex = cex, col = "cyan", rows = -.7, font = 2)
+  
+  addpoly.default(grand.ES, ci.lb = grand.CI.L, ci.ub = grand.CI.U, mlab = expression(bold("mean effect ("*mu*")")), 
+          level = level, cex = f$cex, col = "cyan", rows = par('usr')[3], font = 2, xpd = NA)
 }
 
 #========================================================================================
 
-forest.dint <- function(x, xlab = "effect size (dint)", refline = 0, cex, level = .95, col = 1, col.by.cluster = FALSE, ...){
+forest.dint <- function(x, xlab = "effect size (dint)", refline = 0, cex, level = .95, col = 1, col.by.cluster = FALSE, id = 8, ...){
   
-  if(inherits(x, "robu")) {  forest.rob(x = x, xlab = xlab, refline = refline, cex = cex, level = level, col.by.cluster = col.by.cluster, col = col, ...)
+  if(inherits(x, "robu")) {  forest.rob(x = x, xlab = xlab, refline = refline, cex = cex, level = level, col.by.cluster = col.by.cluster, col = col, id = id, ...)
   }else{
     forest(x = x, xlab = xlab, refline = refline, cex = cex, col = col, ...)
   }
