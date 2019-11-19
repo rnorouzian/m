@@ -5672,7 +5672,37 @@ one <- data.frame(t(sapply(len, function(i) subset(data, dint == eval(up[i])))))
 two <- data.frame(t(sapply(len, function(i) subset(data, dint == eval(lo[i])))))[,1:2]
 cbind(one, two)
 }                                      
-                                      
+
+                           
+#================================================================================================================================================================
+                           
+egger <- function(...){
+
+  m <- list(...)
+  if(!all(sapply(m, inherits, "robu"))) stop("Non-robust variance model(s) detected.", call. = FALSE)
+  L <- length(m)
+  n <- substitute(...())  
+  
+fe <- function(fit){
+  
+ X <- cbind(1, (fit$data.full$sd.eff.size))
+ 
+ f <- fit$ml[[2]]
+  
+ m <- robu(formula(bquote(.(f) ~ X - 1)), data = fit$data, var = fit$data.full$var.eff.size, study = fit$study_orig_id, rho = fit$mod_info$rho, small = TRUE, model = fit$modelweights)  
+ 
+ h <- data.frame(t.value = m$reg_table$t[2], p.value = m$reg_table$p[2])
+ 
+ sig. <- symnum(h$p.value, cut = c(0, .001, .01, .05, .1, 1), na = FALSE, symbols = c("***", "**", "*", ":-)", ":-))"), corr = FALSE)
+ h <- cbind(h, sig.)
+ 
+ attr(h, "rclab") <- c("", "(H0: funnel is symmetric)\nEgger symmetry test:")
+ class(h) <- c("labdf", class(h)) 
+ return(h)
+  }
+setNames(lapply(m, fe), n)
+}                           
+                           
 #================================================================================================================================================================ 
                 
 need <- c("bayesmeta", "distr", "zoo", "robumeta")
