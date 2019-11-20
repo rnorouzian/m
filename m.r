@@ -4994,44 +4994,73 @@ meta.out <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 1, r
 #========================================================================================
                 
                 
-forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex, level = .95, col.by.cluster = FALSE, col = NULL, id = 8, ...)
+forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex, level = .95, col = NULL, main = NA, order.ef = FALSE, col.by.cluster = TRUE, zoom, refit = FALSE, ...)
 {
   
-  if(id > 8) id <- 8
-  d <- x$data.full
+  check <- x$ml[[3]] != 1
+  
+  if(check) message("Note: Overall effect displayed for intercept-only models.")
+  
+  mis <- missing(zoom)
+  d <- cbind(x$data.full, x$data, orig.nm = as.vector(x$study_orig_id))
+  s <- substitute(zoom)
+  if(!mis) d <- subset(d, eval(s))
+  d <- if(order.ef) d[order(d$effect.size, decreasing = TRUE), ] else d
   grp <- d$study
-  s <- as.vector(x$study_orig_id)
-  slab <- s[grp <= id]
-  grp <- grp[grp <= id]
+  s <- if(order.ef & mis) unique(d$orig.nm)[grp] else d$orig.nm
+  slab <- if(order.ef & mis) s[seq_len(length(s))] else s
   
-  cols <- c(1:2, "green4", 4, "magenta3", "tan4", "darkred", "gray40")
+  cols <- rep(c(1:2, "green4", 4, "magenta3", "gold4", "darkred", "gray40"), nrow(d))
   
-  col <- if(!is.null(col)) col else if(is.null(col) & !col.by.cluster) 1 else cols[grp]
+  col <- if(!is.null(col)) col else
+    if(order.ef || is.null(col) & !col.by.cluster || order.ef & col.by.cluster) 1 
+  else cols[grp]
   
   y <- d$effect.size
   vi <- d$var.eff.size
   
-  f <- forest.default(x = y[which(grp <= id)], vi = vi[which(grp <= id)],
-                 level = level,           
-                 refline = refline,
-                 xlab = xlab,
-                 slab = slab,
-                 cex = cex, efac = 0, col = col, ...)
+  f <- forest.default(x = y, vi = vi,
+                      level = level,           
+                      refline = refline,
+                      xlab = NA,
+                      slab = if(order.ef) slab else NA,
+                      cex = cex, efac = 0, col = col, mgp = c(1, .3, 0), ...)
   
-  grand.ES <- x$reg_table$b.r[[1]]
-  grand.CI.L <- x$reg_table$CI.L[[1]]
-  grand.CI.U <- x$reg_table$CI.U[[1]]
+  m <- if(!refit) x else { h <- robu(formula(x$ml), var = d$var.eff.size, study = d$orig.nm, small = x$small, model = x$modelweights, data = d, rho = x$mod_info$rho) 
+  h$ml <- formula(x$ml) ; h }
   
+  ES <- m$reg_table$b.r[[1]]
+  ES.CI.L <- m$reg_table$CI.L[[1]]
+  ES.CI.U <- m$reg_table$CI.U[[1]]
   
-  addpoly.default(grand.ES, ci.lb = grand.CI.L, ci.ub = grand.CI.U, mlab = expression(bold("mean effect ("*mu*")")), 
-          level = level, cex = f$cex, col = "cyan", rows = par('usr')[3], font = 2, xpd = NA)
+  rows <- f$rows
+
+  if(!order.ef){
+    
+    grp <- rev(which(!duplicated(grp)))
+    
+    text(f$xlim[1], rev(rows)[-grp], slab[-grp], pos = 4, cex = f$cex)
+    
+    text(f$xlim[1], rev(rows)[grp], slab[grp], pos = 4, cex = f$cex, col = "red4", font = 4)
+  }
+  
+  mtext(text = main, font = 2, line = -2)
+  
+  if(!check) addpoly.default(ES, ci.lb = ES.CI.L, ci.ub = ES.CI.U, mlab = expression(bold("mean effect ("*mu*")")), 
+                            level = level, cex = f$cex, col = "cyan", rows = par('usr')[3], font = 2, xpd = NA)
+  
+  abline(h = max(rows)+1, lwd = 1, col = 0, xpd = NA)
+  
+  mtext(xlab, side = 1, line = 1.5, ...)
+  
+  if(refit) return(m)
 }
 
 #========================================================================================
 
-forest.dint <- function(x, xlab = "effect size (dint)", refline = 0, cex = NULL, level = .95, col = NULL, col.by.cluster = FALSE, id = 8, ...){
+forest.dint <- function(x, xlab = "effect size (dint)", refline = 0, cex = NULL, level = .95, col = NULL, col.by.cluster = FALSE, zoom, refit = FALSE, ...){
   
-  if(inherits(x, "robu")) {  forest.rob(x = x, xlab = xlab, refline = refline, cex = cex, level = level, col.by.cluster = col.by.cluster, col = col, id = id, ...)
+  if(inherits(x, "robu")) {  eval(substitute(forest.rob(x = x, xlab = xlab, refline = refline, cex = cex, level = level, col.by.cluster = col.by.cluster, col = col, zoom = zoom, refit = refit, ...)))
   }else{
     forest(x = x, xlab = xlab, refline = refline, cex = cex, col = col, ...)
   }
