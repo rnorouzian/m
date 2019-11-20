@@ -5026,15 +5026,17 @@ forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex, level =
                       slab = if(order.ef) slab else NA,
                       cex = cex, efac = 0, col = col, mgp = c(1, .3, 0), ...)
   
-  m <- if(!refit) x else { h <- robu(formula(x$ml), var = d$var.eff.size, study = d$orig.nm, small = x$small, model = x$modelweights, data = d, rho = x$mod_info$rho) 
-  h$ml <- formula(x$ml) ; h }
+  m <- if(!refit) x else { fo <- formula(x$ml) 
+  h <- robu(fo, var = d$var.eff.size, study = d$orig.nm, small = x$small, model = x$modelweights, data = d, rho = x$mod_info$rho) 
+  h$ml <- fo
+  h }
   
   ES <- m$reg_table$b.r[[1]]
   ES.CI.L <- m$reg_table$CI.L[[1]]
   ES.CI.U <- m$reg_table$CI.U[[1]]
   
   rows <- f$rows
-
+  
   if(!order.ef){
     
     grp <- rev(which(!duplicated(grp)))
@@ -5047,7 +5049,7 @@ forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex, level =
   mtext(text = main, font = 2, line = -2)
   
   if(!check) addpoly.default(ES, ci.lb = ES.CI.L, ci.ub = ES.CI.U, mlab = expression(bold("mean effect ("*mu*")")), 
-                            level = level, cex = f$cex, col = "cyan", rows = par('usr')[3], font = 2, xpd = NA)
+                             level = level, cex = f$cex, col = "cyan", rows = par('usr')[3], font = 2, xpd = NA)
   
   abline(h = max(rows)+1, lwd = 1, col = 0, xpd = NA)
   
