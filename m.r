@@ -4994,7 +4994,7 @@ meta.out <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 1, r
 #===============================================================================================================================================================================================================================
                 
                 
-forest.rob <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex, level = .95, col = NULL, main = NA, order.by = FALSE, col.by.cluster = TRUE, refit = FALSE, wsize = 1, ...)
+forest.rob <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex, level = .95, col = NULL, main = NA, order.by = FALSE, col.by.cluster = TRUE, refit = FALSE, wsize = 1, slab = TRUE, summary = TRUE, ...)
 {
   
   order.f <- if(order.by == "weight" || order.by == "effect") TRUE else FALSE
@@ -5002,7 +5002,7 @@ forest.rob <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex
   check <- x$ml[[3]] != 1
   
   if(is.null(refline)) refline <- x$reg_table$b.r[[1]]
-    
+  
   if(check) message("Note: Overall effect displayed for intercept-only models.")
   
   mis <- missing(zoom)
@@ -5011,8 +5011,11 @@ forest.rob <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex
   if(!mis) d <- subset(d, eval(s))
   d <- if(order.by == "effect") d[order(d$effect.size, decreasing = TRUE), ] else if(order.by == "weight") d[order(d$r.weights, decreasing = TRUE), ] else d
   grp <- d$study
+  
+  if(slab){
   s <- if(order.f & mis) unique(d$orig.nm)[grp] else d$orig.nm
-  slab <- if(order.f & mis) s[seq_len(length(s))] else s
+  elab <- if(order.f & mis) s[seq_len(length(s))] else s
+  }
   
   cols <- rep(c(1:2, "green4", 4, "magenta3", "gold4", "darkred", "blue3"), nrow(d))
   
@@ -5034,8 +5037,8 @@ forest.rob <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex
   f <- forest.default(x = y, vi = vi, psize = wsize*(w/max(w)),
                       level = level,           
                       refline = refline,
-                      xlab = NA,
-                      slab = if(order.f) slab else NA,
+                      xlab = xlab,
+                      slab = if(order.f & slab) elab else NA,
                       cex = cex, efac = 0, col = col, mgp = c(1, .3, 0), ...)
   
   ES <- m$reg_table$b.r[[1]]
@@ -5044,40 +5047,42 @@ forest.rob <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex
   
   rows <- f$rows
   
-  if(!order.f){
+  if(!order.f & slab){
     
     grp <- rev(which(!duplicated(grp)))
     
-    text(f$xlim[1], rev(rows)[-grp], slab[-grp], pos = 4, cex = f$cex)
+    text(f$xlim[1], rev(rows)[-grp], elab[-grp], pos = 4, cex = f$cex)
     
-    text(f$xlim[1], rev(rows)[grp], slab[grp], pos = 4, cex = f$cex, col = "red4", font = 4)
+    text(f$xlim[1], rev(rows)[grp], elab[grp], pos = 4, cex = f$cex, col = "red4", font = 4)
   }
   
   mtext(text = main, font = 2, line = -2)
   
-  if(!check) addpoly.default(ES, ci.lb = ES.CI.L, ci.ub = ES.CI.U, mlab = expression(bold("mean effect ("*mu*")")), 
+  if(!check & summary) addpoly.default(ES, ci.lb = ES.CI.L, ci.ub = ES.CI.U, mlab = expression(bold("mean effect ("*mu*")")), 
                              level = level, cex = f$cex, col = "cyan", rows = par('usr')[3], font = 2, xpd = NA)
   
   abline(h = max(rows)+1, lwd = 1, col = 0, xpd = NA)
-  
-  mtext(xlab, side = 1, line = 1.5, ...)
   
   if(refit) return(m)
 }
 
 #========================================================================================
 
-forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex = NULL, level = .95, col = NULL, col.by.cluster = FALSE,  refit = FALSE, order.by = FALSE, wsize = 1, space = TRUE, ...){
+forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex = NULL, level = .95, col = NULL, col.by.cluster = FALSE,  refit = FALSE, order.by = FALSE, wsize = 1, space = TRUE, slab = TRUE, summary = TRUE, ...){
+  
+  par.mgp <- par("mgp")
+  par(mgp = c(1.8, .3, 0))  
+  on.exit(par(mgp = par.mgp))
   
   if(space){
-  par.mar <- par("mar")
-  par(mar = c(2.7, 3, 0, 1))
-  on.exit(par(mar = par.mar))
+    par.mar <- par("mar")
+    par(mar = c(2.7, 3, 0, 1))
+    on.exit(par(mar = par.mar))
   }
   
   if(inherits(x, "robu")) {  
     
-    eval(substitute(forest.rob(x = x, zoom = zoom, xlab = xlab, refline = refline, cex = cex, level = level, order.by = order.by, col.by.cluster = col.by.cluster, col = col, refit = refit, wsize = wsize, ...)))
+    eval(substitute(forest.rob(x = x, zoom = zoom, xlab = xlab, refline = refline, cex = cex, level = level, order.by = order.by, col.by.cluster = col.by.cluster, col = col, refit = refit, wsize = wsize, slab = slab, summary = summary, ...)))
     
   }else{
     
@@ -5085,7 +5090,7 @@ forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, ce
     
     forest(x = x, xlab = xlab, refline = refline, cex = cex, col = col, ...)
   }
-}            
+}          
 
 #========================================================================================
                 
