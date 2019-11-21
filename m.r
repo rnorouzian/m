@@ -5787,7 +5787,7 @@ egger <- function(...){
     
     attr(h, "rclab") <- c("", "(H0: funnel is symmetric)\nEgger symmetry test:")
     class(h) <- c("labdf", class(h)) 
-    return(h)
+    return(round(h, 4))
   }
   setNames(lapply(m, fe), n)
 }                           
