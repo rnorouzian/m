@@ -4994,8 +4994,10 @@ meta.out <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 1, r
 #========================================================================================
                 
                 
-forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex, level = .95, col = NULL, main = NA, order.ef = FALSE, col.by.cluster = TRUE, zoom, refit = FALSE, ...)
+forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex, level = .95, col = NULL, main = NA, order.by, col.by.cluster = TRUE, zoom, refit = FALSE, ...)
 {
+  
+  order.f <- if(order.by == "weight" || order.by == "effect") TRUE else FALSE
   
   check <- x$ml[[3]] != 1
   
@@ -5005,25 +5007,25 @@ forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex, level =
   d <- cbind(x$data.full, x$data, orig.nm = as.vector(x$study_orig_id))
   s <- substitute(zoom)
   if(!mis) d <- subset(d, eval(s))
-  d <- if(order.ef) d[order(d$effect.size, decreasing = TRUE), ] else d
+  d <- if(order.by == "effect") d[order(d$effect.size, decreasing = TRUE), ] else if(order.by == "weight") d[order(d$r.weights, decreasing = TRUE), ] else d
   grp <- d$study
-  s <- if(order.ef & mis) unique(d$orig.nm)[grp] else d$orig.nm
-  slab <- if(order.ef & mis) s[seq_len(length(s))] else s
+  s <- if(order.f & mis) unique(d$orig.nm)[grp] else d$orig.nm
+  slab <- if(order.f & mis) s[seq_len(length(s))] else s
   
   cols <- rep(c(1:2, "green4", 4, "magenta3", "gold4", "darkred", "gray40"), nrow(d))
   
   col <- if(!is.null(col)) col else
-    if(order.ef || is.null(col) & !col.by.cluster || order.ef & col.by.cluster) 1 
+    if(order.f || is.null(col) & !col.by.cluster || order.f & col.by.cluster) 1 
   else cols[grp]
   
   y <- d$effect.size
   vi <- d$var.eff.size
   
-  f <- forest.default(x = y, vi = vi,
+  f <- forest.default(x = y, vi = vi, psize = 1.5*(d$r.weights/max(d$r.weights)),
                       level = level,           
                       refline = refline,
                       xlab = NA,
-                      slab = if(order.ef) slab else NA,
+                      slab = if(order.f) slab else NA,
                       cex = cex, efac = 0, col = col, mgp = c(1, .3, 0), ...)
   
   m <- if(!refit) x else { fo <- formula(x$ml) 
@@ -5037,7 +5039,7 @@ forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex, level =
   
   rows <- f$rows
   
-  if(!order.ef){
+  if(!order.f){
     
     grp <- rev(which(!duplicated(grp)))
     
