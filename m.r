@@ -5084,14 +5084,14 @@ forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, ce
 #========================================================================================
                 
                 
-funnel.rob <- function(x, xlab = "effect size (dint)", ylab = "SD", refline = x$reg_table$b.r[[1]],
+funnel.rob <- function(x, zoom, xlab = "effect size (dint)", ylab = "SD", refline = x$reg_table$b.r[[1]],
                        cex = 1, level = .95, col = "magenta", main = deparse(substitute(x)),
                        back = 8, shade = 0, hlines = NA,
-                       pch = 21, bg = "cyan", zoom, refit = FALSE, ...){
+                       pch = 21, bg = "cyan", refit = FALSE, ...){
   
   check <- x$ml[[3]] != 1
   if(check) message("Note: Overall effect line only used for intercept-only models.")
-
+  
   d <- cbind(x$data.full, x$data, orig.nm = as.vector(x$study_orig_id))
   s <- substitute(zoom)
   if(!missing(zoom)) d <- subset(d, eval(s))
@@ -5129,20 +5129,20 @@ funnel.rob <- function(x, xlab = "effect size (dint)", ylab = "SD", refline = x$
             
 #========================================================================================
 
-funnel.dint <- function(x, xlab = "effect size (dint)", ylab = "SD", refline = x$reg_table$b.r[[1]], 
+funnel.dint <- function(x, zoom, xlab = "effect size (dint)", ylab = "SD", refline = x$reg_table$b.r[[1]], 
                         cex = 1, level = .95, col = "magenta", main = deparse(substitute(x)),
                         back = 8, shade = 0, hlines = NA, 
                         pch = 21, bg = "cyan", study.name = TRUE,
                         FE = FALSE, legend = FALSE, shrink = FALSE, show.mu = TRUE,
-                        zoom, refit = FALSE, ...){
+                        refit = FALSE, ...){
   
-  if(inherits(x, "robu")) { eval(substitute(funnel.rob(x = x, level = level,           
-                                           refline = refline,
-                                           xlab = xlab, main = main,
-                                           cex = cex, col = col, ylab = ylab, 
-                                           back = back, shade = shade, hlines = hlines, 
-                                           pch = pch, bg = bg, zoom = zoom, refit = refit, ...)))
-
+  if(inherits(x, "robu")) { eval(substitute(funnel.rob(x = x, zoom = zoom, level = level,           
+                                                       refline = refline,
+                                                       xlab = xlab, main = main,
+                                                       cex = cex, col = col, ylab = ylab, 
+                                                       back = back, shade = shade, hlines = hlines, 
+                                                       pch = pch, bg = bg, refit = refit, ...)))
+    
   } else { funnel(x = x, main = main, study.name = study.name, FE = FE, 
                   legend = legend, shrink = shrink, show.mu = show.mu, ...) 
   }
