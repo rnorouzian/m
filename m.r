@@ -4991,16 +4991,18 @@ meta.out <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 1, r
   return(res)
 }                                         
 
-#========================================================================================
+#===============================================================================================================================================================================================================================
                 
                 
-forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex, level = .95, col = NULL, main = NA, order.by, col.by.cluster = TRUE, zoom, refit = FALSE, ...)
+forest.rob <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex, level = .95, col = NULL, main = NA, order.by = FALSE, col.by.cluster = TRUE, refit = FALSE, wsize = 1, ...)
 {
   
   order.f <- if(order.by == "weight" || order.by == "effect") TRUE else FALSE
   
   check <- x$ml[[3]] != 1
   
+  if(is.null(refline)) refline <- x$reg_table$b.r[[1]]
+    
   if(check) message("Note: Overall effect displayed for intercept-only models.")
   
   mis <- missing(zoom)
@@ -5020,18 +5022,21 @@ forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex, level =
   
   y <- d$effect.size
   vi <- d$var.eff.size
-  
-  f <- forest.default(x = y, vi = vi, psize = 1.5*(d$r.weights/max(d$r.weights)),
-                      level = level,           
-                      refline = refline,
-                      xlab = NA,
-                      slab = if(order.f) slab else NA,
-                      cex = cex, efac = 0, col = col, mgp = c(1, .3, 0), ...)
+  w <- d$r.weights
   
   m <- if(!refit) x else { fo <- formula(x$ml) 
   h <- robu(fo, var = d$var.eff.size, study = d$orig.nm, small = x$small, model = x$modelweights, data = d, rho = x$mod_info$rho) 
   h$ml <- fo
   h }
+  
+  if(refit & refline == x$reg_table$b.r[[1]]) refline <- m$reg_table$b.r[[1]]
+  
+  f <- forest.default(x = y, vi = vi, psize = wsize*(w/max(w)),
+                      level = level,           
+                      refline = refline,
+                      xlab = NA,
+                      slab = if(order.f) slab else NA,
+                      cex = cex, efac = 0, col = col, mgp = c(1, .3, 0), ...)
   
   ES <- m$reg_table$b.r[[1]]
   ES.CI.L <- m$reg_table$CI.L[[1]]
@@ -5062,13 +5067,19 @@ forest.rob <- function(x, xlab = "effect size (dint)", refline = 0, cex, level =
 
 #========================================================================================
 
-forest.dint <- function(x, xlab = "effect size (dint)", refline = 0, cex = NULL, level = .95, col = NULL, col.by.cluster = FALSE, zoom, refit = FALSE, ...){
+forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex = NULL, level = .95, col = NULL, col.by.cluster = FALSE,  refit = FALSE, order.by = FALSE, wsize = 1, ...){
   
-  if(inherits(x, "robu")) {  eval(substitute(forest.rob(x = x, xlab = xlab, refline = refline, cex = cex, level = level, col.by.cluster = col.by.cluster, col = col, zoom = zoom, refit = refit, ...)))
-  }else{
+  if(inherits(x, "robu")) {  
+    
+    eval(substitute(forest.rob(x = x, zoom = zoom, xlab = xlab, refline = refline, cex = cex, level = level, order.by = order.by, col.by.cluster = col.by.cluster, col = col, refit = refit, wsize = wsize, ...)))
+  
+    }else{
+    
+    if(is.null(refline)) refline <- 0
+    
     forest(x = x, xlab = xlab, refline = refline, cex = cex, col = col, ...)
   }
-}              
+}             
 
 #========================================================================================
                 
