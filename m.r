@@ -5780,14 +5780,14 @@ egger <- function(...){
     
     m <- robu(formula(bquote(.(f) ~ X - 1)), data = fit$data, var = fit$data.full$var.eff.size, study = fit$study_orig_id, rho = fit$mod_info$rho, small = TRUE, model = fit$modelweights)  
     
-    h <- data.frame(b1 = m$reg_table$b.r[2], t.value = m$reg_table$t[2], p.value = m$reg_table$p[2], b1.lower = m$reg_table$CI.L[2], b1.upper = m$reg_table$CI.U[2])
-    
+    h <- round(data.frame(b1 = m$reg_table$b.r[2], t.value = m$reg_table$t[2], p.value = m$reg_table$p[2], b1.lower = m$reg_table$CI.L[2], b1.upper = m$reg_table$CI.U[2]), 4)
+     
     result <- symnum(h$p.value, cut = c(0, .001, .01, .05, .1, 1), na = FALSE, symbols = c("***", "**", "*", ":-)", ":-))"), corr = FALSE)
     h <- cbind(h, result)
     
     attr(h, "rclab") <- c("", "(H0: funnel is symmetric)\nEgger symmetry test:")
     class(h) <- c("labdf", class(h)) 
-    return(round(h, 4))
+    return(h)
   }
   setNames(lapply(m, fe), n)
 }                           
