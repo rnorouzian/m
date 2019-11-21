@@ -5071,31 +5071,73 @@ forest.dint <- function(x, xlab = "effect size (dint)", refline = 0, cex = NULL,
 #========================================================================================
                 
                 
-funnel.dint <- function(x, xlab = "effect size (dint)", ylab = "SD", refline = x$reg_table$b.r[[1]], 
-                        cex = 1, level = .95, col = "magenta", main = deparse(substitute(x)),
-                        back = adjustcolor(8, .1), shade = 0, hlines = NA, 
-                        pch = 21, bg = "cyan", study.name = TRUE,
-                        FE = FALSE, legend = FALSE, shrink = FALSE, show.mu = TRUE,
-                        ...){
+funnel.rob <- function(x, xlab = "effect size (dint)", ylab = "SD", refline = x$reg_table$b.r[[1]],
+                       cex = 1, level = .95, col = "magenta", main = deparse(substitute(x)),
+                       back = 8, shade = 0, hlines = NA,
+                       pch = 21, bg = "cyan", zoom, refit = FALSE, ...){
   
-  if(inherits(x, "robu")) { funnel.default(x = x$data.full$effect.size, 
-                                  vi = x$data.full$var.eff.size,
-                                  level = level,           
-                                   refline = refline,
-                                   xlab = xlab,
-                                   cex = cex, col = col, ylab = ylab, 
-                                   back = back, shade = shade, hlines = hlines, 
-                                  pch = pch, bg = bg, ...)
-    box()
-    
-  } else { funnel(x = x, main = main, study.name = study.name, FE = FE, 
-                                               legend = legend, shrink = shrink, show.mu = show.mu, ...) 
-    }
-}                
+  check <- x$ml[[3]] != 1
+  if(check) message("Note: Overall effect line only used for intercept-only models.")
+
+  d <- cbind(x$data.full, x$data, orig.nm = as.vector(x$study_orig_id))
+  s <- substitute(zoom)
+  if(!missing(zoom)) d <- subset(d, eval(s))
+  
+  y <- d$effect.size
+  vi <- d$var.eff.size
+  
+  m <- if(!refit) x else { fo <- formula(x$ml)
+  h <- robu(fo, var = d$var.eff.size, study = d$orig.nm, small = x$small, model = x$modelweights, data = d, rho = x$mod_info$rho)
+  h$ml <- fo
+  h }
+  
+  if(refit & refline == x$reg_table$b.r[[1]]) refline <- m$reg_table$b.r[[1]]
+  
+  if(refline == 0 & level == .95 & shade == 0){level <- c(.95, .99) ; shade = c("white", "orange")}
+  
+  funnel.default(x = y,
+                 vi = vi,
+                 level = level,          
+                 refline = refline,
+                 xlab = xlab,
+                 cex = cex, col = col, ylab = ylab,
+                 back = back, shade = shade, hlines = hlines,
+                 pch = pch, bg = bg, mgp = c(1.7, .5, 0), ...)
+  box()
+  
+  ref <- if(refline == 0) bquote(H[0]*":"*~mu == .(0)) else bquote(mu == .(round(refline, 3)))
+  
+  mtext(main, font = 2, ...)
+  
+  text(refline, 0, ref, col = "magenta", font = 2, pos = 4)
+  
+  if(refit) return(m)
+}               
             
 #========================================================================================
-              
-                
+
+funnel.dint <- function(x, xlab = "effect size (dint)", ylab = "SD", refline = x$reg_table$b.r[[1]], 
+                        cex = 1, level = .95, col = "magenta", main = deparse(substitute(x)),
+                        back = 8, shade = 0, hlines = NA, 
+                        pch = 21, bg = "cyan", study.name = TRUE,
+                        FE = FALSE, legend = FALSE, shrink = FALSE, show.mu = TRUE,
+                        zoom, refit = FALSE, ...){
+  
+  if(inherits(x, "robu")) { eval(substitute(funnel.rob(x = x, level = level,           
+                                           refline = refline,
+                                           xlab = xlab, main = main,
+                                           cex = cex, col = col, ylab = ylab, 
+                                           back = back, shade = shade, hlines = hlines, 
+                                           pch = pch, bg = bg, zoom = zoom, refit = refit, ...)))
+
+  } else { funnel(x = x, main = main, study.name = study.name, FE = FE, 
+                  legend = legend, shrink = shrink, show.mu = show.mu, ...) 
+  }
+}
+                      
+#==============================================================================================
+                      
+                      
 meta.bayes <- function(data = NULL, by, option = 1, r = .5, mu.prior = mu.norm(-6, 6), tau.prior = function(x){dhalfnormal(x)}){  
   
   data$study.name <- trimws(data$study.name)
