@@ -5734,8 +5734,8 @@ egger <- function(...){
     
     h <- data.frame(b1 = m$reg_table$b.r[2], t.value = m$reg_table$t[2], p.value = m$reg_table$p[2], b1.lower = m$reg_table$CI.L[2], b1.upper = m$reg_table$CI.U[2])
     
-    sig. <- symnum(h$p.value, cut = c(0, .001, .01, .05, .1, 1), na = FALSE, symbols = c("***", "**", "*", ":-)", ":-))"), corr = FALSE)
-    h <- cbind(h, sig.)
+    result <- symnum(h$p.value, cut = c(0, .001, .01, .05, .1, 1), na = FALSE, symbols = c("***", "**", "*", ":-)", ":-))"), corr = FALSE)
+    h <- cbind(h, result)
     
     attr(h, "rclab") <- c("", "(H0: funnel is symmetric)\nEgger symmetry test:")
     class(h) <- c("labdf", class(h)) 
