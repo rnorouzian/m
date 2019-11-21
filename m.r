@@ -5769,9 +5769,13 @@ egger <- function(...){
   n <- substitute(...())  
   
   fe <- function(fit){
-    
-    X <- cbind(1, (fit$data.full$sd.eff.size))
-    
+  
+   X <- cbind(1, fit$data.full$sd.eff.size)
+   
+   tmp <- lm((fit$data.full$effect.size) ~ X - 1)
+   coef.na <- is.na(coef(tmp))
+   if(any(coef.na)) stop("Model matrix not of full rank.", call. = FALSE) 
+      
     f <- fit$ml[[2]]
     
     m <- robu(formula(bquote(.(f) ~ X - 1)), data = fit$data, var = fit$data.full$var.eff.size, study = fit$study_orig_id, rho = fit$mod_info$rho, small = TRUE, model = fit$modelweights)  
