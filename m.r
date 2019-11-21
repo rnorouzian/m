@@ -5014,7 +5014,7 @@ forest.rob <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex
   s <- if(order.f & mis) unique(d$orig.nm)[grp] else d$orig.nm
   slab <- if(order.f & mis) s[seq_len(length(s))] else s
   
-  cols <- rep(c(1:2, "green4", 4, "magenta3", "gold4", "darkred", "gray40"), nrow(d))
+  cols <- rep(c(1:2, "green4", 4, "magenta3", "gold4", "darkred", "blue3"), nrow(d))
   
   col <- if(!is.null(col)) col else
     if(order.f || is.null(col) & !col.by.cluster || order.f & col.by.cluster) 1 
