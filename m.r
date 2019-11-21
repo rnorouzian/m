@@ -5067,19 +5067,25 @@ forest.rob <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex
 
 #========================================================================================
 
-forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex = NULL, level = .95, col = NULL, col.by.cluster = FALSE,  refit = FALSE, order.by = FALSE, wsize = 1, ...){
+forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex = NULL, level = .95, col = NULL, col.by.cluster = FALSE,  refit = FALSE, order.by = FALSE, wsize = 1, space = TRUE, ...){
+  
+  if(space){
+  par.mar <- par("mar")
+  par(mar = c(2.7, 3, 0, 1))
+  on.exit(par(mar = par.mar))
+  }
   
   if(inherits(x, "robu")) {  
     
     eval(substitute(forest.rob(x = x, zoom = zoom, xlab = xlab, refline = refline, cex = cex, level = level, order.by = order.by, col.by.cluster = col.by.cluster, col = col, refit = refit, wsize = wsize, ...)))
-  
-    }else{
+    
+  }else{
     
     if(is.null(refline)) refline <- 0
     
     forest(x = x, xlab = xlab, refline = refline, cex = cex, col = col, ...)
   }
-}             
+}            
 
 #========================================================================================
                 
