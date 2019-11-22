@@ -5836,6 +5836,29 @@ egger <- function(...){
   }
   setNames(lapply(m, fe), n)
 }                           
+
+#================================================================================================================================================================
+                           
+rma.robu <- function(f, var, id, data, w.model = "CORR", rho = .8, small = TRUE, ...){
+  
+  f <- formula(f)  
+  
+  m <- eval(substitute(robu(f, data = data, var = var, study = id, model = w.model, rho = rho, small = small, ...)))
+  
+  w <- m$data.full$r.weights
+  
+  res <- eval(substitute(rma.uni(f, vi = var, data = data, slab = id, weights = w, ...)))
+  
+  res$se <- m$reg_table$SE
+  res$zval <- m$reg_table$t
+  res$pval <- m$reg_table$prob
+  res$ci.lb <- m$reg_table$CI.L
+  res$ci.ub <- m$reg_table$CI.U
+  res$tau2 <- m$mod_info$tau.sq
+  res$I2 <- m$mod_info$I.2
+  
+  return(res)
+}                           
                            
 #================================================================================================================================================================ 
                 
