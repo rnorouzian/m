@@ -5859,6 +5859,30 @@ rma.robu <- function(f, var, id, data, w.model = "CORR", rho = .8, small = TRUE,
   
   return(res)
 }                           
+     
+#================================================================================================================================================================                           
+
+infl <- function(x, add = "id"){
+
+s <- as.character(getCall(x)$slab)  
+  
+cols <- c(as.character(getCall(x)$yi[[2]]), if(length(s) != 0) s else NULL, add)
+  
+out <- influence(x, progbar = TRUE)
+
+plot.infl.rma.uni(out, plotinf = 8, bg.infl = "cyan")
+
+ data <- eval(getCall(x)$data)
+ 
+ izeh <- data[cols]
+ 
+ h <- izeh[out$is.infl,]
+ 
+ message("\nNote: Don't remove before careful examination.")
+ attr(h, "rclab") <- c("", "\nInfluential Effect Size(s):")
+ class(h) <- c("labdf", class(h)) 
+ return(h)
+}                           
                            
 #================================================================================================================================================================ 
                 
