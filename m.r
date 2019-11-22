@@ -5916,9 +5916,27 @@ x <- colSums(matrix(x, nrow = size))
 y <- colSums(matrix(y, nrow = size)) 
 
 list(x = x, y = y)
-
 }                        
+
+#================================================================================================================================================================
           
+ddint <- function(dppc, dppt, nc, nt, ...){
+  
+  like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
+  like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
+  
+  d1 <- AbscontDistribution(d = like1)
+  d2 <- AbscontDistribution(d = like2)
+  
+  like.dif <- function(x) distr::d(d2 - d1)(x)
+  
+  Mean <- integrate(function(x) x*like.dif(x), -Inf, Inf)[[1]]
+  SD <- sqrt(integrate(function(x) x^2*like.dif(x), -Inf, Inf)[[1]] - Mean^2)
+  
+  curve(like.dif, -6, 6, n = 1e4, panel.f = abline(v = Mean, lty = 3, col = 2), lwd = 2, xlab = "dint (dpos - dpre)",
+        panel.l = text(Mean, .6, round(Mean, 4), pos = 3, font = 2, col = 2, srt = 90), ylab = "Density", ...)
+}
+                       
 #================================================================================================================================================================ 
                 
 need <- c("bayesmeta", "distr", "zoo", "robumeta")
