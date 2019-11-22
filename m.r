@@ -4378,7 +4378,8 @@ full.clean1 <- function(X, which)
 drop.col <- function(dat, vec){
   
   vec <- trimws(vec)
-  
+  names(dat) <- trimws(names(dat))
+    
   f <- function(dat, vec) {
     i1 <- !names(dat) %in% vec
     setNames(dat[i1], names(dat)[i1])
