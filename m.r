@@ -5936,6 +5936,24 @@ ddint <- function(dppc, dppt, nc, nt, ...){
   curve(like.dif, -6, 6, n = 1e4, panel.f = abline(v = Mean, lty = 3, col = 2), lwd = 2, xlab = "dint (dpos - dpre)",
         panel.l = text(Mean, .6, round(Mean, 4), pos = 3, font = 2, col = 2, srt = 90), ylab = "Density", ...)
 }
+ 
+#================================================================================================================================================================                       
+                       
+rob.fig <- function(n = 1e3, cluster = 5, adjust = 1, col = 4, cex = .7, pch = 19, ann = FALSE, alpha = .4, ave = FALSE, ...)
+{
+  
+size <- cluster - 1  
+
+a <- rrbinom(n, size, .5, .5)
+
+plot(jitter(a$x, adjust), jitter(a$y, adjust), xaxt = "n", yaxt = "n",
+     pch = pch, cex = cex, col = adjustcolor(col, alpha), ann = ann, ...)
+
+disp <- 0:size
+x <- expand.grid(disp, disp)
+
+if(ave) points(x$Var1, x$Var2, bg = "cyan", pch = 21, col = "magenta", cex = 2)
+}
                        
 #================================================================================================================================================================ 
                 
