@@ -329,8 +329,8 @@ dit2 <- Vectorize(function(dppc, dppt, nc, nt, n.sim = NA){
   like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
   like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
   
-  d1 <- AbscontDistribution(d = like1)
-  d2 <- AbscontDistribution(d = like2)
+  d1 <- AbscontDistribution(d = like1, low1 = -15, up1 = 15, withStand = TRUE)
+  d2 <- AbscontDistribution(d = like2, low1 = -15, up1 = 15, withStand = TRUE)
   
   like.dif <- function(x) distr::d(d2 - d1)(x)
   
@@ -347,8 +347,8 @@ dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5, rev.sign = FALSE){
   like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
   like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
   
-  d1 <- AbscontDistribution(d = like1)
-  d2 <- AbscontDistribution(d = like2)
+  d1 <- AbscontDistribution(d = like1, low1 = -15, up1 = 15, withStand = TRUE)
+  d2 <- AbscontDistribution(d = like2, low1 = -15, up1 = 15, withStand = TRUE)
   
   dif <- distr::r(d2 - d1)(n.sim)
   
@@ -5925,16 +5925,18 @@ ddint <- function(dppc, dppt, nc, nt, ...){
   like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
   like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
   
-  d1 <- AbscontDistribution(d = like1)
-  d2 <- AbscontDistribution(d = like2)
+  d1 <- AbscontDistribution(d = like1, low1 = -15, up1 = 15, withStand = TRUE)
+  d2 <- AbscontDistribution(d = like2, low1 = -15, up1 = 15, withStand = TRUE)
   
   like.dif <- function(x) distr::d(d2 - d1)(x)
   
   Mean <- integrate(function(x) x*like.dif(x), -Inf, Inf)[[1]]
   SD <- sqrt(integrate(function(x) x^2*like.dif(x), -Inf, Inf)[[1]] - Mean^2)
   
-  curve(like.dif, -6, 6, n = 1e4, panel.f = abline(v = Mean, lty = 3, col = 2), lwd = 2, xlab = "dint (dpos - dpre)",
+  curve(like.dif, Mean-(5*SD), Mean+(5*SD), n = 1e4, panel.f = abline(v = Mean, lty = 3, col = 2), lwd = 2, xlab = "dint (dpos - dpre)",
         panel.l = text(Mean, .6, round(Mean, 4), pos = 3, font = 2, col = 2, srt = 90), ylab = "Density", ...)
+  
+  return(c(MEAN = Mean, SD = SD))
 }
  
 #================================================================================================================================================================                       
