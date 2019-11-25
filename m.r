@@ -4283,7 +4283,8 @@ meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)},
 meta.robust <- function(f, data, by, small = TRUE){ 
   
   s <- substitute(by)
-  
+  data <- roundi(data)
+    
   f <- if(missing(f)) formula(dint~1) else formula(f)
   
   m <- robu(f, data = if(missing(by)) data else subset(data, eval(s)), studynum = study.name, var = SD^2, small = small)
@@ -4850,7 +4851,7 @@ metal <- function(data = NULL, mod, mu.prior = c("mean" = NA, "sd" = NA), tau.pr
      
      mods <- subset(D[order(D$study.name), ], !control, select = mod.names)
      
-     H <- cbind(h, mods)
+     H <- roundi(cbind(h, mods))
      
      if(!is.null(file)) write.csv(H, paste0(file, ".csv"), row.names = FALSE, na = na)
      
@@ -5307,6 +5308,8 @@ meta.stats <- function(..., stat = "median"){
 metal.dint <- function(data = NULL, by, over = time, mu.prior = mu.norm(-6, 6), tau.prior = function(x){dhalfnormal(x)}, 
                        option = 1, r = .5, method = c("robust", "bayes")){
   
+  data <- roundi(data)
+    
   over <- deparse(substitute(over))
   
   method <- match.arg(method)
