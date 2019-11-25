@@ -5855,6 +5855,7 @@ egger <- function(...){
 rma.robu <- function(f, var, id, data, w.model = "CORR", rho = .8, small = TRUE, ...){
   
   f <- formula(f)  
+  data <- roundi(data)
   
   m <- eval(substitute(robu(f, data = data, var = var, study = id, model = w.model, rho = rho, small = small, ...)))
   
@@ -5871,7 +5872,7 @@ rma.robu <- function(f, var, id, data, w.model = "CORR", rho = .8, small = TRUE,
   res$I2 <- m$mod_info$I.2
   
   return(res)
-}                           
+}                          
      
 #================================================================================================================================================================                           
 
