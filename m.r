@@ -5308,8 +5308,6 @@ meta.stats <- function(..., stat = "median"){
 metal.dint <- function(data = NULL, by, over = time, mu.prior = mu.norm(-6, 6), tau.prior = function(x){dhalfnormal(x)}, 
                        option = 1, r = .5, method = c("robust", "bayes")){
   
-  data <- roundi(data)
-    
   over <- deparse(substitute(over))
   
   method <- match.arg(method)
@@ -5324,68 +5322,72 @@ metal.dint <- function(data = NULL, by, over = time, mu.prior = mu.norm(-6, 6), 
     lapply(chep, function(x) bquote(.(s) & .(as.name(noquote(over))) == .(x)))
   }
   
- if(method == "robust"){
+  if(method == "robust"){
     
-  setNames(lapply(seq_along(G), function(j) robu(dint~1, data = subset(data, eval(G[[j]])), studynum = study.name, var = SD^2)), chep)
+    dd <- Filter(length, lapply(seq_along(G), function(j) subset(data, eval(G[[j]]))))
+    
+    if(length(dd) == 0) return(NA)
+    
+    zz <- try(setNames(lapply(seq_along(dd), function(x) robu(dint~1, data = dd[[x]], studynum = as.vector(study.name), var = SD^2)), chep), silent = TRUE)
+    if(inherits(zz, "try-error")) NA else zz
+  } 
   
-    } 
-
   else 
-  
-    {
     
-  data$study.name <- trimws(data$study.name)
-  
-  f1 <- function(data = NULL, zy, option = 1, r = .5){ 
+  {
     
-    data <- if(missing(zy)) data else { s <- substitute(zy) ; subset(data, eval(s)) }
+    data$study.name <- trimws(data$study.name)
     
-    m <- split(data, data$study.name)
-    L <- Filter(NROW, rm.allrowNA2(m)) 
+    f1 <- function(data = NULL, zy, option = 1, r = .5){ 
+      
+      data <- if(missing(zy)) data else { s <- substitute(zy) ; subset(data, eval(s)) }
+      
+      m <- split(data, data$study.name)
+      L <- Filter(NROW, rm.allrowNA2(m)) 
+      
+      ds <- Filter(Negate(is.null), lapply(seq_along(L), function(i) L[[i]]$dint))
+      sds <- Filter(Negate(is.null), lapply(seq_along(L), function(i) L[[i]]$SD))
+      
+      f <- if(option == 1) option1 else option2
+      
+      setNames(mapply(f, ds = ds, sds = sds, r = r, SIMPLIFY = FALSE), names(L))
+    }
     
-    ds <- Filter(Negate(is.null), lapply(seq_along(L), function(i) L[[i]]$dint))
-    sds <- Filter(Negate(is.null), lapply(seq_along(L), function(i) L[[i]]$SD))
+    f2 <- function(j, tau.prior, mu.prior){  
+      
+      ds <- sapply(seq_along(j), function(i) j[[i]][1])
+      sds <- sapply(seq_along(j), function(i) j[[i]][2])
+      
+      test <- length(ds) >= 2
+      
+      if(!test) return(NA)
+      
+      res <- bayesmeta(        y = ds,
+                               sigma = sds,
+                               labels = names(j), 
+                               tau.prior = tau.prior,
+                               mu.prior = mu.prior)
+      res$call <- match.call(expand.dots = FALSE)
+      
+      return(res)
+    }  
     
-    f <- if(option == 1) option1 else option2
+    go <- length(G)
     
-    setNames(mapply(f, ds = ds, sds = sds, r = r, SIMPLIFY = FALSE), names(L))
+    k <- vector("list", go)
+    
+    for(w in seq_len(go)) k[[w]] <- f1(data = data, zy = eval(G[[w]]), option = option, r = r)
+    
+    so <- length(k)
+    
+    z <- vector("list", so)
+    
+    for(a in seq_len(so)) z[[a]] <- f2(j = k[[a]], tau.prior = tau.prior, mu.prior = mu.prior)
+    
+    setNames(z, chep)
+    
   }
-  
-  f2 <- function(j, tau.prior, mu.prior){  
-    
-    ds <- sapply(seq_along(j), function(i) j[[i]][1])
-    sds <- sapply(seq_along(j), function(i) j[[i]][2])
-    
-    test <- length(ds) >= 2
-    
-    if(!test) return(NA)
-    
-    res <- bayesmeta(        y = ds,
-                             sigma = sds,
-                             labels = names(j), 
-                             tau.prior = tau.prior,
-                             mu.prior = mu.prior)
-    res$call <- match.call(expand.dots = FALSE)
-    
-    return(res)
-  }  
-  
-  go <- length(G)
-  
-  k <- vector("list", go)
-  
-  for(w in seq_len(go)) k[[w]] <- f1(data = data, zy = eval(G[[w]]), option = option, r = r)
-  
-  so <- length(k)
-  
-  z <- vector("list", so)
-  
-  for(a in seq_len(so)) z[[a]] <- f2(j = k[[a]], tau.prior = tau.prior, mu.prior = mu.prior)
-  
-  setNames(z, chep)
-  
-  }
-}           
+}            
            
            
 #================================================================================================================================================================           
