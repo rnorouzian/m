@@ -1724,7 +1724,7 @@ dint.plot2 <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (din
 #===============================================================================================================================                  
  
                   
-dint.plot <- function(..., main = NULL, xlab = "", ylab = "Effect Size (dint)", labels = NULL){
+dint.plot <- function(..., main = NULL, xlab = NA, ylab = "Effect Size (dint)", labels = NULL){
   
   m <- Filter(NROW, lapply(list(...), function(x) x[!is.na(x)]))
   L <- length(m)
@@ -1762,7 +1762,7 @@ dint.plot <- function(..., main = NULL, xlab = "", ylab = "Effect Size (dint)", 
     
     invisible(lapply(seq_len(L), function(i) if(!is.na(mu[i])) lines(c(i-1, i-1), c(lo[i], hi[i]), lwd = 4, lend = 1, col = 2)))
     
-    text(x, .88*hi, paste0("(k = ", k,")"), cex = .75, font = 2, xpd = NA, srt = 90, pos = 2)
+    text(x, .9*hi, paste0("(k = ", k,")"), cex = .65, font = 2, xpd = NA, srt = 90, pos = 2)
     
     points(x, mu, pch = 22, cex = 6.3, bg = "cyan", col = "magenta", xpd = NA)
     
