@@ -5033,8 +5033,6 @@ meta.out <- function(data = NULL, by, impute = FALSE, n.sim = 1e5, option = 1, r
                 
 forest.rob <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex, level = .95, col = NULL, main = NA, order.by = FALSE, col.by.cluster = TRUE, refit = FALSE, wsize = 1, slab = TRUE, summary = TRUE, ...)
 {
-  
-  order.by <- match.arg(order.by)
     
   order.f <- if(order.by == "weight" || order.by == "effect") TRUE else FALSE
   
