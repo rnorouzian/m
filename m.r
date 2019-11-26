@@ -5958,7 +5958,7 @@ ddint <- function(dppc, dppt, nc, nt, ...){
  
 #================================================================================================================================================================                       
                        
-rob.fig <- function(n = 3e2, cluster = 5, adjust = 1, col = 4, cex = .7, pch = 19, ann = FALSE, alpha = .4, ave = FALSE, pcex = 2, random = TRUE, ...)
+rob.fig <- function(n = 2e3, cluster = 5, adj = 1, col = 4, cex = .7, pch = 19, ann = FALSE, alpha = .4, random = TRUE, ...)
 {
   
   size <- cluster - 1  
@@ -5966,13 +5966,8 @@ rob.fig <- function(n = 3e2, cluster = 5, adjust = 1, col = 4, cex = .7, pch = 1
   if(!random) { set.seed(0) } else { set.seed(NULL) }
   a <- rrbinom(n, size, .5, .5)
   
-  plot(jitter(a$x, adjust), jitter(a$y, adjust), xaxt = "n", yaxt = "n",
+  plot(jitter(a$x, adj), jitter(a$y, adj), xaxt = "n", yaxt = "n",
        pch = pch, cex = cex, col = adjustcolor(col, alpha), ann = ann, ...)
-  
-  disp <- 0:size
-  x <- expand.grid(disp, disp)
-
-if(ave) points(x$Var1, x$Var2, bg = "cyan", pch = 21, col = "magenta", cex = pcex)
 }
                        
 #================================================================================================================================================================ 
