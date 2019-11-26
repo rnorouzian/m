@@ -1724,7 +1724,7 @@ dint.plot2 <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (din
 #===============================================================================================================================                  
  
                   
-dint.plot <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint)", labels = NULL){
+dint.plot <- function(..., main = NULL, xlab = "", ylab = "Effect Size (dint)", labels = NULL){
   
   m <- Filter(NROW, lapply(list(...), function(x) x[!is.na(x)]))
   L <- length(m)
