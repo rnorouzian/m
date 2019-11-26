@@ -5328,7 +5328,7 @@ metal.dint <- function(data = NULL, by, over = time, mu.prior = mu.norm(-6, 6), 
     
     if(length(dd) == 0) return(NA)
     
-    f <- try(setNames(lapply(seq_along(dd), function(x) robu(dint~1, data = dd[[x]], studynum = as.vector(study.name), var = SD^2)), chep), silent = TRUE)
+    f <- try(setNames(lapply(seq_along(dd), function(x) robu(dint~1, data = dd[[x]], studynum = as.vector(study.name), var = SD^2)), paste(over, chep)), silent = TRUE)
     if(inherits(f, "try-error")) NA else f[sapply(seq_along(f), function(i) is.finite(f[[i]]$reg_table$dfs[1]) & f[[i]]$reg_table$dfs[1] > 1)]
   } 
   
@@ -5384,7 +5384,7 @@ metal.dint <- function(data = NULL, by, over = time, mu.prior = mu.norm(-6, 6), 
     
     for(a in seq_len(so)) z[[a]] <- f2(j = k[[a]], tau.prior = tau.prior, mu.prior = mu.prior)
     
-    setNames(z, chep)
+    setNames(z, paste(over, chep))
   }
 }
            
