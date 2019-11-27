@@ -6049,7 +6049,7 @@ rdint <- function(n, dppc, dppt, nc, nt, rev.sign = FALSE){
 
 #================================================================================================================================================================
 
-qdint <- function(p, dppc, dppt, nc, nt, rev.sign = FALSE){
+qdint <- function(p, dppc, dppt, nc, nt, rev.sign = FALSE, lower.tail = TRUE){
   
   a <- dppc
   b <- dppt 
@@ -6062,12 +6062,13 @@ qdint <- function(p, dppc, dppt, nc, nt, rev.sign = FALSE){
   d1 <- AbscontDistribution(d = like1, low1 = -15, up1 = 15, withStand = TRUE)
   d2 <- AbscontDistribution(d = like2, low1 = -15, up1 = 15, withStand = TRUE)
   
-  distr::q.l(if(test) -(d2 - d1) else d2 - d1)(p)
+  res <- distr::q.l(if(test) -(d2 - d1) else d2 - d1)(p)
+  if(lower.tail) res else 1 - res
 }
 
 #================================================================================================================================================================
 
-pdint <- function(q, dppc, dppt, nc, nt, rev.sign = FALSE){
+pdint <- function(q, dppc, dppt, nc, nt, rev.sign = FALSE, lower.tail = TRUE){
   
   a <- dppc
   b <- dppt
@@ -6080,7 +6081,8 @@ pdint <- function(q, dppc, dppt, nc, nt, rev.sign = FALSE){
   d1 <- AbscontDistribution(d = like1, low1 = -15, up1 = 15, withStand = TRUE)
   d2 <- AbscontDistribution(d = like2, low1 = -15, up1 = 15, withStand = TRUE)
   
-  distr::p.r(if(test) -(d2 - d1) else d2 - d1)(q)
+  res <- distr::p.r(if(test) -(d2 - d1) else d2 - d1)(q)
+  if(lower.tail) res else 1 - res
 }
 
 #================================================================================================================================================================
