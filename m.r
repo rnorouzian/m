@@ -5987,7 +5987,7 @@ list(x = x, y = y)
 
 #================================================================================================================================================================
           
-ddint <- function(dppc, dppt, nc, nt, rev.sign = FALSE, ...){
+ddint.plot <- function(dppc, dppt, nc, nt, rev.sign = FALSE, ...){
   
   a <- dppc
   b <- dppt
@@ -6028,6 +6028,87 @@ rob.fig <- function(n = 2e3, cluster = 5, adj = 1, col = 4, cex = .7, pch = 19, 
   plot(jitter(a$x, adj), jitter(a$y, adj), xaxt = "n", yaxt = "n",
        pch = pch, cex = cex, col = adjustcolor(col, alpha), ann = ann, ...)
 }
+ 
+#================================================================================================================================================================
+                       
+rdint <- function(n, dppc, dppt, nc, nt, rev.sign = FALSE){
+  
+  a <- dppc
+  b <- dppt
+  
+  din <- b - a 
+  
+  test <- if(!rev.sign || rev.sign & b < 0 & a < 0 & abs(b) < abs(a)) FALSE else TRUE
+  
+  like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
+  like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
+  
+  d1 <- AbscontDistribution(d = like1, low1 = -15, up1 = 15, withStand = TRUE)
+  d2 <- AbscontDistribution(d = like2, low1 = -15, up1 = 15, withStand = TRUE)
+  
+  distr::r(if(test) -(d2 - d1) else d2 - d1)(n)
+}
+
+#================================================================================================================================================================
+
+qdint <- function(p, dppc, dppt, nc, nt, rev.sign = FALSE){
+  
+  a <- dppc
+  b <- dppt
+  
+  din <- b - a 
+  
+  test <- if(!rev.sign || rev.sign & b < 0 & a < 0 & abs(b) < abs(a)) FALSE else TRUE
+  
+  like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
+  like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
+  
+  d1 <- AbscontDistribution(d = like1, low1 = -15, up1 = 15, withStand = TRUE)
+  d2 <- AbscontDistribution(d = like2, low1 = -15, up1 = 15, withStand = TRUE)
+  
+  distr::q.l(if(test) -(d2 - d1) else d2 - d1)(p)
+}
+
+#================================================================================================================================================================
+
+pdint <- function(q, dppc, dppt, nc, nt, rev.sign = FALSE){
+  
+  a <- dppc
+  b <- dppt
+  
+  din <- b - a 
+  
+  test <- if(!rev.sign || rev.sign & b < 0 & a < 0 & abs(b) < abs(a)) FALSE else TRUE
+  
+  like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
+  like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
+  
+  d1 <- AbscontDistribution(d = like1, low1 = -15, up1 = 15, withStand = TRUE)
+  d2 <- AbscontDistribution(d = like2, low1 = -15, up1 = 15, withStand = TRUE)
+  
+  distr::p.r(if(test) -(d2 - d1) else d2 - d1)(q)
+}
+
+#================================================================================================================================================================
+
+
+ddint <- function(x, dppc, dppt, nc, nt, rev.sign = FALSE){
+  
+  a <- dppc
+  b <- dppt
+  
+  test <- if(!rev.sign || rev.sign & b < 0 & a < 0 & abs(b) < abs(a)) FALSE else TRUE
+  
+  like1 <- function(y) dt(dppc*sqrt(nc), df = nc - 1, ncp = y*sqrt(nc))
+  like2 <- function(y) dt(dppt*sqrt(nt), df = nt - 1, ncp = y*sqrt(nt))
+  
+  d1 <- AbscontDistribution(d = like1, low1 = -5e1, up1 = 5e1, withStand = TRUE)
+  d2 <- AbscontDistribution(d = like2, low1 = -5e1, up1 = 5e1, withStand = TRUE)
+  
+  like.dif <- function(y) distr::d(if(test) -(d2 - d1) else d2 - d1)(y)
+  
+  like.dif(x)
+}                       
                        
 #================================================================================================================================================================ 
                 
