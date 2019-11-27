@@ -6036,8 +6036,6 @@ rdint <- function(n, dppc, dppt, nc, nt, rev.sign = FALSE){
   a <- dppc
   b <- dppt
   
-  din <- b - a 
-  
   test <- if(!rev.sign || rev.sign & b < 0 & a < 0 & abs(b) < abs(a)) FALSE else TRUE
   
   like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
@@ -6054,9 +6052,7 @@ rdint <- function(n, dppc, dppt, nc, nt, rev.sign = FALSE){
 qdint <- function(p, dppc, dppt, nc, nt, rev.sign = FALSE){
   
   a <- dppc
-  b <- dppt
-  
-  din <- b - a 
+  b <- dppt 
   
   test <- if(!rev.sign || rev.sign & b < 0 & a < 0 & abs(b) < abs(a)) FALSE else TRUE
   
@@ -6075,8 +6071,6 @@ pdint <- function(q, dppc, dppt, nc, nt, rev.sign = FALSE){
   
   a <- dppc
   b <- dppt
-  
-  din <- b - a 
   
   test <- if(!rev.sign || rev.sign & b < 0 & a < 0 & abs(b) < abs(a)) FALSE else TRUE
   
