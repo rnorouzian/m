@@ -5951,23 +5951,32 @@ list(x = x, y = y)
 
 #================================================================================================================================================================
           
-ddint <- function(dppc, dppt, nc, nt, ...){
+ddint <- function(dppc, dppt, nc, nt, rev.sign = FALSE, ...){
+  
+  a <- dppc
+  b <- dppt
+  
+  din <- b - a  
+  
+  test <- if(!rev.sign || rev.sign & b < 0 & a < 0 & abs(b) < abs(a)) FALSE else TRUE
   
   like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
   like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
   
-  d1 <- AbscontDistribution(d = like1, low1 = -15, up1 = 15, withStand = TRUE)
-  d2 <- AbscontDistribution(d = like2, low1 = -15, up1 = 15, withStand = TRUE)
+  d1 <- AbscontDistribution(d = like1, low1 = -5e1, up1 = 5e1, withStand = TRUE)
+  d2 <- AbscontDistribution(d = like2, low1 = -5e1, up1 = 5e1, withStand = TRUE)
   
-  like.dif <- function(x) distr::d(d2 - d1)(x)
+  like.dif <- function(x) distr::d(if(test) -(d2 - d1) else d2 - d1)(x)
   
   Mean <- integrate(function(x) x*like.dif(x), -Inf, Inf)[[1]]
   SD <- sqrt(integrate(function(x) x^2*like.dif(x), -Inf, Inf)[[1]] - Mean^2)
   
-  curve(like.dif, Mean-(5*SD), Mean+(5*SD), n = 1e4, panel.f = abline(v = Mean, lty = 3, col = 2), lwd = 2, xlab = "dint (dpos - dpre)",
-        panel.l = text(Mean, .6, round(Mean, 4), pos = 3, font = 2, col = 2, srt = 90), ylab = "Density", ...)
+  din <- if(test) -din else din
   
-  return(c(MEAN = Mean, SD = SD))
+  curve(like.dif, din-(5*SD), din+(5*SD), n = 1e3, panel.f = abline(v = din, lty = 3, col = 2), lwd = 2, xlab = "dint (dpost - dpre)",
+        panel.l = text(din, .6, round(din, 4), pos = 3, font = 2, col = 2, srt = 90), ylab = "Density", ...)
+  
+  return(c(MEAN = din, SD = SD))
 }
  
 #================================================================================================================================================================                       
