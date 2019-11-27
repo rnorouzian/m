@@ -337,7 +337,14 @@ dit1 <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5){
 #===============================================================================================================================
                 
                 
-dit2 <- Vectorize(function(dppc, dppt, nc, nt, n.sim = NA){
+dit2 <- Vectorize(function(dppc, dppt, nc, nt, rev.sign = FALSE){
+  
+  a <- dppc
+  b <- dppt
+  
+  din <- b - a  
+  
+  test <- if(!rev.sign || rev.sign & b < 0 & a < 0 & abs(b) < abs(a)) FALSE else TRUE
   
   like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
   like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
@@ -345,17 +352,20 @@ dit2 <- Vectorize(function(dppc, dppt, nc, nt, n.sim = NA){
   d1 <- AbscontDistribution(d = like1, low1 = -15, up1 = 15, withStand = TRUE)
   d2 <- AbscontDistribution(d = like2, low1 = -15, up1 = 15, withStand = TRUE)
   
-  like.dif <- function(x) distr::d(d2 - d1)(x)
+  like.dif <- function(x) distr::d(if(test) -(d2 - d1) else d2 - d1)(x)
+  
+  din <- if(test) -din else din
   
   Mean <- integrate(function(x) x*like.dif(x), -Inf, Inf)[[1]]
   SD <- sqrt(integrate(function(x) x^2*like.dif(x), -Inf, Inf)[[1]] - Mean^2)
   
-  return(c(dint = dppt - dppc, SD = SD))
-})       
+  return(c(dint = din, SD = SD))
+})
+
              
 #===============================================================================================================================
              
-dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5, rev.sign = FALSE){
+dit3 <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5, rev.sign = FALSE){
   
   like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
   like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
@@ -377,6 +387,32 @@ dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5, rev.sign = FALSE){
   return(c(dint = di, SD = SD))
 })                     
 
+#===============================================================================================================================
+             
+dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5, rev.sign = FALSE){
+  
+  a <- dppc
+  b <- dppt
+  
+  din <- b - a 
+  
+  test <- if(!rev.sign || rev.sign & b < 0 & a < 0 & abs(b) < abs(a)) FALSE else TRUE
+  
+  like1 <- function(x) dt(dppc*sqrt(nc), df = nc - 1, ncp = x*sqrt(nc))
+  like2 <- function(x) dt(dppt*sqrt(nt), df = nt - 1, ncp = x*sqrt(nt))
+  
+  d1 <- AbscontDistribution(d = like1, low1 = -15, up1 = 15, withStand = TRUE)
+  d2 <- AbscontDistribution(d = like2, low1 = -15, up1 = 15, withStand = TRUE)
+  
+  dif <- distr::r(if(test) -(d2 - d1) else d2 - d1)(n.sim)
+  
+  din <- if(test) -din else din
+  
+  SD <- sd(dif)
+  
+  return(c(dint = din, SD = SD))
+})
+    
 #===============================================================================================================================
              
 pairup <- function(rv){ rv[1:(length(rv)/2)] }             
