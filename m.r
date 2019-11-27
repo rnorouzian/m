@@ -4379,7 +4379,7 @@ rm.allcolNA <- function(X) {
   
   if(inherits(X, "list")){
     
-    lapply(X, function(i) i[, colSums(is.na(i) | i == "") != nrow(i)], drop = FALSE)
+    lapply(X, function(i) i[, colSums(is.na(i) | i == "") != nrow(i), drop = FALSE])
     
   } else { X[, colSums(is.na(X) | X == "") != nrow(X), drop = FALSE] }
 }
