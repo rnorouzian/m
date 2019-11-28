@@ -4694,7 +4694,6 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   r <- lapply(r, function(x) do.call(rbind, c(split(x, x$study.name), make.row.names = FALSE)))
   
-  
   drop <- trimws(drop)                
   drop <- if(!by.group.name) setdiff(drop, "study.name") else setdiff(drop, c("study.name", "group.name"))
   
@@ -4702,8 +4701,8 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   r <- unname(r)
   
- if(n.df == 1) tbl <- table(names(r[[1]]))
-              
+  if(n.df == 1) tbl <- table(names(r[[1]]))
+  
   com.names <- if(n.df >= 2) { 
     
     if(common) { Reduce(intersect, lapply(r, names)) 
@@ -4786,9 +4785,9 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     invisible(mapply(splot, y = A, main = names(A), lwd = lwd, lend = lend))
   }
   
-  data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) names(i)[which.min(i)]), 
+  data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) if(i < 1) names(i)[which.min(i)] else NA), 
                      n.rater = n.rater, study.level = study.level)))
-}                               
+}          
                                                
 #===============================================================================================================================
       
