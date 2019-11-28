@@ -4330,17 +4330,23 @@ meta.bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)},
                  
 #===============================================================================================================================
           
-meta.robust <- function(f, data, by, small = TRUE){ 
+meta.robust <- function(f, data, group, w.model = "CORR", small = TRUE, rho = .8){ 
   
-  s <- substitute(by)
   data <- roundi(data)
-    
+  
   f <- if(missing(f)) formula(dint~1) else formula(f)
   
-  m <- robu(f, data = if(missing(by)) data else subset(data, eval(s)), studynum = study.name, var = SD^2, small = small)
+  if(!missing(group)) { 
+    
+    s <- substitute(group) 
+    data <- subset(data, eval(s)) 
+    f <- formula(bquote(.(f[[2]]) ~ 1))
+  }
+  
+  m <- robu(f, data = data, studynum = study.name, var = SD^2, small = small, model = w.model, rho = rho)
   m$ml <- f
   m
-}                                  
+}                                
     
 #===============================================================================================================================
                                       
