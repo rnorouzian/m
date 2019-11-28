@@ -4685,7 +4685,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   r <- full.clean(r, ar, all)
   
   r <- lapply(r, function(i) setNames(i, trimws(names(i))))
-              
+  
   check <- all(sapply(r, function(i) "study.name" %in% names(i)))
   
   if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
@@ -4695,25 +4695,12 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   r <- lapply(r, function(x) do.call(rbind, c(split(x, x$study.name), make.row.names = FALSE)))
   
   
-  if(by.group.name){
-    
-    check <- all(sapply(r, function(i) "group.name" %in% names(i)))
-    
-    if(!check) stop("Add a new column named 'group.name' with distinct names for groups in each row.", call. = FALSE)
-    
-    if(!is.unique(r, "group.name")) { stop("Each 'group.name' in each row must be distinct.", call. = FALSE) 
-      
-    } else { r <- lapply(r, function(i) {i$group.name <- trimws(i$group.name); i})
-      
-      r <- lapply(r, function(x) do.call(rbind, c(split(x, x$group.name), make.row.names = FALSE))) }
-  }
-  
   drop <- trimws(drop)                
   drop <- if(!by.group.name) setdiff(drop, "study.name") else setdiff(drop, c("study.name", "group.name"))
   
   if(!is.null(drop) & length(drop) != 0) r <- drop.col(r, drop)   
   
-  if(n.df == 1) tbl <- table(names(r[[1]]))
+  r <- unname(r)
   
   com.names <- if(n.df >= 2) { 
     
@@ -4799,9 +4786,8 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) names(i)[which.min(i)]), 
                      n.rater = n.rater, study.level = study.level)))
-}                                  
-                        
-                        
+}                               
+                                               
 #===============================================================================================================================
       
 metal <- function(data = NULL, mod, mu.prior = c("mean" = NA, "sd" = NA), tau.prior = function(x){dhalfnormal(x)}, impute = FALSE, n.sim = 1e4, option = 1, r = .5){
