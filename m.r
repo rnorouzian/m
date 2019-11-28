@@ -5892,16 +5892,23 @@ egger <- function(...){
 
 #================================================================================================================================================================
                            
-rma.robu <- function(f, var, id, data, w.model = "CORR", rho = .8, small = TRUE, ...){
+rma.robu <- function(f, var, id, data, w.model = "CORR", rho = .8, small = TRUE, group, ...){
   
   f <- formula(f)  
   data <- roundi(data)
+  
+  if(!missing(group)) { 
+    
+    s <- substitute(group) 
+  data <- subset(data, eval(s)) 
+  f <- formula(bquote(.(f[[2]]) ~ 1))
+  }
   
   m <- eval(substitute(robu(f, data = data, var = var, study = id, model = w.model, rho = rho, small = small, ...)))
   
   w <- m$data.full$r.weights
   
-  res <- eval(substitute(rma.uni(f, vi = var, data = data, slab = id, weights = w, ...)))
+  res <- eval(substitute(rma.uni(f, vi = var, data = data, slab = id, weights = w, subset = NULL, ...)))
   
   res$se <- m$reg_table$SE
   res$zval <- m$reg_table$t
@@ -5912,7 +5919,7 @@ rma.robu <- function(f, var, id, data, w.model = "CORR", rho = .8, small = TRUE,
   res$I2 <- m$mod_info$I.2
   
   return(res)
-}                          
+}                           
      
 #================================================================================================================================================================                           
 
