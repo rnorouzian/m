@@ -4702,6 +4702,8 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   r <- unname(r)
   
+ if(n.df == 1) tbl <- table(names(r[[1]]))
+              
   com.names <- if(n.df >= 2) { 
     
     if(common) { Reduce(intersect, lapply(r, names)) 
