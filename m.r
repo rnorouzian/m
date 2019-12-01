@@ -1776,7 +1776,7 @@ dint.plot <- function(..., main = NULL, ylab = "Effect Size (dint)", labels = NU
     
     L <- length(fit)  
     
-   bs <- all(sapply(fit, inherits, "bayesmeta"))
+    bs <- all(sapply(fit, inherits, "bayesmeta"))
     
     if(bs){
       
@@ -1802,26 +1802,37 @@ dint.plot <- function(..., main = NULL, ylab = "Effect Size (dint)", labels = NU
     
     text(x, .98*hi, paste0("(k = ", k,")"), cex = .65, font = 2, xpd = NA, srt = 90, pos = 2)
     
-    points(x, mu, pch = 22, cex = 6.3, bg = "cyan", col = "magenta", xpd = NA)
+   # points(x, mu, pch = 22, cex = 6.3, bg = "cyan", col = "magenta", xpd = NA)
     
-    text(x, c(.97*lo, mu, 1.03*hi),
-         round(c(lo, mu, hi), 3), cex = .9, font = 2, xpd = NA)
+    RECT = matrix(rep(c(0.28, 0.24), each = length(x)), ncol = 2)
     
+    symbols(x, mu, rectangles = RECT, inches = FALSE, add = TRUE, bg = "cyan", fg = "magenta")
+    
+    text(x, mu,
+         round(mu, 3), cex = .9, font = 2, xpd = NA)
+    
+    text(x, lo,
+         round(lo, 3), cex = .9, font = 2, xpd = NA, pos = 1)
+    
+    text(x, hi,
+         round(hi, 3), cex = .9, font = 2, xpd = NA, pos = 3)
     
     if(percent){
-    text(x*1.02, c(lo, .95*mu, hi),
-         paste0("[", dint.norm(c(lo, mu, hi)),"]"), cex = .7, font = 2, xpd = NA, pos = 4, col = "magenta")
-    }
+      
+      text(x*1.02, c(lo, .95*mu, hi),
+           paste0("[", dint.norm(c(lo, mu, hi)),"]"), cex = .7, font = 2, xpd = NA, pos = 4, col = "magenta")
+      }
     
-    dint.norm(mu)
+    mu
   }
   
   res <- invisible(lapply(seq_len(L), function(i) G(m[[i]], main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i], labels = if(is.null(labels)) names(m[[i]]) else labels[[i]])))
-
+  
   z <- if(is.null(main)) as.character(n) else main
   
-  data.frame(Plot.name = rep(z, each = lengths(res)), Percent.mu = unlist(res))
-} 
+  mu <- unlist(res)
+  data.frame(plot.name = rep(z, each = lengths(res)), mu = round(mu, 4), percent.mu = dint.norm(mu))
+}
                                      
 #===============================================================================================================================
                   
@@ -6105,7 +6116,15 @@ ddint <- function(x, dppc, dppt, nc, nt, rev.sign = FALSE){
   
   like.dif(x)
 }                       
-                       
+
+#================================================================================================================================================================                                   
+                                   
+rev.dint.norm <- function(percent){ 
+  
+a <- as.numeric(substr(percent, 1, nchar(percent)-1)) / 1e2
+round(qnorm(a + pnorm(0)), 4)
+
+}
 #================================================================================================================================================================ 
                 
 need <- c("bayesmeta", "distr", "zoo", "robumeta")
