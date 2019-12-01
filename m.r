@@ -1824,9 +1824,10 @@ dint.plot <- function(..., main = NULL, ylab = "Effect Size (dint)", labels = NU
     
     text(x, .98*hi, paste0("(k = ", k,")"), cex = .65, font = 2, xpd = NA, srt = 90, pos = 2)
     
-    rec <- matrix(rep(c(0.25, 0.24), each = length(x)), ncol = 2)
+   # rec <- matrix(rep(c(0.3, 0.22), each = length(x)), ncol = 2)
+   # symbols(x, mu, rectangles = rec, inches = FALSE, add = TRUE, bg = "cyan", fg = "magenta")
     
-    symbols(x, mu, rectangles = rec, inches = FALSE, add = TRUE, bg = "cyan", fg = "magenta")
+    points(x, mu, pch = 22, cex = 6.3, bg = "cyan", col = "magenta", xpd = NA)
     
     text(x, mu, round(mu, 3), cex = .9, font = 2, xpd = NA)
     
@@ -1838,7 +1839,7 @@ dint.plot <- function(..., main = NULL, ylab = "Effect Size (dint)", labels = NU
       
       text(x*1.04, c(lo, mu, hi),
            paste0("[", dint.norm(c(lo, mu, hi)),"]"), cex = .7, font = 2, xpd = NA, pos = 4, col = "magenta")
-      }
+    }
     mu
   }
   
@@ -1847,8 +1848,8 @@ dint.plot <- function(..., main = NULL, ylab = "Effect Size (dint)", labels = NU
   z <- if(is.null(main)) as.character(n) else main
   
   mu <- unlist(res)
-  data.frame(plot.name = rep(z, each = lengths(res)), mu = round(mu, 4), percent.mu = dint.norm(mu))
-}                                                    
+  data.frame(plot.name = rep(z, lengths(res)), mu = round(mu, 4), percent.mu = dint.norm(mu))
+}                            
                                                     
 #===============================================================================================================================
                   
