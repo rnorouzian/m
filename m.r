@@ -1707,60 +1707,9 @@ if(!test[1] & test[2] & test[3]) return(list(DEL1 = result2, DEL2 = result3))
    }             
 }
                
-#===============================================================================================================================
-             
-               
-dint.plot2 <- function(..., main = NULL, xlab = "Time", ylab = "Effect Size (dint)", labels = NULL){
-  
-  m <-list(...)
-  L <- length(m)
-  n <- substitute(...())
-  graphics.off()
-  org.par <- par(no.readonly = TRUE)
-  on.exit(par(org.par))
-  
-  if(L > 1L) { par(mfrow = n2mfrow(L)) ; set.margin() }
-  
-  G <- function(fit, main){  
-    
-    L <- length(fit)  
-    
-    LO <- fit$LONG
-    
-    mu <- sapply(1:L, function(i) fit[[i]]$summary["mean","mu"])
-    lo <- sapply(1:L, function(i) fit[[i]]$summary["95% lower","mu"])
-    hi <- sapply(1:L, function(i) fit[[i]]$summary["95% upper","mu"])
-    k <- sapply(1:L, function(i) fit[[i]]$k)
-    
-    x <- 0:(L-1)
-    
-    plot(x, mu, type = "l", xlim = range(x)+c(-.05, .05), ylim = range(lo, hi), ylab = ylab, lwd = 2, lty = 2, lend = 1,
-         xaxt = "n", xlab = xlab, panel.l = axis(1, at = x, labels = if(!is.null(labels)) labels else c(if(!is.na(mu[1]) & is.null(LO))
-           "Short" else if(!is.na(mu[2]) & !is.null(LO)) "Short" else NULL, if(!is.na(mu[2]) & is.null(LO)) "Medium" else if(!is.na(mu[2]) & !is.null(LO)) "Long" else NULL,
-           if(!is.na(mu[3]) & is.null(LO)) "Long" 
-           else NULL)), main = main)
-    
-    if(!is.na(mu[1])) lines(c(0, 0), c(lo[1], hi[1]), col = 2, lwd = 4, lend = 1)
-    if(!is.na(mu[2])) lines(c(1, 1), c(lo[2], hi[2]), col = 2, lwd = 4, lend = 1) 
-    if(!is.na(mu[3])) lines(c(2, 2), c(lo[3], hi[3]), col = 2, lwd = 4, lend = 1)
-    
-    if(!is.null(LO)) k[2] <- "stage"
-    
-    text(x, .88*hi, paste0("(k = ", k,")"), cex = .75, font = 2, xpd = NA, srt = 90, pos = 2) 
-    
-    points(x, mu, pch = 22, cex = 6.3, bg = "cyan", col = "magenta", xpd = NA)
-    
-    text(x, c(.97*lo, mu, 1.03*hi), 
-         round(c(lo, mu, hi), 3), cex = .9, font = 2, xpd = NA)
-  }
-  
-  for(i in 1:L) G(m[[i]], main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i])
-}         
-   
 #===============================================================================================================================                  
- 
-                  
-dint.plot <- function(..., main = NULL, ylab = "Effect Size (dint)", labels = NULL, percent = FALSE, lwd = 1){
+                 
+dint.plot2 <- function(..., main = NULL, ylab = "Effect Size (dint)", labels = NULL, percent = FALSE, lwd = 1){
   
   m <- Filter(NROW, lapply(list(...), function(x) x[!is.na(x)]))
   L <- length(m)
@@ -1802,11 +1751,7 @@ dint.plot <- function(..., main = NULL, ylab = "Effect Size (dint)", labels = NU
     
     text(x, .98*hi, paste0("(k = ", k,")"), cex = .65, font = 2, xpd = NA, srt = 90, pos = 2)
     
-   # points(x, mu, pch = 22, cex = 6.3, bg = "cyan", col = "magenta", xpd = NA)
-    
-    RECT = matrix(rep(c(0.28, 0.24), each = length(x)), ncol = 2)
-    
-    symbols(x, mu, rectangles = RECT, inches = FALSE, add = TRUE, bg = "cyan", fg = "magenta")
+    points(x, mu, pch = 22, cex = 6.3, bg = "cyan", col = "magenta", xpd = NA)
     
     text(x, mu,
          round(mu, 3), cex = .9, font = 2, xpd = NA)
@@ -1833,7 +1778,78 @@ dint.plot <- function(..., main = NULL, ylab = "Effect Size (dint)", labels = NU
   mu <- unlist(res)
   data.frame(plot.name = rep(z, each = lengths(res)), mu = round(mu, 4), percent.mu = dint.norm(mu))
 }
-                                     
+   
+#===============================================================================================================================                                                    
+                                                    
+dint.plot <- function(..., main = NULL, ylab = "Effect Size (dint)", labels = NULL, percent = FALSE, lwd = 1){
+  
+  m <- Filter(NROW, lapply(list(...), function(x) x[!is.na(x)]))
+  L <- length(m)
+  n <- substitute(...())
+  graphics.off()
+  org.par <- par(no.readonly = TRUE)
+  on.exit(par(org.par))
+  
+  
+  if(L > 1L) { par(mfrow = n2mfrow(L)) ; set.margin() ; if(percent) par(mar = c(1.5, 2.6, 1.8, 1.6)) }
+  
+  G <- function(fit, main, labels){  
+    
+    L <- length(fit)  
+    
+    bs <- all(sapply(fit, inherits, "bayesmeta"))
+    
+    if(bs){
+      
+      mu <- sapply(1:L, function(i) fit[[i]]$summary["mean","mu"])
+      lo <- sapply(1:L, function(i) fit[[i]]$summary["95% lower","mu"])
+      hi <- sapply(1:L, function(i) fit[[i]]$summary["95% upper","mu"])
+      k <- sapply(1:L, function(i) fit[[i]]$k)
+      
+    } else {
+      
+      mu <- sapply(1:L, function(i) fit[[i]]$reg_table$b.r[[1]])
+      lo <- sapply(1:L, function(i) fit[[i]]$reg_table$CI.L[[1]])            
+      hi <- sapply(1:L, function(i) fit[[i]]$reg_table$CI.U[[1]])
+      k <- sapply(1:L, function(i) fit[[i]]$N)
+      dfs <- sapply(1:L, function(i) fit[[i]]$reg_table$dfs[[1]] < 4)
+    }
+    
+    x <- 0:(L-1)
+    
+    plot(x, mu, type = "l", xlim = range(x)+c(-.05, .05), ylim = range(lo, hi), ylab = ylab, lwd = lwd, lty = 2, lend = 1, font.lab = 2,
+         xaxt = "n", xlab = NA, panel.last = axis(1, at = x, labels = labels), main = main, las = 1, cex.axis = .9, padj = .3)
+    
+    invisible(lapply(seq_len(L), function(i) if(!is.na(mu[i])) lines(c(i-1, i-1), c(lo[i], hi[i]), lwd = 4, lend = 1, col = if(bs) 2 else if(!bs & dfs[i]) 8 else 4)))
+    
+    text(x, .98*hi, paste0("(k = ", k,")"), cex = .65, font = 2, xpd = NA, srt = 90, pos = 2)
+    
+    rec <- matrix(rep(c(0.25, 0.24), each = length(x)), ncol = 2)
+    
+    symbols(x, mu, rectangles = rec, inches = FALSE, add = TRUE, bg = "cyan", fg = "magenta")
+    
+    text(x, mu, round(mu, 3), cex = .9, font = 2, xpd = NA)
+    
+    text(x, lo, round(lo, 3), cex = .9, font = 2, xpd = NA, pos = 1)
+    
+    text(x, hi, round(hi, 3), cex = .9, font = 2, xpd = NA, pos = 3)
+    
+    if(percent){
+      
+      text(x*1.04, c(lo, mu, hi),
+           paste0("[", dint.norm(c(lo, mu, hi)),"]"), cex = .7, font = 2, xpd = NA, pos = 4, col = "magenta")
+      }
+    mu
+  }
+  
+  res <- invisible(lapply(seq_len(L), function(i) G(m[[i]], main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i], labels = if(is.null(labels)) names(m[[i]]) else labels[[i]])))
+  
+  z <- if(is.null(main)) as.character(n) else main
+  
+  mu <- unlist(res)
+  data.frame(plot.name = rep(z, each = lengths(res)), mu = round(mu, 4), percent.mu = dint.norm(mu))
+}                                                    
+                                                    
 #===============================================================================================================================
                   
                   
