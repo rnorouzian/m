@@ -5153,7 +5153,7 @@ forest.rob <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex
   mtext(text = main, font = 2, line = -2)
   
   if(!check & summary) addpoly.default(ES, ci.lb = ES.CI.L, ci.ub = ES.CI.U, mlab = expression(bold("mean effect ("*mu*")")), 
-                             level = level, cex = f$cex, col = "cyan", rows = par('usr')[3], font = 2, xpd = NA)
+                             level = level, cex = f$cex, col = "cyan", rows = par('usr')[3], font = 2, xpd = NA, border = "magenta")
   
   abline(h = max(rows)+1, lwd = 1, col = 0, xpd = NA)
   
