@@ -6150,62 +6150,7 @@ impute <- function(D, FUN = median){
 D[sapply(D, is.numeric)] <- lapply(D[sapply(D, is.numeric)], function(x){x[is.na(x)] <- FUN(x, na.rm = TRUE); x})
 return(D)
 }                                   
-
-#================================================================================================================================================================
-                                   
-                                   
-d.ci <- function(d, t = NA, n1, n2 = NA, conf.level = .95, digits = 1e2, show = FALSE)
-{
-  UseMethod("d.ci")
-}
-
-d.ci.default <- function(d, t = NA, n1, n2 = NA, conf.level = .95, digits = 1e2, show = FALSE){
-  
-  ci <- Vectorize(function(d, t, n1, n2, conf.level){
-    
-    options(warn = -1)  
-    alpha = (1 - conf.level)/2
-    N = ifelse(is.na(n2), n1, (n1 * n2)/(n1 + n2))
-    df = ifelse(is.na(n2), n1 - 1, (n1 + n2) - 2)
-    d.SE = 1/sqrt(N)
-    q = ifelse(is.na(t), d/d.SE, t)
-    
-    f <- function(ncp, alpha, q, df){
-      alpha - suppressWarnings(pt(q, df, ncp, lower.tail = FALSE))
-    }
-    
-    CI <- sapply(c(alpha, 1-alpha),
-                 function(x) uniroot(f, interval = c(-1e7, 1e7), alpha = x, q = q, df = df, extendInt = "yes")[[1]]*d.SE)
-    
-    Cohen.d = ifelse(is.na(t), d, t*d.SE)
-    
-    return(c(Cohen.d = Cohen.d, lower = CI[1], upper = CI[2], conf.level = conf.level, ncp = q))
-  })
-  
-  d <- if(missing(d)) NA else d
-  
-  a <- round(data.frame(t(ci(d = d, t = t, n1 = n1, n2 = n2, conf.level = conf.level))), digits = digits)
-  
-  if(show){
-    
-    r <- nrow(a)
-    graphics.off()
-    original.par = par(no.readonly = TRUE)
-    on.exit(par(original.par))
-    if(r > 1) { par(mfrow = n2mfrow(r)) ; set.margin() }
-    
-    I <- eq(a$Cohen.d, n1, n2, conf.level)
-    
-    d <- I[[1]] ; n1 <- I[[2]] ; n2 <- I[[3]]; conf.level <- I[[4]]
-    
-    for(i in 1:r) CI.d(d = d[i], n1 = n1[i], n2 = n2[i], conf.level = conf.level[i], CI = c(a$lower[i], a$upper[i]))
-    
-  }
-  
-  return(a)
-  
-}                                    
-                                   
+                                  
 #================================================================================================================================================================ 
                 
 need <- c("bayesmeta", "distr", "zoo", "robumeta")
