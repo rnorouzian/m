@@ -38,16 +38,16 @@ test <- t.test(a, b, paired = TRUE)  # run a paired t-test on the latent contstr
 
 t.val <- unname(test$statistic)
 
-df.t <- test$parameter
+N <- total
 
 # Use Reza's newly developed program to measure effect size (pre-post):
 
-cohen.d  <- t2d(t.val, df.t) # measure effect size of change after SLI
-# a d of "0.593807"
+cohen.d  <- t2d(t.val, N) # measure effect size of change after SLI
+# a d of "0.5896104"
 
 # Use Reza's newly developed program to interpret effect size in percentages (pre-post):
 
-dint.norm(cohen.d) # 'd' shows SLI has made 22.37% improvement.
+dint.norm(cohen.d) # 'd' shows SLI has made 22.23% improvement.
 
 
 # Show the conceptual model:
