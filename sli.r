@@ -6,6 +6,8 @@
 
 # Access Reza's suites of new programs:
 source("https://raw.githubusercontent.com/rnorouzian/m/master/m.r")
+source("https://raw.githubusercontent.com/rnorouzian/i/master/i.r")
+
 
 # Access the SLI paper Data:
 D <- read.csv("https://raw.githubusercontent.com/rnorouzian/i/master/SLI.csv", h = T)
