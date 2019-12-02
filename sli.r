@@ -36,7 +36,9 @@ pos <- D[,9:16]
 a <- (efa(pre, factors = 1, scores = "reg")$score)$Fa  # measure pre latent construct (educational leadership)
 b <- (efa(pos, factors = 1, scores = "reg")$score)$Fa  # measure pos latent construct (educational leadership)
 
-test <- t.test(a, b, paired = TRUE)  # run a paired t-test on the latent contstructs before & after SLI rather then items
+
+# run a paired t-test on the latent contstructs before & after SLI rather than items:
+test <- t.test(a, b, paired = TRUE)  
 
 t.val <- unname(test$statistic)
 
@@ -47,13 +49,18 @@ N <- total
 cohen.d  <- t2d(t.val, N) # measure effect size of change after SLI
 # a d of "0.5896104"
 
-# Use Reza's newly developed program to interpret effect size in percentages (pre-post):
 
+# Use Reza's newly developed program to measure 95% confidence interval for effect size (pre-post):
+d.ci(cohen.d, n1 = N)
+
+#     Cohen.d     lower     upper     conf.level      ncp
+#    0.5896104 0.3356008  0.8400179       0.95      4.968146
+
+# Use Reza's newly developed program to interpret effect size in percentages (pre-post):
 dint.norm(cohen.d) # 'd' shows SLI has made 22.23% improvement.
 
 
 # Show the conceptual model:
-
 
 m2 <- " 
 LBpr = ~Q1_a+Q6_a
