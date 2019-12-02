@@ -6142,6 +6142,15 @@ a <- as.numeric(substr(percent, 1, nchar(percent)-1)) / 1e2
 round(qnorm(a + pnorm(0)), 4)
 
 }
+                                   
+#================================================================================================================================================================
+                                                                     
+impute <- function(D, FUN = median){
+  
+D[sapply(D, is.numeric)] <- lapply(D[sapply(D, is.numeric)], function(x){x[is.na(x)] <- FUN(x, na.rm = TRUE); x})
+return(D)
+}                                   
+                                   
 #================================================================================================================================================================ 
                 
 need <- c("bayesmeta", "distr", "zoo", "robumeta")
@@ -6154,6 +6163,4 @@ suppressMessages({
     library("bayesmeta")
     library("robumeta")
     library("zoo")
-})               
-               
-              
+})                                         
