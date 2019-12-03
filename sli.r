@@ -2,7 +2,7 @@
 
 #=========== SLI PAPER DATA-ANALYSIS ==============#
 
-# By Component 5 team members: Reza & rudy
+# By Component 5 team members: Reza & Rudy
 
 # Access Reza's suites of new programs:
 source("https://raw.githubusercontent.com/rnorouzian/m/master/m.r")
