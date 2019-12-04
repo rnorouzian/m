@@ -101,24 +101,24 @@ writeDoc(doc2, file = "CFA2.docx")
 # Use Reza's program to generalize the results to a wider pool of participants:
 
 nor <- function(di = cohen.d, ri = c(1e-6, .999999)){
-
-xx <- range(c(qnorm(ri), qnorm(ri, di)), finite = TRUE)
-
-a <- curve(dnorm(x), xx[1], xx[2], n = 1e4, xlab = "Effect Size", ylab = "Density")
-
-b <- curve(dnorm(x, di), add = TRUE, col = 2, n = 1e4, lty = 2)
-axis(1, at = di, labels = round(di, 3), col = 2, col.axis = 2)
-
-u <- par('usr')[3]
-
-segments(x <- c(0, di), c(u, u), x, c(max(a$y, na.rm = T), max(b$y, na.rm = T)), col = c(1, 2), lwd = 2, lend = 1)
-
-xy <- a$x >= 0 & a$x <= di
-
-x <- c(0, a$x[xy], di)
-y <- c(u, pmin.int(a$y, b$y)[xy], u)
-
-polygon(x, y, col = 4, border = NA, density = 15)
+  
+  xx <- range(c(qnorm(ri), qnorm(ri, di)), finite = TRUE)
+  
+  a <- curve(dnorm(x), xx[1], xx[2], n = 1e4, xlab = "Effect Size", ylab = "Density")
+  
+  b <- curve(dnorm(x, di), add = TRUE, col = 2, n = 1e4, lty = 2)
+  axis(1, at = di, labels = round(di, 3), col = 2, col.axis = 2)
+  
+  u <- par('usr')[3]
+  
+  xy <- a$x >= 0 & a$x <= di
+  
+  x <- c(0, a$x[xy], di)
+  y <- c(u, pmin.int(a$y, b$y)[xy], u)
+  
+  polygon(x, y, col = 4, border = NA, density = 15)
+  
+  segments(x <- c(0, di), c(u, u), x, c(max(a$y, na.rm = T), max(b$y, na.rm = T)), col = c(1, 2), lwd = 2, lend = 1)
 }
 
 
