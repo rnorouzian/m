@@ -1,5 +1,4 @@
 
-
 #=========== SLI PAPER DATA-ANALYSIS ==============#
 
 # By Component 5 team members: Reza & Rudy
@@ -16,12 +15,12 @@ D <- read.csv("https://raw.githubusercontent.com/rnorouzian/i/master/SLI.csv", h
 # total participants:
 total <- nrow(D)         
 
-# non-responses:
+# If non-responses removed:
 none <- nrow(na.omit(D)) 
 
 
-#Percetange of data missing:
-mis <- noquote(paste0(round(1 - none/total, 4)*1e2, "%")) # 12.68% of responses missing
+#Percetange of data affected by missing:
+mis <- noquote(paste0(round(1 - none/total, 4)*1e2, "%")) # 12.68% of data affected by missing
 
 
 # Use Reza's newly developed program to recover the missing responses:
