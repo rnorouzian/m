@@ -6045,12 +6045,12 @@ ddint.plot <- function(dppc, dppt, nc, nt, rev.sign = FALSE, ...){
  
 #================================================================================================================================================================                       
                        
-rob.fig <- function(n = 2e3, cluster = 5, adj = 1, col = 4, cex = .7, pch = 19, ann = FALSE, alpha = .4, random = TRUE, ...)
+rob.fig <- function(n = 2e3, cluster = 5, adj = 1, col = 4, cex = .7, pch = 19, ann = FALSE, alpha = .4, seed = NULL, ...)
 {
   
   size <- cluster - 1  
   
-  if(!random) { set.seed(0) } else { set.seed(NULL) }
+  set.seed(seed)
   a <- rrbinom(n, size, .5, .5)
   
   plot(jitter(a$x, adj), jitter(a$y, adj), xaxt = "n", yaxt = "n",
