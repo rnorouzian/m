@@ -116,7 +116,7 @@ nor <- function(di = cohen.d, ri = c(1e-6, .999999)){
   x <- c(0, a$x[xy], di)
   y <- c(u, pmin.int(a$y, b$y)[xy], u)
   
-  polygon(x, y, col = 4, border = NA, density = 15)
+  polygon(x, y, col = 4, border = NA, density = 15, angle = 45)
   
   segments(x <- c(0, di), c(u, u), x, c(max(a$y, na.rm = T), max(b$y, na.rm = T)), col = c(1, 2), lwd = 2, lend = 1)
 }
