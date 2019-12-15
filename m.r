@@ -6150,7 +6150,25 @@ impute <- function(D, FUN = median){
   D[y] <- lapply(D[y], function(x){x[is.na(x)] <- FUN(x, na.rm = TRUE); x})
   return(D)
 }                                   
-                                  
+
+                                   
+#================================================================================================================================================================
+                                   
+hist.pt <- function(x, breaks = "Sturges", xlab = "x", ylab = "Frequency", ...){
+  
+  h <- hist(x, breaks = breaks, plot = FALSE)
+
+pt <- data.frame(
+  x = unlist(lapply(1:length(h$mids), function(i) rep(h$mids[i], each = h$counts[i]))),
+  y = unlist(lapply(h$counts, function(co) 1:co))
+)
+
+plot(pt$x, pt$y, xlab = xlab, ylab = ylab, ...)
+
+invisible(h)
+}                                   
+                                   
+                                   
 #================================================================================================================================================================ 
                 
 need <- c("bayesmeta", "distr", "zoo", "robumeta")
