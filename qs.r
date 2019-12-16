@@ -23,3 +23,13 @@ mult.norm <- function(n.subject = 5e3, n.subskill = 5, max.small.growth = .01){
   plot(density(growth), main = "Growth Distribution", xlab = "Growth Rate")
   mean(growth)
 }
+
+
+
+mult.norm.free <- function(n.subject = 5e3, n.subskill = 5, max.big.growth = 2){
+  
+  growth <- replicate(n.subject, log(prod(1 + runif(n.subskill, 0, max.big.growth))))
+  
+  plot(density(growth), main = "Growth Distribution", xlab = "Growth Rate")
+  mean(growth)
+}
