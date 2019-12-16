@@ -12,7 +12,7 @@ add.norm <- function(n.test.taker = 5e3, n.question = 15, pt.worth = 2){
 }
 
 
-# Suppose growth rate of a human skill is influenced by a small percentage growth in 5 other interacting subskills (their effects multiply), 
+# Suppose growth rate of a human skill is influenced by a small percentage growth (e.g., 1% max) in 5 other interacting subskills (their effects multiply), 
 # what can be a likely distribution for that human skill's growth among 5000 randomly selected subjects?
 
 # USE R to find an answer:
