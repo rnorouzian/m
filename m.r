@@ -6159,15 +6159,14 @@ hist.pt <- function(x, breaks = "Sturges", xlab = "x", ylab = if(freq) "Frequenc
   h <- hist(x, breaks = breaks, plot = FALSE)
 
 pt <- data.frame(
-  x = unlist(lapply(1:length(h$mids), function(i) rep(h$mids[i], each = h$counts[i]))),
-  y = if(freq) unlist(lapply(h$counts, function(co) 1:co)) else unlist(lapply(1:length(h$mids), function(i) seq(0, h$density[i], length.out = h$counts[i])))
+  x = rep(h$mids, h$counts),
+  y = if(freq) sequence(h$counts) else unlist(lapply(seq_len(length(h$mids)), function(i) seq(0, h$density[i], length.out = h$counts[i])))
 )
 
 plot(pt$x, pt$y, xlab = xlab, ylab = ylab, ...)
 
 invisible(h)
-}                                   
-                                   
+}                                  
                                    
 #================================================================================================================================================================ 
                 
