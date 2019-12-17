@@ -1,6 +1,6 @@
 
-# Suppose a human skill can be measured by asking 15 questions that are each worth 2 points, 
-# what can be a likely distribution of overall scores (i.e., sum of 15 questions) of 5000 randomly selected test-takers?
+#Question 1: Suppose a human skill can be measured by asking 15 questions that are each worth 2 points, 
+# what can be a likely distribution of overall scores (i.e., sum of 15 questions) for 5000 randomly selected test takers?
 
 # USE R to find an answer:
 add.norm <- function(n.test.taker = 5e3, n.question = 15, pt.worth = 2){
@@ -12,7 +12,7 @@ add.norm <- function(n.test.taker = 5e3, n.question = 15, pt.worth = 2){
 }
 
 
-#Question: Suppose the growth rate of a human skill is enhanced by 5 other interacting subskills (i.e., their effects multiply), each of which can stimulate the growth by a small percentage (e.g., 1% maximum), 
+#Question 2: Suppose the growth rate of a human skill is enhanced by 5 other interacting subskills (i.e., their effects multiply), each of which can stimulate the growth by a small percentage (e.g., 1% maximum), 
 #what can be a likely distribution for that human skill’s growth rate among 5000 randomly selected subjects?
 
 # USE R to find an answer:
