@@ -6165,7 +6165,28 @@ plot(x, y, xlab = xlab, ylab = ylab, ...)
 
 invisible(h)
 }                                  
-                                   
+ 
+#================================================================================================================================================================                                                      
+                                                                                                            
+pt.curve <- function(X, adjust = 1, compact = .3, pch = 16, col = 2, cex = .7, ...) {
+  
+  n.target <- length(X)
+  
+  d <- density.default(X, adjust = adjust, n = n.target, na.rm = TRUE)
+  
+  auc <- sum(d$y*median(diff(d$x)))/(diff(range(d$x))*max(d$y))
+  
+  n <- compact*ceiling(n.target/auc)
+  
+  pts <- data.frame(x = runif(n, min(d$x), max(d$x)), y = runif(n, 0, max(d$y)))
+  
+  pts <- pts[pts$y < approx(d$x, d$y, xout = pts$x)$y, ]
+  
+  pts <- pts[sample(seq_len(nrow(pts)), n, replace = TRUE), ]
+  
+  plot(pts, pch = pch, col = col, cex = cex, ...)
+}                                                      
+                                                      
 #================================================================================================================================================================ 
                 
 need <- c("bayesmeta", "distr", "zoo", "robumeta")
