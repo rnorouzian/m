@@ -5,9 +5,9 @@
 # USE R to find an answer:
 add.norm <- function(n.test.taker = 5e3, n.question = 15, pt.worth = 2){
   
-  dis <- replicate(n.test.taker, sum(round(runif(n.question, 0, pt.worth))))
+  dis <- replicate(n.test.taker, sum(runif(n.question, 0, pt.worth)))
   
-  plot(density(dis, adjust = 1.2), main = "Score Distribution", xlab = "Test Scores")
+  plot(density(dis), main = "Score Distribution", xlab = "Test Scores")
   mean(dis)
 }
 
