@@ -47,7 +47,7 @@ mult.norm <- function(n.subject = 5e3, n.subskill = 5, max.small.growth = .01, c
 
 #Question 3: Go back to question 2. Now, suppose that each interacting subskill can stimulate the growth rate of driving skill by a much higher percentage (e.g., 100% max). 
 # (A) Is the distribution of driving skill’s growth rate among 5000 randomly selected subjects the same as in question 2?
-# (B) Suppose we are open to re-scale growth rate of driving skill to logrithmic scale (`log = TRUE`) as a way to reduce the size of the growth rates,
+# (B) Suppose we are open to re-scaling the growth rate of driving skill to logrithmic scale (`log = TRUE`) as a way to reduce the size of the growth rates,
 #     Now what is the likely distribution of the log-scaled growth rates?
 
 
