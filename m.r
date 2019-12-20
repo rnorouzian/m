@@ -6192,6 +6192,30 @@ pt.curve <- function(X, adjust = 1, compact = NULL, pch = 16, col = 2, cex = .7,
   
   plot(pts, pch = pch, col = col, cex = cex, ...)
 }                                                    
+
+#================================================================================================================================================================                                                      
+
+qplot <- function(..., col.pt = 1, pch = 21, cex = 1, col.line = 2, main = NULL){
+
+M <- list(...)
+n <- substitute(...())
+
+foo <- function(x, col.pt, pch, cex, col.line, main){ 
+  
+qqnorm(x, col = col.pt, cex = cex, pch = pch, main = main)
+qqline(x, col = col.line)
+}
+
+graphics.off()             
+org.par <- par(no.readonly = TRUE)
+on.exit(par(org.par))
+
+N <- length(M)
+
+if(N > 1L) { par(mfrow = n2mfrow(N)) ; set.margin() }
+
+invisible(lapply(1:N, function(i) foo(M[[i]], col.pt = col.pt, pch = pch, cex = cex, col.line = col.line, main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i])))
+}                                                      
                                                       
 #================================================================================================================================================================ 
                 
