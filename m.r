@@ -4761,7 +4761,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   dot.names <- if(all) com.names else com.names[!com.names %in% ar]
   
-  if(length(dot.names) == 0) stop("No two variables/moderators names match.", call. = FALSE)
+  if(length(dot.names) == 0) stop("No 2 raters detected OR no two variables/moderators names match.", call. = FALSE)
   
   if(n.df >= 2) { 
     
