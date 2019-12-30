@@ -4508,7 +4508,8 @@ full.clean <- function(X, omit, all = TRUE, omit.auto.suffix = TRUE)
                                       
 kap <- function (x, level = .95)
 {
-  
+    
+  x <- matrix(table(x[[1]], x[[2]]), 2)
   d  <- diag(x)
   n  <- sum(x)
   nc <- ncol(x)
@@ -4638,7 +4639,7 @@ splot <- function(y, main, lwd = 5, lend = 2){
                                                           
 #===============================================================================================================================
       
-int <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6, raw = TRUE) 
+Kappa <- int <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6, raw = TRUE) 
 {
   
   if(!inherits(X, c("data.frame", "matrix", "table"))) stop("Ratings must be 'data.frame', 'matrix', and if not raw, a 'table'.", call. = FALSE)
