@@ -6220,7 +6220,8 @@ invisible(lapply(1:N, function(i) foo(M[[i]], col.pt = col.pt, pch = pch, cex = 
                                                       
 #===========================# Datasets # ===================================================================================== 
    
-irr1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
+table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
+table2 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr2.csv", row.names = 1)          
                                       
 #================================================================================================================================================================
                                       
