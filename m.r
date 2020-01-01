@@ -6217,7 +6217,30 @@ if(N > 1L) { par(mfrow = n2mfrow(N)) ; set.margin() }
 
 invisible(lapply(1:N, function(i) foo(M[[i]], col.pt = col.pt, pch = pch, cex = cex, col.line = col.line, main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i])))
 }                                                      
-                                                      
+       
+#================================================================================================================================================================
+                                      
+plan.object <- function(margin = .2, S.index = NA){
+  
+  margin[margin > .99] <- .99  
+  margin[margin < .01] <- .01
+  
+  data.frame(n.obj = ceiling(1/margin^2), margin = paste0("+-", margin), S.index = S.index, lower = if(!is.na(S.index)) S.index - margin else NA, upper = if(!is.na(S.index)) S.index + margin else NA)
+}
+
+#================================================================================================================================================================
+                            
+plan.coder <- function(se2irr = .2, S.index = NA){
+  
+  se2irr[se2irr > .99] <- .99  
+  se2irr[se2irr < .01] <- .01 
+  
+  n <- ceiling(2/se2irr)
+  se <- if(!is.na(S.index)) se2irr*S.index else NA
+  
+  data.frame(n.coder = n, se2irr = se2irr, S.index = S.index, lower = if(!is.na(S.index)) S.index - 2*se else NA, upper = if(!is.na(S.index)) S.index + 2*se else NA, conf.lev = .95)
+}
+                             
 #===========================# Datasets # ===================================================================================== 
    
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
