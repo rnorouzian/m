@@ -5311,6 +5311,9 @@ mu.norm <- find.norm <- function(low, high, cover = .99, digits = 6){
   
   options(warn = -1)
   
+  cover[cover >= 1] <- .999999999999999
+  cover[cover <= 0] <- .000000000000001
+  
   p1 <- (1 - cover) / 2 
   p2 <- 1 - p1
   
@@ -5321,7 +5324,7 @@ mu.norm <- find.norm <- function(low, high, cover = .99, digits = 6){
   
   if (p1 <= 0 || p2 >= 1 || q[1] >= q[2] || p1 >= p2) {
     
-    stop("Incorrect 'low' and/or 'high' values.", call. = FALSE)
+    stop("Incorrect 'low' and/or 'high' or 'cover' values.", call. = FALSE)
     
   } else {
     
@@ -5334,13 +5337,13 @@ mu.norm <- find.norm <- function(low, high, cover = .99, digits = 6){
   
   if(is.df(low, q[[1]]) || is.df(high, q[[2]])) {
     
-    stop("Change 'low' and/or 'high' values.", call. = FALSE)
+    stop("Change 'low' and/or 'high' or 'cover' values.", call. = FALSE)
     
   } else {
     
     return(round(c(mean = parm[[1]], sd = parm[[2]]), digits = digits))
   }
-}                
+}                               
   
                 
 #========================================================================================
