@@ -4639,7 +4639,7 @@ splot <- function(y, main, lwd = 5, lend = 2){
                                                           
 #===============================================================================================================================
       
-Kappa <- int <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6, raw = TRUE) 
+irr <- int <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6, raw = TRUE) 
 {
   
   if(!inherits(X, c("data.frame", "matrix", "table"))) stop("Ratings must be 'data.frame', 'matrix', and if not raw, a 'table'.", call. = FALSE)
@@ -4702,7 +4702,7 @@ is.unique <- function(X, which){
                                                                           
 #===============================================================================================================================
                                   
-interag <- interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = FALSE, lwd = 5, lend = 1)
+intercode <- interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = FALSE, lwd = 5, lend = 1)
 {
   
   r <- list(...) 
