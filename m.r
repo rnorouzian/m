@@ -4820,8 +4820,8 @@ intercode <- interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany"
     invisible(mapply(splot, y = A, main = names(A), lwd = lwd, lend = lend))
   }
   
-  data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) if(any(i < 1)) names(i)[which.min(i)] else NA), 
-                     n.rater = n.rater, study.level = study.level)))
+  data.frame(t(d), row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) if(any(i < 1)) names(i)[which.min(i)] else NA),
+                          n.rater = n.rater, study.level = study.level)
 }          
                                                
 #===============================================================================================================================
