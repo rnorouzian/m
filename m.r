@@ -4803,8 +4803,6 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   if(length(st.level) == 0) st.level <- "No moderator"
   
-  message("\nNote: ", toString(dQuote(st.level), width = 47), " treated at 'study.level' see output.\n")
-  
   d <- data.frame(out)
   
   d[] <- lapply(d, as.list)
@@ -4824,7 +4822,10 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
                             n.rater = n.rater, study.level = study.level)))
   
   output <- data.frame(lapply(res, unlist))
-  write.csv(output, "IRRoutput.csv")
+  ur <- try(write.csv(output, "IRRoutput.csv"), silent = TRUE)
+  if(inherits(ur, "try-error")) stop("\nClose the EXCEL file: 'IRRoutput' and try again.", call. = FALSE)
+  
+  message("\nNote: ", toString(dQuote(st.level), width = 47), " treated at 'study.level' see output.\n")
   return(res)
 }
                                                
