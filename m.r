@@ -4584,7 +4584,7 @@ efa <- function(x, factors, data = NULL, covmat = NULL, n.obs = NA,
 #===============================================================================================================================
                                                           
 detail2 <- function(X, useNA = "ifany"){
-
+  
   nr <- nrow(X)
   nc <- ncol(X)
   tab <- table(row(X), unlist(X), useNA = useNA)
@@ -4593,8 +4593,7 @@ detail2 <- function(X, useNA = "ifany"){
   K <- (pjk - pj)/(1 - pj)
   h <- names(K)
   h[is.na(h)] <- "NA"
-  names(K) <- h
-  return(K)
+  setNames(K, h)
 }         
 
 #===============================================================================================================================
