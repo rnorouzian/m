@@ -4825,7 +4825,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   ur <- try(write.csv(output, "IRRoutput.csv"), silent = TRUE)
   if(inherits(ur, "try-error")) stop("\nClose the EXCEL file: 'IRRoutput' and try again.", call. = FALSE)
   
-  message("\nNote 1: Check your machine's working directory (e.g.,'documents') for EXCEL file: 'IRRoutput'.")
+  message("\nNote 1: Check your machine's working directory (use: 'getwd()') for EXCEL file: 'IRRoutput'.")
   message("Note 2: ", toString(dQuote(st.level), width = 47), " treated at 'study.level' see output.\n")
   return(res)
 }
