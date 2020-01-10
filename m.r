@@ -6249,7 +6249,17 @@ plan.coder <- function(se2irr = .2, S.index = NA){
   
   data.frame(n.coder = n, se2irr = se2irr, S.index = S.index, lower = if(!is.na(S.index)) S.index - 2*se else NA, upper = if(!is.na(S.index)) S.index + 2*se else NA, conf.lev = .95)
 }
-                             
+      
+#================================================================================================================================================================
+             
+irr.diag <- function(X, useNA = "ifany"){
+  
+  a <- detail2(X, useNA = useNA)
+  b <- detail(X, useNA = useNA)
+  
+  t(data.frame(KAPPA = a, SA = b))
+}
+             
 #===========================# Datasets # ===================================================================================== 
    
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
