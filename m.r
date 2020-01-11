@@ -4672,7 +4672,52 @@ irr <- int <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6,
                  upper = s.boot.ci[[2]], 
                  conf.level = level), digits))
 }                                      
-                                      
+
+                   
+#===============================================================================================================================                   
+                   
+                                   
+int2 <- function(X, level = .95, useNA = "ifany", nsim = 1e3, digits = 4, raw = TRUE){ 
+  
+  X <- table(row(X), unlist(X), useNA = useNA)
+  
+  agree.mat <- as.matrix(X) 
+  n <- nrow(agree.mat) # number of studies or groups within studies
+  q <- ncol(agree.mat) # number of categories
+  f <- 0               # population correction 
+  
+    weights.mat <- diag(q)
+
+  agree.mat.w <- t(weights.mat%*%t(agree.mat))
+  
+  ri.vec <- agree.mat%*%rep(1,q)
+  sum.q <- (agree.mat*(agree.mat.w-1))%*%rep(1,q)
+  n2more <- sum(ri.vec>=2)
+  pa <- sum(sum.q[ri.vec>=2]/((ri.vec*(ri.vec-1))[ri.vec>=2]))/n2more
+  
+  pi.vec <- t(t(rep(1/n,n))%*%(agree.mat/(ri.vec%*%t(rep(1,q)))))
+  pe <- sum(weights.mat) * sum(pi.vec*(1-pi.vec)) / (q*(q-1))
+  ac1 <- (pa-pe)/(1-pe)
+  
+  den.ivec <- ri.vec*(ri.vec-1)
+  den.ivec <- den.ivec - (den.ivec == 0) # this replaces each 0 value with -1 to make the next ratio calculation always possible.
+  pa.ivec <- sum.q/den.ivec
+  
+  pe.r2 <- pe*(ri.vec>=2)
+  ac1.ivec <- (n/n2more)*(pa.ivec-pe.r2)/(1-pe)
+  pe.ivec <- (sum(weights.mat)/(q*(q-1))) * (agree.mat%*%(1-pi.vec))/ri.vec
+  ac1.ivec.x <- ac1.ivec - 2*(1-ac1) * (pe.ivec-pe)/(1-pe)
+  
+  var.ac1 <- ((1-f)/(n*(n-1))) * sum((ac1.ivec.x - ac1)^2)
+  stderr <- sqrt(var.ac1)
+  p.value <- 2*(1-pt(ac1/stderr,n-1))
+  
+  lower <- ac1 - stderr*qt(1-(1-level)/2,n-1)
+  upper <- min(1,ac1 + stderr*qt(1-(1-level)/2,n-1))
+  
+  return(round(c(AC = ac1, lower = lower, upper = upper, conf.level = level), digits))
+}                   
+                   
 #===============================================================================================================================
                        
 is.constant <- function(x) length(unique(x)) == 1L 
