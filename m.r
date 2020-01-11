@@ -6257,7 +6257,7 @@ irr.diag <- function(X, useNA = "ifany"){
   a <- detail2(X, useNA = useNA)
   b <- detail(X, useNA = useNA)
   
-  t(data.frame(KAPPA = a, SA = b))
+  data.frame(KAPPA = a, SA = b)
 }
              
 #===========================# Datasets # ===================================================================================== 
