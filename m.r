@@ -4747,7 +4747,7 @@ is.unique <- function(X, which){
 #===============================================================================================================================
 
                                    
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = FALSE, lwd = 5, lend = 1)
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = TRUE, lwd = 5, lend = 1)
 {
   
   r <- list(...) 
