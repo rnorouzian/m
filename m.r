@@ -6274,12 +6274,12 @@ invisible(lapply(1:N, function(i) foo(M[[i]], col.pt = col.pt, pch = pch, cex = 
        
 #================================================================================================================================================================
                                       
-plan.object <- function(margin = .2, S.index = NA){
+plan.item <- function(margin = .2, S.index = NA){
   
   margin[margin > .99] <- .99  
   margin[margin < .01] <- .01
   
-  data.frame(n.obj = ceiling(1/margin^2), margin = paste0("+-", margin), S.index = S.index, lower = if(!is.na(S.index)) S.index - margin else NA, upper = if(!is.na(S.index)) S.index + margin else NA)
+  data.frame(n.item = ceiling(1/margin^2), margin = paste0("+-", margin), S.index = S.index, lower = if(!is.na(S.index)) S.index - margin else NA, upper = if(!is.na(S.index)) S.index + margin else NA)
 }
 
 #================================================================================================================================================================
