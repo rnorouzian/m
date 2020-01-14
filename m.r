@@ -6322,7 +6322,7 @@ irr.diag <- function(X, useNA = "ifany"){
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
 table2 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr2.csv", row.names = 1)          
 table3 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/X.csv", row.names = 1)
-coding1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/cd1.csv")             
+coding1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/c2.csv")             
 #================================================================================================================================================================
                                       
                                       
