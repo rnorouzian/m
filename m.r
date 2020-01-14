@@ -4747,7 +4747,7 @@ is.unique <- function(X, which){
 #===============================================================================================================================
 
                                    
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = TRUE, lwd = 5, lend = 1)
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = TRUE, lwd = 5, lend = 1, exclude = NULL, file.name = NULL)
 {
   
   r <- list(...) 
@@ -4832,6 +4832,13 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   st.level <- st.level[st.level %in% dot.names]
   
+  exclude <- trimws(exclude)
+  
+  a <- length(exclude)
+  b <- length(st.level)
+  
+  st.level <- setdiff(if(a > b) exclude else st.level, if(a < b) exclude else st.level)
+  
   L <- split.default(r[names(r) %in% dot.names], names(r)[names(r) %in% dot.names])
   
   if(length(st.level) != 0) L[st.level] <- lapply(L[st.level], function(x) x[ave(seq_along(x[[1]]), r$study.name, FUN = seq_along) == 1, ]) 
@@ -4866,12 +4873,17 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   res <- data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) if(any(i < 1)) names(i)[which.min(i)] else NA), 
                             n.rater = n.rater, study.level = study.level)))
   
-  output <- data.frame(lapply(res, unlist))
-  ur <- try(write.csv(output, "IRRoutput.csv"), silent = TRUE)
-  if(inherits(ur, "try-error")) stop("\nClose the EXCEL file: 'IRRoutput' and try again.", call. = FALSE)
+  file.name <- trimws(file.name)
   
-  message("\nNote 1: Check your machine's working directory (use: 'getwd()') for EXCEL file: 'IRRoutput'.")
-  message("Note 2: ", toString(dQuote(st.level), width = 47), " treated at 'study.level' see output.\n")
+  if(length(file.name) != 0){
+  output <- data.frame(lapply(res, unlist))
+  nm <- paste0(file.name, ".csv")
+  ur <- try(write.csv(output, nm), silent = TRUE)
+  if(inherits(ur, "try-error")) stop(paste0("\nClose the EXCEL file '", nm, "' and try again."), call. = FALSE)
+  message("\nNote: Check your machine's working directory (use 'getwd()') for EXCEL file '", nm, "'")
+  }
+  
+  message("Note: ", toString(dQuote(st.level), width = 47), " treated at 'study.level' see output.\n")
   return(res)
 }
                                                
