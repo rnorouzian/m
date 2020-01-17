@@ -4747,7 +4747,7 @@ is.unique <- function(X, which){
 #===============================================================================================================================
 
                                    
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = TRUE, lwd = 5, lend = 1, exclude = NULL, file.name = NULL)
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = TRUE, lwd = 5, lend = 1, group.level = NULL, study.level = NULL, file.name = NULL)
 {
   
   r <- list(...) 
@@ -4819,7 +4819,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   }
   
-  n.rater <- if(common) { 
+  n.coder <- if(common) { 
     
     tbl[tbl == max(tbl)] 
     
@@ -4828,11 +4828,11 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     tbl[tbl >= 2]
   }
   
-  st.level <- names(Filter(base::all, aggregate(.~study.name, r, is.constant)[-1]))
+  st.level <- c(names(Filter(base::all, aggregate(.~study.name, r, is.constant)[-1])), study.level)
   
   st.level <- st.level[st.level %in% dot.names]
   
-  exclude <- trimws(exclude)
+  exclude <- trimws(group.level)
   
   a <- length(exclude)
   b <- length(st.level)
@@ -4871,16 +4871,16 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   }
   
   res <- data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) if(any(i < 1)) names(i)[which.min(i)] else "--"), 
-                            n.rater = n.rater, study.level = study.level)))
+                            n.coder = n.coder, study.level = study.level)))
   
   file.name <- trimws(file.name)
   
   if(length(file.name) != 0){
-  output <- data.frame(lapply(res, unlist))
-  nm <- paste0(file.name, ".csv")
-  ur <- try(write.csv(output, nm), silent = TRUE)
-  if(inherits(ur, "try-error")) stop(paste0("\nClose the EXCEL file '", nm, "' and try again."), call. = FALSE)
-  message("\nNote: Check your machine's working directory (use 'getwd()') for EXCEL file '", nm, "'")
+    output <- data.frame(lapply(res, unlist))
+    nm <- paste0(file.name, ".csv")
+    ur <- try(write.csv(output, nm), silent = TRUE)
+    if(inherits(ur, "try-error")) stop(paste0("\nClose the EXCEL file '", nm, "' and try again."), call. = FALSE)
+    message("\nNote: Check your machine's working directory (use 'getwd()') for EXCEL file '", nm, "'")
   }
   
   message("Note: ", toString(dQuote(st.level), width = 47), " treated at 'study.level' see output.\n")
