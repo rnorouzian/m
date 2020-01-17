@@ -4828,7 +4828,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     tbl[tbl >= 2]
   }
   
-  st.level <- c(names(Filter(base::all, aggregate(.~study.name, r, is.constant, na.action = na.pass)[-1])), study.level)
+  st.level <- c(names(Filter(base::all, aggregate(.~study.name, r, is.constant, na.action = na.pass)[-1])), if(is.null(study.level)) study.level else trimws(study.level))
   
   st.level <- st.level[st.level %in% dot.names]
   
