@@ -4623,7 +4623,7 @@ set.margin <- function()
 
 #===============================================================================================================================                                                          
  
-splot <- function(y, main, lwd = 5, lend = 2){
+splot <- function(y, main, lwd = 5, lend = 2, show.sa = FALSE, digits = 3){
   
   x <- seq_len(length(y))
   
@@ -4631,6 +4631,8 @@ splot <- function(y, main, lwd = 5, lend = 2){
        ylab = "%SA", xaxt = "n", xlab = "Category", lend = lend, lwd = lwd,
        col = colorRampPalette(c(4, 2))(length(y)), font.lab = 2, 
        panel.first = abline(h = 0, col = 8), las = 1, cex.axis = .9, padj = .3)
+  
+  if(show.sa) text(x[y != 0], .4, round(y[y != 0], digits), pos = 2, xpd = NA, srt = 90, font = 2)
   
   axis(1, at = x, labels = names(y))
 } 
@@ -4747,7 +4749,7 @@ is.unique <- function(X, which){
 #===============================================================================================================================
 
                                    
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = TRUE, lwd = 5, lend = 1, group.level = NULL, study.level = NULL, file.name = NULL)
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = FALSE, drop = NULL, by.group.name = FALSE, plot = TRUE, lwd = 5, lend = 1, show.sa = FALSE, group.level = NULL, study.level = NULL, file.name = NULL)
 {
   
   r <- list(...) 
@@ -4867,10 +4869,10 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     on.exit(par(org.par))
     if(n > 1L) { par(mfrow = n2mfrow(n)) ; set.margin() }
     
-    invisible(mapply(splot, y = A, main = names(A), lwd = lwd, lend = lend))
+    invisible(mapply(splot, y = A, main = names(A), lwd = lwd, lend = lend, show.sa = show.sa, digits = digits))
   }
   
-   res <- data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) if(any(i < 1)) names(i)[which.min(i)] else "--"), 
+  res <- data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) if(any(i < 1)) names(i)[which.min(i)] else "--"), 
                             n.coder = n.coder, study.level = ifelse(study.level, "Yes", "No"))))
   
   file.name <- trimws(file.name)
