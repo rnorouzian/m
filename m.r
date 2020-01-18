@@ -4870,8 +4870,8 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     invisible(mapply(splot, y = A, main = names(A), lwd = lwd, lend = lend))
   }
   
-  res <- data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) if(any(i < 1)) names(i)[which.min(i)] else "--"), 
-                            n.coder = n.coder, study.level = study.level)))
+   res <- data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) if(any(i < 1)) names(i)[which.min(i)] else "--"), 
+                            n.coder = n.coder, study.level = ifelse(study.level, "Yes", "No"))))
   
   file.name <- trimws(file.name)
   
