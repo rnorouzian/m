@@ -4883,11 +4883,10 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     output <- data.frame(lapply(res, unlist))
     nm <- paste0(file.name, ".csv")
     ur <- try(write.csv(output, nm), silent = TRUE)
-    if(inherits(ur, "try-error")) stop(paste0("\nClose the EXCEL file '", nm, "' and try again."), call. = FALSE)
-    message("\nNote: Check your machine's working directory (use 'getwd()') for EXCEL file '", nm, "'")
+    if(inherits(ur, "try-error")) stop(paste0("\nClose the Excel file '", nm, "' and try again."), call. = FALSE)
+    message(paste0("\nNote: Check folder '", basename(getwd()),"' for the Excel file '", nm, "'.\n"))
   }
-  
-  message("Note: ", toString(dQuote(st.level), width = 47), " treated at 'study.level' see output.\n")
+                                                                              
   return(res)
 }
                                                
