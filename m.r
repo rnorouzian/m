@@ -4634,7 +4634,7 @@ splot <- function(y, main, lwd = 5, lend = 2, show.sa = FALSE, digits = 3){
        col = colorRampPalette(c(4, 2))(ll), font.lab = 2, 
        panel.first = abline(h = 0, col = 8), las = 1, cex.axis = .9, padj = .3)
   
-  if(show.sa) text(x[y != 0], .4, round(y[y != 0], digits), pos = 2, xpd = NA, srt = 90, font = 2)
+  if(show.sa) text(x[y != 0]-.015, .4, round(y[y != 0], digits), pos = 2, xpd = NA, srt = 90, font = 2)
   
   axis(1, at = x, labels = names(y))
 } 
