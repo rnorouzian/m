@@ -6327,11 +6327,12 @@ table3 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/X.csv"
 c1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/c1.csv")
 c2 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/c2.csv")
 c3 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/c3.csv")
+c4 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/c4.csv")             
              
 #================================================================================================================================================================
                                       
                                       
-need <- c("bayesmeta", "distr", "zoo", "robumeta")
+need <- c("bayesmeta", "distr", "robumeta") # , "zoo"
 have <- need %in% rownames(installed.packages())
 if(any(!have)){ install.packages( need[!have] ) }
  
@@ -6340,5 +6341,5 @@ suppressMessages({
     library("distr")
     library("bayesmeta")
     library("robumeta")
-    library("zoo")
+    #library("zoo")
 })                                         
