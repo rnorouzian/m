@@ -6319,6 +6319,19 @@ irr.diag <- function(X, useNA = "ifany"){
   
   round(data.frame(KAPPA = a, SA = b), 3)
 }
+
+#==========================================================================================================================================
+             
+find.irr <- function(X, what){
+
+if(!inherits(X, "data.frame")) stop("Data must be an Excel CSV file or a 'data.frame'.", call. = FALSE)
+  
+s <- as.list(substitute(what))  
+  
+res <- Filter(NROW, X[rowSums(X[grep(as.character(s[[2]]), names(X))] == s[[3]], na.rm = TRUE) > 0,][c("study.name", "group.name")])
+
+if(length(res) == 0) NULL else res
+}           
              
 #===========================# Datasets # ===================================================================================== 
    
