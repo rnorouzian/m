@@ -4751,12 +4751,12 @@ is.unique <- function(X, which){
 #===============================================================================================================================
 
                                    
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = TRUE, drop = NULL, by.group.name = FALSE, plot = TRUE, lwd = 5, lend = 1, show.sa = TRUE, group.level = NULL, study.level = NULL, file.name = NULL)
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = TRUE, drop = NULL, plot = TRUE, lwd = 5, lend = 1, show.sa = TRUE, group.level = NULL, study.level = NULL, file.name = NULL)
 {
   
   r <- list(...) 
   
-  if(!(all(sapply(r, inherits, c("data.frame", "matrix"))))) stop("Coding-sheet must be a 'data.frame' or 'matrix'.", call. = FALSE)
+  if(!all(sapply(r, inherits, c("data.frame", "matrix")))) stop("Coding-sheet must be a 'data.frame' or 'matrix'.", call. = FALSE)
   
   n.df <- length(r)
   
@@ -4764,7 +4764,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   arg <- formalArgs(d.prepos)
   
-  ar <- if(!by.group.name) arg[-c(2, 21)] else arg[-c(2, 3, 21)]
+  ar <- arg[-c(2, 22)]
   
   r <- full.clean(r, ar, all)
   
@@ -4772,14 +4772,14 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   check <- all(sapply(r, function(i) "study.name" %in% names(i)))
   
-  if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
+  if(!check) stop("Add a new column named 'study.name' to the coding sheet(s).", call. = FALSE)
   
   r <- lapply(r, function(i) {i$study.name <- trimws(i$study.name); i})
   
   r <- lapply(r, function(x) do.call(rbind, c(split(x, x$study.name), make.row.names = FALSE)))
   
   drop <- trimws(drop)                
-  drop <- if(!by.group.name) setdiff(drop, "study.name") else setdiff(drop, c("study.name", "group.name"))
+  drop <- setdiff(drop, "study.name")
   
   if(!is.null(drop) & length(drop) != 0) r <- drop.col(r, drop)   
   
@@ -4817,7 +4817,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     
     r <- do.call(cbind, r)
     
-    tbl <- table(names(r)[!names(r) %in% c(ar, "study.name")]) 
+    tbl <- table(names(r)[!names(r) %in% c("study.name", "group.name")]) 
     
   } else { r <- r[[1]]
   
@@ -4831,7 +4831,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     
     tbl[tbl >= 2]
   }
-  
+    
   st.level <- c(names(Filter(base::all, aggregate(.~study.name, r, is.constant, na.action = na.pass)[-1])), if(is.null(study.level)) study.level else trimws(study.level))
   
   st.level <- st.level[st.level %in% dot.names]
@@ -4847,7 +4847,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   if(length(st.level) != 0) L[st.level] <- lapply(L[st.level], function(x) x[ave(seq_along(x[[1]]), r$study.name, FUN = seq_along) == 1, ]) 
   
-  L <- if(!by.group.name) drop.inner.list(L, "study.name") else drop.inner.list(L, c("study.name", "group.name"))
+  L <- drop.inner.list(L, c("study.name", "group.name"))
   
   if(na.rm) L <- lapply(L, na.omit)
   
@@ -4860,7 +4860,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   if(length(st.level) == 0) st.level <- "No moderator"
   
   d <- data.frame(out)
-  
+
   d[] <- lapply(d, as.list)
   
   if(plot){
@@ -4886,7 +4886,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     if(inherits(ur, "try-error")) stop(paste0("\nClose the Excel file '", nm, "' and try again."), call. = FALSE)
     message(paste0("\nNote: Check folder '", basename(getwd()),"' for the Excel file '", nm, "'.\n"))
   }
-                                                                              
+  
   return(res)
 }
                                                
