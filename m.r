@@ -4756,7 +4756,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   r <- list(...) 
   
-  if(!all(sapply(r, inherits, c("data.frame", "matrix")))) stop("Coding-sheet must be a 'data.frame' or 'matrix'.", call. = FALSE)
+  if(!all(sapply(r, inherits, c("data.frame", "matrix")))) stop("Coding-sheet(s) must be 'Excel CSV' files, 'data.frame' or 'matrix'.", call. = FALSE)
   
   n.df <- length(r)
   
