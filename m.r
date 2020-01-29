@@ -4751,7 +4751,7 @@ is.unique <- function(X, which){
 #===============================================================================================================================
 
                                    
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = TRUE, drop = NULL, plot = TRUE, lwd = 5, lend = 1, show.sa = TRUE, group.level = NULL, study.level = NULL, file.name = NULL)
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = TRUE, drop = NULL, plot = TRUE, lwd = 5, lend = 1, show.sa = TRUE, group.level = NULL, study.level = NULL, file.name = NULL, reset = TRUE)
 {
   
   r <- list(...) 
@@ -4831,7 +4831,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     
     tbl[tbl >= 2]
   }
-    
+  
   st.level <- c(names(Filter(base::all, aggregate(.~study.name, r, is.constant, na.action = na.pass)[-1])), if(is.null(study.level)) study.level else trimws(study.level))
   
   st.level <- st.level[st.level %in% dot.names]
@@ -4860,15 +4860,18 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   if(length(st.level) == 0) st.level <- "No moderator"
   
   d <- data.frame(out)
-
+  
   d[] <- lapply(d, as.list)
   
   if(plot){
     
     n <- length(L)
+    
+    if(reset){
     graphics.off()
     org.par <- par(no.readonly = TRUE)
     on.exit(par(org.par))
+    }
     if(n > 1L) { par(mfrow = n2mfrow(n)) ; set.margin() }
     
     invisible(mapply(splot, y = A, main = names(A), lwd = lwd, lend = lend, show.sa = show.sa, digits = digits))
