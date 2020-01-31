@@ -4623,7 +4623,7 @@ set.margin <- function()
 
 #===============================================================================================================================                                                          
  
-splot <- function(y, main, lwd = 5, lend = 2, show.sa = FALSE, digits = 3){
+splot <- function(y, main, lwd = 5, lend = 2, show.sa = FALSE, digits = 3, cex.sa = .9){
   
   ll <- length(y)
   
@@ -4634,10 +4634,10 @@ splot <- function(y, main, lwd = 5, lend = 2, show.sa = FALSE, digits = 3){
        col = colorRampPalette(c(4, 2))(ll), font.lab = 2, 
        panel.first = abline(h = 0, col = 8), las = 1, cex.axis = .9, padj = .3)
   
-  if(show.sa) text(x[y != 0]-.015, .4, round(y[y != 0], digits), pos = 2, xpd = NA, srt = 90, font = 2)
+  if(show.sa) text(x[y != 0]-.015, .4, round(y[y != 0], digits), pos = 2, xpd = NA, srt = 90, font = 2, cex = cex.sa)
   
   axis(1, at = x, labels = names(y))
-} 
+}
                                                        
                                                           
 #===============================================================================================================================
@@ -4751,7 +4751,7 @@ is.unique <- function(X, which){
 #===============================================================================================================================
 
                                    
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = TRUE, drop = NULL, plot = TRUE, lwd = 5, lend = 1, show.sa = TRUE, group.level = NULL, study.level = NULL, file.name = NULL, reset = TRUE)
+interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = TRUE, drop = NULL, plot = TRUE, lwd = 5, lend = 1, show.sa = TRUE, group.level = NULL, study.level = NULL, file.name = NULL, reset = TRUE, rev.page = FALSE, cex.sa = .9)
 {
   
   r <- list(...) 
@@ -4868,13 +4868,14 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     n <- length(L)
     
     if(reset){
-    graphics.off()
-    org.par <- par(no.readonly = TRUE)
-    on.exit(par(org.par))
+      graphics.off()
+      org.par <- par(no.readonly = TRUE)
+      on.exit(par(org.par))
     }
-    if(n > 1L) { par(mfrow = n2mfrow(n)) ; set.margin() }
+    dev <- if(!rev.page) n2mfrow(n) else rev(n2mfrow(n))
+    if(n > 1L) { par(mfrow = dev) ; set.margin() }
     
-    invisible(mapply(splot, y = A, main = names(A), lwd = lwd, lend = lend, show.sa = show.sa, digits = digits))
+    invisible(mapply(splot, y = A, main = names(A), lwd = lwd, lend = lend, show.sa = show.sa, digits = digits, cex.sa = cex.sa))
   }
   
   res <- data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) if(any(i < 1)) names(i)[which.min(i)] else "--"), 
