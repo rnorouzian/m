@@ -4785,7 +4785,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   r <- unname(r)
   
-  if(n.df == 1) tbl <- table(names(r[[1]]))
+  if(n.df == 1) tbl <- table(names(r[[1]])[!names(r[[1]]) %in% c("study.name", "group.name")])
   
   com.names <- if(n.df >= 2) { 
     
