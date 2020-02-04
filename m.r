@@ -4857,8 +4857,6 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   study.level <- sapply(seq_along(out), function(i) names(out)[[i]] %in% st.level)
   
-  if(length(st.level) == 0) st.level <- "No moderator"
-  
   d <- data.frame(out)
   
   d[] <- lapply(d, as.list)
