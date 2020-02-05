@@ -161,7 +161,7 @@ if(length(res) == 0) NA else res
                   
 mod.level <- function(data, what){
   
-unique(na.omit(unlist(data[paste0(substitute(what))])))
+sort(unique(na.omit(unlist(data[paste0(substitute(what))]))))
   
 }
 
@@ -169,7 +169,7 @@ unique(na.omit(unlist(data[paste0(substitute(what))])))
                   
 mods.level <- function(data){
   
-f <- function(data, what)unique(na.omit(unlist(data[what])))
+f <- function(data, what) sort(unique(na.omit(unlist(data[what]))))
 
   ar <- formalArgs(d.prepos)[-c(21, 22)]
   
