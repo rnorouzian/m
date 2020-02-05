@@ -166,12 +166,12 @@ sort(unique(na.omit(unlist(data[paste0(substitute(what))]))))
 }
 
 #===============================================================================================================================
-                  
+                                                     
 mods.level <- function(data){
   
 f <- function(data, what) sort(unique(na.omit(unlist(data[what]))))
 
-  ar <- formalArgs(d.prepos)[-c(21, 22)]
+  ar <- c(formalArgs(d.prepos)[-c(21, 22)], c("dint", "SD", "id"))
   
   dot.names <- names(data)[!names(data) %in% ar]
   
