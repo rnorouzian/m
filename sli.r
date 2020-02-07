@@ -77,7 +77,7 @@ EdLps =~ LBps + BAVps + OSps+ EFps
 
 library(semPlot)
 library(lavaan)
-library(ReporteRs)
+#library(ReporteRs)
 
 
 # fit the conceptual model:
@@ -91,11 +91,11 @@ G2()
 
 # print the conceptual model for publication:
 
-doc2 <- addPlot(docx(), fun = G2, vector.graphic = TRUE, width = 3.7, height = 4.1,  
-                par.properties = parCenter(), editable = TRUE)
+#doc2 <- addPlot(docx(), fun = G2, vector.graphic = TRUE, width = 3.7, height = 4.1,  
+ #               par.properties = parCenter(), editable = TRUE)
 
 
-writeDoc(doc2, file = "CFA2.docx")
+#writeDoc(doc2, file = "CFA2.docx")
 
 
 # Use Reza's program to generalize the results to a wider pool of participants:
