@@ -4777,8 +4777,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   r <- lapply(r, function(i) {i$study.name <- trimws(i$study.name); i})
   
   r <- lapply(r, function(x) do.call(rbind, c(split(x, x$study.name), make.row.names = FALSE)))
-  
-  drop <- trimws(drop)                
+                 
   drop <- setdiff(drop, "study.name")
   
   if(!is.null(drop) & length(drop) != 0) r <- drop.col(r, drop)   
