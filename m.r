@@ -6349,42 +6349,45 @@ exam.efa <- function(x, factors, data = NULL, covmat = NULL, n.obs = NA,
   fit$call <- match.call(expand.dots = FALSE)
   
   
-res <- round(transform(subset(as.data.frame.table(loadings(fit)), Freq >= cutoff),
-          Var2 = match(Var2, unique(Var2)), Var1 = as.numeric(Var1)), digits = digits)
-
-names(res) <- c("Item", "Factor", "Loading")
-
-rownames(res) <- NULL
-
-file.name <- trimws(file.name)  
-
-if(length(file.name) != 0){
-
-  nm <- paste0(file.name, ".csv")
-  ur <- try(write.csv(res, nm, row.names = FALSE), silent = TRUE)
-  if(inherits(ur, "try-error")) stop(paste0("\nClose the Excel file '", nm, "' and try again OR pick another file name."), call. = FALSE)
-  message(paste0("\nNote: Check folder '", basename(getwd()),"' for the Excel file '", nm, "'.\n"))
-} 
-
-if(plot){
+  res <- round(transform(subset(as.data.frame.table(loadings(fit)), Freq >= cutoff),
+                         Var2 = match(Var2, unique(Var2)), Var1 = as.numeric(Var1)), digits = digits)
   
-  graphics.off()
-  org.par <- par(no.readonly = TRUE)
-  on.exit(par(org.par))
-  par(mar = c(5.1, 1.1, 4.1, 4.1))
+  names(res) <- c("Item", "Factor", "Loading")
   
-plot(res$Factor, res$Item, las = 1, pch = 22, cex = 1.2, xlim = c(-.1, max(res$Factor)+.1), axes = FALSE, xlab = "FACTOR", main = "ITEMS", font.lab = 2, ylab = NA)
-
-text(res$Factor, 0, res$Factor, pos = 1, xpd = NA, font = 2, cex = 2)
-
-rect(unique(res$Factor)-.5, 0, unique(res$Factor)+.5, tapply(res$Item, res$Factor, FUN = max)+1, col = adjustcolor(1:8, .2), xpd = NA, border = NA)
-
-dup <- duplicated(res$Item) | duplicated(res$Item, fromLast = TRUE)
-
-text(res$Factor, res$Item, res$Item, pos = 4, cex = .7, xpd = NA, font = 2, col = ifelse(dup, 2, 1))
-}
-return(res)
-}             
+  rownames(res) <- NULL
+  
+  file.name <- trimws(file.name)  
+  
+  if(length(file.name) != 0){
+    
+    nm <- paste0(file.name, ".csv")
+    ur <- try(write.csv(res, nm, row.names = FALSE), silent = TRUE)
+    if(inherits(ur, "try-error")) stop(paste0("\nClose the Excel file '", nm, "' and try again OR pick another file name."), call. = FALSE)
+    message(paste0("\nNote: Check folder '", basename(getwd()),"' for the Excel file '", nm, "'.\n"))
+  } 
+  
+  f <- res$Factor
+  i <- res$Item
+  
+  if(plot){
+    
+    graphics.off()
+    org.par <- par(no.readonly = TRUE)
+    on.exit(par(org.par))
+    par(mar = c(3.1, 1.1, 2.1, 4.1), mgp = c(1.7, .5, 0))
+    
+    plot(f, i, las = 1, pch = 22, cex = 1.2, xlim = c(-.1, max(f)+.1), axes = FALSE, xlab = "FACTORS", main = "ITEMS", font.lab = 2, ylab = NA)
+    
+    text(f, 0, f, pos = 1, xpd = NA, font = 2, cex = 2)
+    
+    rect(unique(f)-.5, 0, unique(f)+.5, tapply(i, f, FUN = max)+1, col = adjustcolor(1:8, .2), xpd = NA, border = NA)
+    
+    dup <- duplicated(i) | duplicated(i, fromLast = TRUE)
+    
+    text(f, i, i, pos = 4, cex = .7, xpd = NA, font = 2, col = ifelse(dup, 2, 1))
+  }
+  return(res)
+}         
                          
 #===========================# Datasets # ===================================================================================== 
    
