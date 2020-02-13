@@ -6349,7 +6349,7 @@ exam.efa <- function(x, factors, data = NULL, covmat = NULL, n.obs = NA,
   fit$call <- match.call(expand.dots = FALSE)
   
   
-  res <- round(transform(subset(as.data.frame.table(loadings(fit)), Freq >= cutoff),
+  res <- round(transform(subset(as.data.frame.table(fit[[2]]), Freq >= cutoff),
                          Var2 = match(Var2, unique(Var2)), Var1 = as.numeric(Var1)), digits = digits)
   
   names(res) <- c("Item", "Factor", "Loading")
@@ -6374,11 +6374,13 @@ exam.efa <- function(x, factors, data = NULL, covmat = NULL, n.obs = NA,
     graphics.off()
     org.par <- par(no.readonly = TRUE)
     on.exit(par(org.par))
-    par(mar = c(3.1, 1.1, 2.1, 4.1), mgp = c(1.7, .5, 0))
+    par(mar = c(3.1, 1.1, 1.5, 4.1), mgp = c(1.7, .5, 0))
     
-    plot(f, i, las = 1, pch = 22, cex = 1.2, xlim = c(-.1, max(f)+.1), axes = FALSE, xlab = NA, main = "ITEMS", font.lab = 2, ylab = NA)
+    plot(f, i, las = 1, pch = 22, cex = 1.2, xlim = c(-.1, max(f)+.1), axes = FALSE, xlab = NA, main = NA, font.lab = 2, ylab = NA)
     
-    mtext("FACTORS", 1, line = 1.8, font = 2, at = mean(unique(f)))
+    at <- mean(unique(f))
+    
+    mtext("FACTORS", 1, line = 1.8, font = 2, at = at)
     
     text(f, 0, f, pos = 1, xpd = NA, font = 2, cex = 1.75)
     
@@ -6387,9 +6389,11 @@ exam.efa <- function(x, factors, data = NULL, covmat = NULL, n.obs = NA,
     dup <- duplicated(i) | duplicated(i, fromLast = TRUE)
     
     text(f, i, i, pos = 4, cex = .7, xpd = NA, font = 2, col = ifelse(dup, 2, 1))
+    
+    legend(at, par('usr')[4], legend = "ITEMS", pch = 22, horiz = TRUE, bty = "n", text.font = 2, xpd = NA, pt.cex = 1.4, yjust = .5)
   }
   return(res)
-}         
+}          
                          
 #===========================# Datasets # ===================================================================================== 
    
