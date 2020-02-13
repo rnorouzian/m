@@ -6380,7 +6380,7 @@ exam.efa <- function(x, factors, data = NULL, covmat = NULL, n.obs = NA,
     
     mtext("FACTORS", 1, line = 1.7, font = 2, at = mean(unique(f)))
     
-    text(f, 0, f, pos = 1, xpd = NA, font = 2, cex = 1.7)
+    text(f, 0, f, pos = 1, xpd = NA, font = 2, cex = 1.8)
     
     rect(unique(f)-.5, 0, unique(f)+.5, tapply(i, f, FUN = max)+1, col = adjustcolor(1:8, .25), xpd = NA, border = NA)
     
