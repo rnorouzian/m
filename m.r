@@ -6376,11 +6376,13 @@ exam.efa <- function(x, factors, data = NULL, covmat = NULL, n.obs = NA,
     on.exit(par(org.par))
     par(mar = c(3.1, 1.1, 2.1, 4.1), mgp = c(1.7, .5, 0))
     
-    plot(f, i, las = 1, pch = 22, cex = 1.2, xlim = c(-.1, max(f)+.1), axes = FALSE, xlab = "FACTORS", main = "ITEMS", font.lab = 2, ylab = NA)
+    plot(f, i, las = 1, pch = 22, cex = 1.2, xlim = c(-.1, max(f)+.1), axes = FALSE, xlab = NA, main = "ITEMS", font.lab = 2, ylab = NA)
+    
+    mtext("FACTORS", 1, line = 1.6, font = 2, at = mean(unique(f)))
     
     text(f, 0, f, pos = 1, xpd = NA, font = 2, cex = 2)
     
-    rect(unique(f)-.5, 0, unique(f)+.5, tapply(i, f, FUN = max)+1, col = adjustcolor(1:8, .2), xpd = NA, border = NA)
+    rect(unique(f)-.5, 0, unique(f)+.5, tapply(i, f, FUN = max)+1, col = adjustcolor(1:8, .25), xpd = NA, border = NA)
     
     dup <- duplicated(i) | duplicated(i, fromLast = TRUE)
     
