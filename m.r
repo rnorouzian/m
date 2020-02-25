@@ -50,6 +50,15 @@ d2t <- function(d, n1, n2 = NA){
 
 #===============================================================================================================================
 
+trim <- function(X){
+  X <- setNames(X, trimws(names(X)))
+  y <- sapply(names(X), function(x) is.character(as.vector(X[[x]])))
+  X[y] <- lapply(X[y], trimws)
+  return(X)
+}
+              
+#===============================================================================================================================
+
 sdif <- function(n = NA, mpre = NA, mpos = NA, sdpre = NA, sdpos = NA, r = NA, t.pair = NA, df = NA,
                  sdp = NA){
   
