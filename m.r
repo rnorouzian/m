@@ -4680,7 +4680,7 @@ irr <- int <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6,
   s.boot.ci <- quantile(s.boot, probs = c(p, 1-p), na.rm = TRUE)
   
   return(round(c(KAPPA = KAPPA, 
-                 S.index = s, 
+                 Sindex = s, 
                  lower = s.boot.ci[[1]], 
                  upper = s.boot.ci[[2]], 
                  conf.level = level), digits))
