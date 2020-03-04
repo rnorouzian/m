@@ -4673,7 +4673,7 @@ irr <- int <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6,
   KAPPA <- (p - pe)/(1 - pe)
   s <- (nc * p - 1)/(nc - 1)
   pi.v.boot <- replicate(nsim, pi.boot <- sample(pi, size = nr, replace = TRUE))
-  p.boot <- apply(pi.v.boot, 2, mean)
+  p.boot <- colMeans(pi.v.boot)
   s.boot <- sapply(seq_len(nsim), function(i) (nc * p.boot[i] - 1)/(nc - 1))
   
   p <- (1 - level) / 2
