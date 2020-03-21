@@ -6468,7 +6468,23 @@ exam.efa <- function(x, factors, data = NULL, covmat = NULL, n.obs = NA,
   }
   return(res)
 }                  
-                         
+
+#============================================================================================================================================                      
+
+setRowNames <- function (object = nm, nm) 
+{
+  rownames(object) <- nm
+  object
+}
+
+#============================================================================================================================================
+                       
+setColNames <- function (object = nm, nm) 
+{
+  colnames(object) <- nm
+  object
+}
+                       
 #===========================# Datasets # ===================================================================================== 
    
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
