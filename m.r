@@ -5972,33 +5972,46 @@ cbind(one, two)
 egger <- function(...){
   
   m <- list(...)
-  if(!all(sapply(m, inherits, "robu"))) stop("Non-robust variance model(s) detected.", call. = FALSE)
+  if(!all(sapply(m, inherits, c("robu", "bayesmeta")))) stop("Unsupported meta-analytic model(s) detected.", call. = FALSE)
   L <- length(m)
   n <- substitute(...())  
   
   fe <- function(fit){
+    
+if(inherits(fit, "robu")){ 
   
-   X <- cbind(1, fit$data.full$sd.eff.size)
-   
-   tmp <- lm((fit$data.full$effect.size) ~ X - 1)
-   coef.na <- is.na(coef(tmp))
-   if(any(coef.na)) stop("Model matrix not of full rank.", call. = FALSE) 
-      
+    X <- cbind(1, fit$data.full$sd.eff.size)
+    
+    tmp <- lm((fit$data.full$effect.size) ~ X - 1)
+    coef.na <- is.na(coef(tmp))
+    if(any(coef.na)) stop("Model matrix not of full rank.", call. = FALSE) 
+    
     f <- fit$ml[[2]]
     
     m <- robu(formula(bquote(.(f) ~ X - 1)), data = fit$data, var = fit$data.full$var.eff.size, study = fit$study_orig_id, rho = fit$mod_info$rho, small = TRUE, model = fit$modelweights)  
     
     h <- round(data.frame(b1 = m$reg_table$b.r[2], t.value = m$reg_table$t[2], p.value = m$reg_table$p[2], b1.lower = m$reg_table$CI.L[2], b1.upper = m$reg_table$CI.U[2]), 4)
-     
+    
+  } else {
+    
+    sei <- fit$sigma
+    X <- cbind(1, sei)
+    y <- fit$y
+    
+    m <- rma.uni(y, sei = sei, mods = X, intercept = FALSE)
+    
+    h <- round(data.frame(b1 = m$b[[2]], z.value = m$zval[2], p.value = m$pval[2], b1.lower = m$ci.lb[2], b1.upper = m$ci.ub[2]), 4)
+  }
+  
     result <- symnum(h$p.value, cut = c(0, .001, .01, .05, .1, 1), na = FALSE, symbols = c("***", "**", "*", ":-)", ":-))"), corr = FALSE)
     h <- cbind(h, result)
-    
+
     attr(h, "rclab") <- c("", "(H0: funnel is symmetric)\nEgger symmetry test:")
     class(h) <- c("labdf", class(h)) 
     return(h)
   }
   setNames(lapply(m, fe), n)
-}                           
+}                            
 
 #================================================================================================================================================================
                            
