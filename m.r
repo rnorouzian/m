@@ -6015,6 +6015,59 @@ if(inherits(fit, "robu")){
 
 #================================================================================================================================================================
                            
+                           
+egger.data <- function(data = NULL, by, r = .5, dependent = FALSE, dep.model = "CORR", ef.name = NULL, se.name = NULL){  
+  
+  data <- trim(data)
+  
+  metain <- function(data = NULL, by, r = .5){ 
+    
+    m <- split(data, data$study.name)
+    m <- Filter(NROW, rm.allrowNA2(m)) 
+    
+    L <- if(missing(by)) m else { s <- substitute(by) ; h <- lapply(m, function(x) do.call("subset", list(x, s))) ;
+    res <- Filter(NROW, h) ; if(length(res) == 0) NULL else res}
+    
+    ds <- Filter(Negate(is.null), lapply(seq_along(L), function(i) L[[i]]$dint))
+    sds <- Filter(Negate(is.null), lapply(seq_along(L), function(i) L[[i]]$SD))
+    
+    setNames(mapply(option1, ds = ds, sds = sds, r = r, SIMPLIFY = FALSE), names(L))
+  }
+  
+if(!dependent){  
+  
+  j <- eval(substitute(metain(data = data, by = by, r = r)))
+  
+  ds <-  sapply(seq_along(j), function(i) j[[i]][1])
+  sds <- sapply(seq_along(j), function(i) j[[i]][2])
+  X <- cbind(1, sds)
+  
+  m <- rma.uni(ds, sei = sds, mods = X, intercept = FALSE)
+
+  h <- round(data.frame(b1 = m$b[[2]], z.value = m$zval[2], p.value = m$pval[2], b1.lower = m$ci.lb[2], b1.upper = m$ci.ub[2]), 4)
+}
+  else {
+    
+    sds <- if(is.null(se.name)) data$SD else data[[trimws(se.name)]]
+    X <- cbind(1, sds)
+    
+    f <- if(is.null(ef.name)) formula(dint ~ X - 1) else formula(paste(ef.name, "~ X - 1"))
+    
+    m <- robu(f, data = data, var = sds^2, study = data$study.name, rho = r, model = dep.model)  
+    
+    h <- round(data.frame(b1 = m$reg_table$b.r[2], t.value = m$reg_table$t[2], p.value = m$reg_table$p[2], b1.lower = m$reg_table$CI.L[2], b1.upper = m$reg_table$CI.U[2]), 4)
+  }
+  
+  result <- symnum(h$p.value, cut = c(0, .001, .01, .05, .1, 1), na = FALSE, symbols = c("***", "**", "*", ":-)", ":-))"), corr = FALSE)
+  h <- cbind(h, result)
+  
+  attr(h, "rclab") <- c("", "(H0: funnel is symmetric)\nEgger symmetry test:")
+  class(h) <- c("labdf", class(h)) 
+  return(h)
+}             
+                
+#================================================================================================================================================================
+                           
 rma.robu <- function(f, var, id, data, w.model = "CORR", rho = .8, small = TRUE, group, ...){
   
   f <- formula(f)  
