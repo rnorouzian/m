@@ -6484,7 +6484,32 @@ setColNames <- function (object = nm, nm)
   colnames(object) <- nm
   object
 }
+
+#============================================================================================================================================                       
                        
+cor.average <- function(data = NULL, by, r = .5, ef.name = "dint", se.name = "SD"){  
+  
+  data <- trim(data)
+  
+  metain <- function(data = NULL, by, r = .5){ 
+    
+    m <- split(data, data$study.name)
+    m <- Filter(NROW, rm.allrowNA2(m)) 
+    
+    L <- if(missing(by)) m else { s <- substitute(by) ; h <- lapply(m, function(x) do.call("subset", list(x, s))) ;
+    res <- Filter(NROW, h) ; if(length(res) == 0) NULL else res}
+    
+    ds <- Filter(Negate(is.null), lapply(seq_along(L), function(i) L[[i]][[trimws(ef.name)]]))
+    sds <- Filter(Negate(is.null), lapply(seq_along(L), function(i) L[[i]][[trimws(se.name)]]))
+    
+    setNames(mapply(option1, ds = ds, sds = sds, r = r, SIMPLIFY = FALSE), names(L))
+  }
+  
+  j <- eval(substitute(metain(data = data, by = by, r = r)))
+  
+  setRowNames(setNames(do.call(rbind.data.frame, j), c("dint", "SD")), names(j))
+}                       
+                      
 #===========================# Datasets # ===================================================================================== 
    
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
