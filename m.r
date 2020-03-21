@@ -713,7 +713,7 @@ convolve <- function(dens1, dens2,
 funnel.bayesmeta <- function(x,
                              main = deparse(substitute(x)),
                              xlab = "Effect Size (dint)",
-                             ylab = "Standard Error(SE)", study.name = TRUE,
+                             ylab = "Standard Error (SE)", study.name = TRUE,
                              FE = FALSE, legend = FALSE, shrink = FALSE, show.mu = TRUE, ...)
 {
   
