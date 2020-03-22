@@ -714,7 +714,7 @@ funnel.bayesmeta <- function(x,
                              main = deparse(substitute(x)),
                              xlab = "Effect Size (dint)",
                              ylab = "Standard Error (SE)", study.name = TRUE,
-                             FE = FALSE, legend = FALSE, shrink = FALSE, show.mu = TRUE, ...)
+                             FE = FALSE, legend = FALSE, shrink = FALSE, show.mu = TRUE, pt.cex = 1, mu.cex = .8, mu.pos = 2, ...)
 {
   
   
@@ -763,24 +763,24 @@ funnel.bayesmeta <- function(x,
   lines(rep(x$summary["median","mu"], 2), range(-sevec), col= REcol, lty= 2)
   if (FE) lines(rep(cm[1,"mean"], 2), range(-sevec), col=FEcol, lty="dotted")
   
-  if(show.mu) text(x$summary["median","mu"], mean(par('usr')[3:4])*.1, bquote(mu == .(round(x$summary["median","mu"], 3))), font = 2, col = REcol, srt = 90, pos = 2)
-
+  if(show.mu) text(x$summary["median","mu"], mean(par('usr')[3:4])*.1, bquote(mu == .(round(x$summary["median","mu"], 3))), font = 2, col = REcol, srt = 90, pos = mu.pos, cex = mu.cex)
+  
   lines(c(0, 0), c(-1,1)*max(sevec), col = "darkgrey")
   
-  points(x$y, -x$sigma, pch=21, col="magenta", bg="cyan", cex=1.35)
+  points(x$y, -x$sigma, pch=21, col="magenta", bg="cyan", cex= pt.cex)
   
-  if(shrink) points(x$theta[5,], -x$sigma, pch=21, col=adjustcolor("gray40", .5), bg= adjustcolor("gray40", .5), cex=1.2)
+  if(shrink) points(x$theta[5,], -x$sigma, pch=21, col=adjustcolor("gray40", .5), bg= adjustcolor("gray40", .5), cex=pt.cex)
   #if(shrink) {
-   # segments(x$y, -x$sigma, x$theta[5,], -x$sigma, col="gray40", lty = 3)
-   # points(x$theta[5,], -x$sigma, pch=21, col="gray60", bg= "gray60", cex=1.2)
+  # segments(x$y, -x$sigma, x$theta[5,], -x$sigma, col="gray40", lty = 3)
+  # points(x$theta[5,], -x$sigma, pch=21, col="gray60", bg= "gray60", cex=1.2)
   #}
-     
+  
   if(study.name)text(x$y, -x$sigma, x$labels, cex = .65, font = 2, pos = 3)
   
   if (FE && legend)
     legend("topleft", c("RE model", "FE model"),
            col=c(REcol, FEcol), lty=c("dashed", "dotted"), bg="white")
-  axis(1) ; axis(2, at=-yticks, labels=yticks); box()
+  axis(1, ...) ; axis(2, at=-yticks, labels=yticks, ...); box()
   invisible()
 }
   
@@ -5261,8 +5261,9 @@ forest.bayes <- function(x, xlab = "effect size", refline = x$summary["median","
                       
 #========================================================================================
 
-forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex = NULL, level = .95, col = NULL, col.by.cluster = FALSE,  refit = FALSE, order.by = FALSE, wsize = 1, space = TRUE, slab = TRUE, summary = TRUE, ...){
-  
+forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex = NULL, level = .95, col = NULL, col.by.cluster = FALSE,  refit = FALSE, order.by = FALSE, wsize = 1, space = TRUE, slab = TRUE, summary = TRUE, reset = TRUE, ...){
+
+    
   par.mgp <- par("mgp")
   par(mgp = c(1.8, .3, 0))  
   on.exit(par(mgp = par.mgp))
@@ -5270,7 +5271,9 @@ forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, ce
   if(space){
     par.mar <- par("mar")
     par(mar = c(2.7, 3, 0, 1))
+    if(reset){
     on.exit(par(mar = par.mar))
+    }
   }
   
   if(inherits(x, "robu")) {  
@@ -5284,7 +5287,7 @@ forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, ce
     forest.bayes(x = x, xlab = xlab, refline = refline, cex = cex, ...)
   }
 }          
-
+                      
 #========================================================================================
                 
                 
