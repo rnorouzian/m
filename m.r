@@ -5461,7 +5461,7 @@ meta.stats <- function(..., stat = "median"){
     
     if(inherits(fit, "bayesmeta")){
       
-      c(I2 = fit$I2(fit$summary[stat,1]), tau = fit$summary[stat,1])
+      c(I2 = fit$I2(fit$summary[stat,1]), tau = fit$summary[stat,1], BF01.mu = fit$bayesfactor[1,2], BF01.tau = fit$bayesfactor[1,1])
       
     } else if(inherits(fit, "robu")){
       
@@ -5477,7 +5477,7 @@ meta.stats <- function(..., stat = "median"){
   d <- data.frame(out)
   d[] <- lapply(d, as.list)
   data.frame(t(d))
-}             
+}               
                 
 #================================================================================================================================================================
               
