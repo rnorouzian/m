@@ -5233,6 +5233,32 @@ forest.rob <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex
   if(refit) return(m)
 }
 
+                      
+#========================================================================================                      
+                      
+forest.bayes <- function(x, xlab = "effect size", refline = x$summary["median","mu"], cex = NULL, ...){
+
+  f <- forest.default(x = x$y, sei = x$sigma,
+                          showweight = FALSE,  
+                          ylim = c(-x$k-4, 1),
+                          level = 95,         
+                          refline = refline,
+                          xlab = xlab,
+                          slab = x$labels,
+                          rows = seq(-2, -x$k - 1, by = -1),
+                          cex = cex, ...)
+  
+  if(is.null(cex)) cex <- f$cex
+  
+  abline(h = max(f$rows)+1, lwd = 1, col = 0, xpd = NA)
+  
+  addpoly(x$summary["median","mu"], ci.lb=x$summary["95% lower","mu"], ci.ub=x$summary["95% upper","mu"],
+                   rows = -x$k-3, mlab= "mean effect", level=95, cex=cex, xpd = NA, col = "cyan", border = "magenta", font = 2, ...)
+  
+  addpoly(x$summary["median","theta"], ci.lb=x$summary["95% lower","theta"], ci.ub=x$summary["95% upper","theta"],
+                   rows = -x$k-4.5, mlab= "prediction", level=95, cex=cex, xpd = NA, col = 8, font = 2, ...)
+}  
+                      
 #========================================================================================
 
 forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex = NULL, level = .95, col = NULL, col.by.cluster = FALSE,  refit = FALSE, order.by = FALSE, wsize = 1, space = TRUE, slab = TRUE, summary = TRUE, ...){
@@ -5253,9 +5279,9 @@ forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, ce
     
   }else{
     
-    if(is.null(refline)) refline <- 0
+    if(is.null(refline)) refline <- x$summary["median","mu"]
     
-    forest(x = x, xlab = xlab, refline = refline, cex = cex, col = col, ...)
+    forest.bayes(x = x, xlab = xlab, refline = refline, cex = cex, ...)
   }
 }          
 
