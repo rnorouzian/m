@@ -5456,16 +5456,17 @@ meta.stats <- function(..., stat = "median"){
   len <- length(m)
   m <- if(cl == "list" & len == 1) as.list(...) else m
   n <- substitute(...())
+  stat <- trimws(stat)
   
   f <- function(fit, stat = "median"){
     
     if(inherits(fit, "bayesmeta")){
       
-      c(I2 = fit$I2(fit$summary[stat,1]), tau = fit$summary[stat,1], BF01.mu = fit$bayesfactor[1,2], BF01.tau = fit$bayesfactor[1,1])
+      c(K = fit$k, I2 = fit$I2(fit$summary[stat,1]), tau = fit$summary[stat,1], BF01.mu = fit$bayesfactor[1,2], BF01.tau = fit$bayesfactor[1,1])
       
     } else if(inherits(fit, "robu")){
       
-      c(I2 = as.vector(fit$mod_info$I.2), tau = sqrt(as.vector(fit$mod_info$tau.sq)))
+      c(K = fit$N, I2 = as.vector(fit$mod_info$I.2), tau = sqrt(as.vector(fit$mod_info$tau.sq)))
       
     } else {
       
@@ -5477,7 +5478,7 @@ meta.stats <- function(..., stat = "median"){
   d <- data.frame(out)
   d[] <- lapply(d, as.list)
   data.frame(t(d))
-}               
+}                              
                 
 #================================================================================================================================================================
               
