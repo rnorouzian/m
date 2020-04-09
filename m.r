@@ -6539,7 +6539,16 @@ cor.average <- function(data = NULL, by, r = .5, ef.name = "dint", se.name = "SD
   
   setRowNames(setNames(do.call(rbind.data.frame, j), c("dint", "SD")), names(j))
 }                       
-                      
+
+#=============================================================================================================================
+                                          
+data.str <- function(dat, drop = NULL){
+  
+  dat <- if(is.null(drop)) dat else drop.col(dat, vec = drop)
+  
+  setNames(lapply(names(dat), function(i) sort(unique(dat[[i]]))), names(dat))
+}                                          
+                                          
 #===========================# Datasets # ===================================================================================== 
    
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
