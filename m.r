@@ -6425,11 +6425,11 @@ irr.diag <- function(X, useNA = "ifany"){
 #==========================================================================================================================================
 
 find.irr <- function(X, what){
-
-s <- substitute(what)
-X <- trim(X)
-res <- rm.colrowNA(do.call("subset", list(X, s))[c("study.name", "group.name")])
-if(nrow(res) == 0) NULL else res
+  
+  s <- substitute(what)
+  X <- trim(X)
+  res <- try(rm.colrowNA(do.call("subset", list(X, s))[c("study.name", "group.name")]), silent = TRUE)
+  if(inherits(res, "try-error")) NULL else res
 }
              
 #============================================================================================================================================
