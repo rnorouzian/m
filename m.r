@@ -6548,7 +6548,39 @@ data.str <- function(dat, drop = NULL){
   
   setNames(lapply(names(dat), function(i) sort(unique(dat[[i]]))), names(dat))
 }                                          
-                                          
+
+#=============================================================================================================================
+                  
+long <- function(data, one.cols, multi.cols = NULL, multi.colnames = NULL, time.name = "time", 
+                 time.val = NULL, replace = "#N/A", with = NA, drop = NULL, order.by = one.cols[1]){
+
+data <- rm.colrowNA(trim(data)) 
+  
+for(i in seq_along(replace)){
+  data[data == replace[i]] <- with[i]
+}
+
+varying <- if(is.null(multi.cols)) setdiff(names(data), one.cols) else multi.cols
+
+time.val <- if(is.null(time.val) & !is.null(multi.cols)) seq_along(varying[[1L]]) else time.val
+
+if(is.null(time.val) || length(time.val) == 1) stop("Please provide unique values for 'time.val'.", call. = FALSE)
+
+res <- tryCatch({na.omit(reshape(data, direction = 'long', timevar = time.name, times = time.val,
+                      idvar = one.cols, v.names = multi.colnames,
+                      varying = varying, drop = drop))}, 
+                error = function(e) {
+                  if(as.character(e) == "Error in guess(varying): failed to guess time-varying variables from their names\n") stop("Please provide the 'multi.cols'.", call. = FALSE) 
+                  else e
+                })
+
+if(inherits(res, "simpleError")) stop(paste0(res[[2]]), call. = FALSE)
+res <- res[order(res[[order.by]]), ]
+
+rownames(res) <- NULL
+res
+}                  
+                  
 #===========================# Datasets # ===================================================================================== 
    
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
