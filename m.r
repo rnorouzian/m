@@ -6580,6 +6580,34 @@ long <- function(data, one.cols, multi.cols = NULL, multi.colnames = NULL, time.
   res[] <- lapply(res, function(x) type.convert(as.character(x), as.is = TRUE))
   return(res)
 }                
+
+#=============================================================================================================================
+                  
+mask <- function(data, what, full = FALSE){
+  
+  data[] <- lapply(data, function(x) type.convert(as.character(x), as.is = TRUE))
+  
+  data <- data[what]
+  f1 <- function(x) as.numeric(factor(x, levels = unique(x)))
+  f2 <- function(x) {
+    temp <- substr(x, 1, 1)
+    paste0(temp, ave(x, temp, FUN = function(y) match(y, unique(y))))
+  }
+  num.cols <- names(data)[sapply(data, is.numeric)]
+  char.cols <- names(data)[sapply(data, is.character)]
+  
+  if(!full){
+    
+  if(length(num.cols))  data[num.cols] <- lapply(data[num.cols], f1)
+  if(length(char.cols)) data[char.cols] <- lapply(data[char.cols], f2)
+  
+  }else{
+      
+    data[what] <- lapply(data[what], f1)
+  }
+  return(data)
+}
+                  
                   
 #===========================# Datasets # ===================================================================================== 
    
