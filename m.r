@@ -6586,8 +6586,7 @@ long <- function(data, one.cols, multi.cols = NULL, multi.colnames = NULL, time.
 mask <- function(data, what, full = FALSE){
   
   data[] <- lapply(data, function(x) type.convert(as.character(x), as.is = TRUE))
-  
-  data <- data[what]
+
   f1 <- function(x) as.numeric(factor(x, levels = unique(x)))
   f2 <- function(x) {
     temp <- substr(x, 1, 1)
@@ -6602,13 +6601,12 @@ mask <- function(data, what, full = FALSE){
   if(length(char.cols)) data[char.cols] <- lapply(data[char.cols], f2)
   
   }else{
-      
+    
     data[what] <- lapply(data[what], f1)
   }
   return(data)
 }
-                  
-                  
+                                   
 #===========================# Datasets # ===================================================================================== 
    
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
