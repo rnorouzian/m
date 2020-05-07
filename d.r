@@ -102,10 +102,9 @@ dummy <- data.frame(model.matrix(~gender))[-1]
 op1 <- cbind(op1, dummy)
 
 #======================================================================
-
-### Let SEM make the composites:
-
+### Make Measurement Models Using SEM (Structural Equation Modeling)
 #======================================================================
+             
 ############################
 ## ASSUMPTIONS AND DECISIONS   
 ############################
