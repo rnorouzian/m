@@ -1,9 +1,9 @@
-#================= Duolingo English Test:
+#================= Duolingo English Test (CAT Section):
 
 ### Response (xi) is on continous [0,1] interval.
 ### Two possible transformations include logit transformation & dyadic expasion.
 
-### logit transformation and its linearizing effect on responses is well known.
+### logit transformation and its linearizing effect on responses are well known.
 ### logit transformation also allows highly flexible SEM measurement models.
 
 #============= raw dataset:
@@ -42,12 +42,13 @@ summary(as.data.frame(tab))
 
 
 # plot items use frequency to see skewness (natural in CAT delievery):
-# - Find the number of most "exposed items" (given to => 100 test-takers):
+# - Find the number of most "exposed items" (given to >= 100 test-takers):
 expo.items <- 1:3*1e2
 tx <- paste('items >=', expo.items)
 ns <- sapply(expo.items, function(i) length(tab[tab >= i]))
 
-plot(tab, xlab = "Items", ylab = "Frequency", lwd = 1)
+# plot item exposure frequency             
+plot(tab, xlab = "Items", ylab = "Exposure Frequency", lwd = 1)
 legend('topright', paste(tx, '=', ns), bty = 'n', text.col = 4, cex = .8)
 
 # So, due to extreme sparsity, item-specific difficulty estimation is not possible.
@@ -56,7 +57,7 @@ legend('topright', paste(tx, '=', ns), bty = 'n', text.col = 4, cex = .8)
 # Finally, try measurement models with robust standard errors uing SEM framework
 
 
-### widen the dataset for SEM package 'lavaan' and expose sparsity sources:
+### widen the dataset for SEM package 'lavaan' and expose sparsity concentration:
 
 # sort the data by person_id, item_type and item_id (change dataset name to 'w2'):
 w2 <- dat[order(dat$person_id, dat$item_type, dat$item_id),]
@@ -65,13 +66,15 @@ w2 <- dat[order(dat$person_id, dat$item_type, dat$item_id),]
 w2$item_seq <- with(w2, ave(seq_along(person_id), person_id,
                             item_type, FUN = seq_along))
 
+# Add numeric suffix for item sequences:             
 w2$item_type <- sprintf("%s_%d",w2$item_type,w2$item_seq)
 
+# Reshape and drop temprary index variables:             
 w2 <- reshape(w2, dir = 'wide', drop = c("item_id","item_seq"), 
               idvar = c('person_id','gender'),
               timevar = 'item_type')
 
-# clean up column names
+# clean up column names:
 names(w2) <- gsub("item_score.","", names(w2))
 
 
@@ -103,7 +106,10 @@ op1 <- cbind(op1, dummy)
 ### Let SEM make the composites:
 
 #======================================================================
-
+############################
+## ASSUMPTIONS AND DECISIONS   
+############################
+             
 # Exclude extremely sparse 7th sequence of item types to avoid convergence issues (over 80% of test takers didn't take the 7th ctest etc.)
 # Robust estimators accomadete the extreme observations.
 
@@ -158,7 +164,7 @@ mi1 <- modindices(m1, sort. = T, minimum.value = 3)
 # Finally, dictation_1 is suggested to relate with text_vocab composite variable.
 # These changes are implemented in model 2:
 
-#====Model 2:
+#==== Model 2:
 
 m2 <- '
 
@@ -231,8 +237,10 @@ anova(m2, m3)
 
 
 #=== But given excellent fit of model 3, how DET CAT section, let's add a covariate
-## - let's control for 'gender' (the 'other' category is very small so perhaps non-significant)
+## - In model 4, let's control for 'gender' (the 'other' category is very small so perhaps non-significant)
 
+#=== Model 4:
+             
 m4 <- '
 
 au_v=~ NA*audio_vocab_1+audio_vocab_2+audio_vocab_3+audio_vocab_4+audio_vocab_5+audio_vocab_6+text_vocab_1+dictation_1+ctest_1 
