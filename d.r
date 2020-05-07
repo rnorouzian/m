@@ -7,8 +7,7 @@
 ### logit transformation and its linearizing effect on responses are well known.
 ### logit transformation also allows highly flexible SEM measurement models.
 
-#============= raw dataset:
-
+#============= Let's start with the required tools:
 
 # > R version 3.6.1 (2019-07-05)
 
@@ -22,7 +21,8 @@ library(semPlot)
 library(lattice)
 library(latticeExtra)
 
-# 'trim' all potential 'white spaces' before or after the string variables + column names
+
+# Import and 'trim' all potential 'white spaces' before or after the string variables + column names
 dat1 <- trim(read.csv('https://raw.githubusercontent.com/hkil/m/master/task.csv', stringsAsFactors = F))
 
 
