@@ -2,7 +2,7 @@
 #================= Duolingo English Test (CAT Section):
 
 ### Response (xi) is on continous [0,1] scale.
-### Two possible transformations include logit transformation & dyadic expasion.
+### Two possible transformations include logit transformation & dyadic expansion.
 
 ### logit transformation and its linearizing effect on responses are well known.
 ### logit transformation also allows highly flexible SEM measurement models.
