@@ -3,7 +3,7 @@
 ### Response (xi) is on continous [0,1] interval.
 ### Two possible transformations include logit transformation & dyadic expasion.
 
-### logit transformation and its linearizing effect on responses is well known in R: `stats::qlogis(x)`
+### logit transformation and its linearizing effect on responses is well known.
 ### logit transformation also allows highly flexible SEM measurement models.
 
 #============= raw dataset:
@@ -43,7 +43,6 @@ summary(as.data.frame(tab))
 
 # plot items use frequency to see skewness (natural in CAT delievery):
 # - Find the number of most "exposed items" (given to => 100 test-takers):
-
 expo.items <- 1:3*1e2
 tx <- paste('items >=', expo.items)
 ns <- sapply(expo.items, function(i) length(tab[tab >= i]))
@@ -60,7 +59,6 @@ legend('topright', paste(tx, '=', ns), bty = 'n', text.col = 4, cex = .8)
 ### widen the dataset for SEM package 'lavaan' and expose sparsity sources:
 
 # sort the data by person_id, item_type and item_id (change dataset name to 'w2'):
-
 w2 <- dat[order(dat$person_id, dat$item_type, dat$item_id),]
 
 # create item_type sequence (1st ctest, 2nd ctest etc.):
@@ -78,10 +76,9 @@ names(w2) <- gsub("item_score.","", names(w2))
 
 
 # rename dataset to op1:
-
 op1 <- w2
 
-# exclude non-item related columns
+# exclude non-item columns
 unwant <- 1:2
 
 # tranform to logit:
@@ -89,7 +86,6 @@ op1[-unwant] <- lapply(op1[-unwant], stats::qlogis)
 
 
 # Visualize values after transformation:
-
 boxplot(op1[-unwant], cex.axis = .7)
 
 # SEM computes robust Standard Errors to account for non-normalities
@@ -109,7 +105,7 @@ op1 <- cbind(op1, dummy)
 #======================================================================
 
 # Exclude extremely sparse 7th sequence of item types to avoid convergence issues (over 80% of test takers didn't take the 7th ctest etc.)
-# Robust estimators accomadete the extreme observations
+# Robust estimators accomadete the extreme observations.
 
 ## In these SEM models, 'intecepts' function as difficulty parameters and, 
 ## 'path coeffiecients' function as discrimination parameters,
@@ -117,8 +113,8 @@ op1 <- cbind(op1, dummy)
 
 ## Test a first measurement model and evaluate the fit:
 # This model assumes DET CAT section consists of uncorrelated item types that
-# over a sequence of presentations to test takers form composite variables.
-# Yet at a higher level, these composites themselves form the DET representing 
+# over a sequence of presentations to test takers measure their subskills i.e., first-order composite variables.
+# Yet at a higher level, these first-order composites themselves in combination form the DET representing 
 # "Proficiency" as measured in its CAT section.
 
 
@@ -138,13 +134,11 @@ DET ~~ 1*DET
  tx_v ~~ 1*tx_v
 '
 
-
+# Fit the first model:
 m1 <- sem(m1, data = op1, meanstructure = TRUE, missing = 'ML', estimator = "MLF")
 
 ## Visualize the model:
-
 semPlot::semPaths(m1)
-
 
 # Evaluate the fit
 summary(m1, fit.measures=TRUE) 
@@ -152,13 +146,14 @@ summary(m1, fit.measures=TRUE)
 # CFI = .804     # Not very good fit comapred to 'null' model (model with no covariation among any variables)
 # RMSEA = 0.044  # Acceptable fit compared to 'saturated' model (model with all variables correlated with one another)
 
-## Conclusion: The model needs further improvement to obtain very good fit (e.g., CFI > .9)
+## Conclusion: The model needs further improvement to obtain very good fit (e.g., CFI > .95)
 
 ## How? Consult modification idicies and then consider them theoritically:
 
-mi1 <- modindices(m1, sort. = T, minimum.value = 3) ## Modification indices
+## Modification indices:
+mi1 <- modindices(m1, sort. = T, minimum.value = 3) 
 
-# dication_1 and text_vocab_1 are suggested to relate with auto_vocab composite variable 
+# dication_1 and text_vocab_1 are suggested to relate with auto_vocab first-order composite variable 
 # Similarly, text_vocab_1 is suggested to relate with dictation composite variable 
 # Finally, dictation_1 is suggested to relate with text_vocab composite variable.
 # These changes are implemented in model 2:
@@ -182,6 +177,7 @@ DET ~~ 1*DET
  tx_v ~~ 1*tx_v
  '
 
+# Fit the model:             
 m2 <- sem(m2, data = op1, meanstructure = TRUE, missing = "ML", estimator = "MLF")
 
 # The fit has drastically improved:
@@ -196,9 +192,9 @@ semPlot::semPaths(m2)
 
 
 # To honor model 2's suggestion, we relate 'ctest_1' to 'au_vocab' composite variable 
-# to create model 3:
+# leading to model 3:
 
-#====Model 3:
+#==== Model 3:
 
 m3 <- '
 
@@ -217,13 +213,14 @@ DET ~~ 1*DET
  tx_v ~~ 1*tx_v
  '
 
+# Fit the model:               
 m3 <- sem(m3, data = op1, meanstructure = TRUE, missing = "ML", estimator = "MLF")
 
 # The fit has slightly improved:
 summary(m3, fit.measures = TRUE)  ## CFI 0.968
 ## RMSEA 0.018
 
-
+## Visualize the new model:
 semPlot::semPaths(m3)
 
 
@@ -233,7 +230,7 @@ anova(m2, m3)
 # Model 3 seems to be a very good-fitting measurement model with sig. advantage over model 2!
 
 
-#=== But given model 3, how DET CAT section worked for different genders ===========
+#=== But given excellent fit of model 3, how DET CAT section, let's add a covariate
 ## - let's control for 'gender' (the 'other' category is very small so perhaps non-significant)
 
 m4 <- '
@@ -256,40 +253,44 @@ DET ~~ 1*DET
  DET ~ genderOTHER
  
  '
-
+# Fit the model
 m4 <- sem(m4, data = op1, meanstructure = TRUE, missing = "ML", estimator = "MLF")
 
 # Summary of results:
 summary(m4, fit.measures = TRUE)
 
-# visualize the gender differences model
+# visualize the gender model
 semPlot::semPaths(m4, thresholds = F)
 
 # based on these simulated data:
-
 # Females are shown to have overperformed males and other (other's n = 14) 
-#==========================
 
+
+#==== Deriving the estimates from model 4:
+             
 parm <- parameterEstimates(m4)
 item.diff <- setNames(parm$est[82:111], parm[82:111,1])    
 x <- seq_len(length(item.diff))
 nms <- names(item.diff)
 it.dif <- item.diff
 
+# clean name suffixes for a final data.frame of item diff. estimates:             
 names(it.dif) <- sub("_\\d+$", "", names(it.dif))
 
 
-# Estimated person abilities
+# Estimated person abilities:
 overall <- data.frame(lavPredict(m4))
 
+# Ability empirical distribution:             
 ability <- density(overall$DET)
 
+         
 # Plot difficulty parameters against test-takers ability:
 a <- lattice::xyplot(x*.015~it.dif| names(it.dif), col = 'magenta', type = 'h', xlab = bquote(theta), ylab = 'Density')
 a + layer(panel.polygon(ability, col = adjustcolor('orange', .3)))
 
 
-#Make a final table of difficulty parameters
+#Make a final data.frame of difficulty parameters:
 dif <- data.frame(split(unname(item.diff), sub("_\\d+$", "", names(item.diff))))
 
 
