@@ -57,9 +57,10 @@ legend('topright', paste(tx, '=', ns), bty = 'n', text.col = 4, cex = .8)
 # Then, make composite (synthetic) variables based on item_type.
 # Finally, try measurement models with robust standard errors uing SEM framework
 
-
-### widen the dataset for SEM package 'lavaan' and expose sparsity concentration:
-
+#==============================================================================
+## Widen the dataset for SEM package 'lavaan' and expose sparsity concentration:
+#==============================================================================
+             
 # sort the data by person_id, item_type and item_id (change dataset name to 'w2'):
 w2 <- dat[order(dat$person_id, dat$item_type, dat$item_id),]
 
@@ -95,7 +96,7 @@ boxplot(op1[-unwant], cex.axis = .7)
 # SEM computes robust Standard Errors to account for non-normalities
 
 ## We are planning to control for 'gender'.
-# SEM packages require a dummy variable for 'gender', let's do add a dummy to the dataset:
+# SEM packages require a dummy variable for 'gender', let's add a dummy to the dataset:
 
 gender <- op1$gender
 dummy <- data.frame(model.matrix(~gender))[-1]
