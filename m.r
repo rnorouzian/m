@@ -6608,7 +6608,25 @@ mask <- function(data, what, full = FALSE){
   }
   return(data)
 }
-                                   
+
+#=============================================================================================================================
+                     
+make.dummy <- function(data, what){
+
+ff <- function(data, what){
+  
+  if(!inherits(data, 'data.frame')) stop("'data' must be a data.frame.", call. = FALSE)
+  if(!is.character(what)) stop("'what' must be a character.", call. = FALSE)
+  what <- trimws(what)
+  data <- trim(data)
+  if(!is.character(as.vector(data[[what]]))) stop('Not a character variable.', call. = FALSE)
+  formula <- as.formula(paste('~', what))
+  data.frame(model.matrix(formula, data = data))[-1L]
+}
+
+cbind(data, do.call(cbind, lapply(what, ff, data = data)))
+}                     
+                     
 #===========================# Datasets # ===================================================================================== 
    
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
