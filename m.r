@@ -6764,7 +6764,7 @@ c4 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/c4.csv")
 #================================================================================================================================================================
                                       
                                       
-need <- c("bayesmeta", "distr", "robumeta", "ellipse") # , "zoo"
+need <- c("bayesmeta", "distr", "robumeta", "ellipse", "emmeans", "lme4") # , "zoo"
 have <- need %in% rownames(installed.packages())
 if(any(!have)){ install.packages( need[!have] ) }
  
@@ -6774,5 +6774,7 @@ suppressMessages({
     library("bayesmeta")
     library("robumeta")
     library('ellipse')
+    library('emmeans')
+    library('lme4')
     #library("zoo")
 })                                         
