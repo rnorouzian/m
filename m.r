@@ -6725,6 +6725,31 @@ plot.cor <- function (corr, outline = FALSE, col = colorRampPalette(c(4, 2))(cho
   invisible()
 }                     
                      
+#=============================================================================================================================
+                     
+post.mixed <- function(fit, formula, plot = TRUE, by = NULL, horiz = TRUE, digits = 3, adjust = "tukey", ...){
+
+vc <- VarCorr(fit)
+  
+f <- if(missing(formula)) as.formula(bquote(pairwise ~ .(terms(fit)[[3]]))) else as.formula(formula)
+  
+ems <- emmeans::emmeans(fit, f, infer = c(TRUE, TRUE))
+
+if(plot) print(plot(ems, by = by, comparisons = TRUE, horizontal = horiz, adjust = adjust, ...))
+
+sigma <- sqrt(sum(as.numeric(c(attr(vc[[1]], "stddev"), attr(vc, "sc")))^2))
+edf <- min(as.data.frame(ems[[1]])$df, na.rm = TRUE)
+
+em <- as.data.frame(ems[[2]])
+ef <- as.data.frame(emmeans::eff_size(ems[[1]], sigma = sigma, edf = edf))[c(2,5:6)]
+
+out <- cbind(em, ef)
+names(out)[c(2,5:7, 9:11)] <- c("mean.dif", "lower", "upper", "t.value", "Cohen.d", "lower.d", "upper.d")
+
+out[2:11] <- lapply(out[2:11], round, digits)
+
+return(out)
+}                     
                      
 #===========================# Datasets # ===================================================================================== 
    
