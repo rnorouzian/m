@@ -6727,29 +6727,57 @@ plot.cor <- function (corr, outline = FALSE, col = colorRampPalette(c(4, 2))(cho
                      
 #=============================================================================================================================
                      
-post.mixed <- function(fit, formula, plot = TRUE, by = NULL, horiz = TRUE, digits = 3, adjust = "tukey", ...){
-
-vc <- VarCorr(fit)
+post.mixed <- function(fit, formula = NULL, plot = TRUE, by = NULL, var = NULL, horiz = TRUE, digits = 3, adjust = "tukey", type = "response", ...){
   
-f <- if(missing(formula)) as.formula(bquote(pairwise ~ .(terms(fit)[[3]]))) else as.formula(formula)
+  vc <- VarCorr(fit)
+  limit <- nobs(fit)
   
-ems <- emmeans::emmeans(fit, f, infer = c(TRUE, TRUE))
+  f <- if(is.null(formula)) as.formula(bquote(pairwise ~ .(terms(fit)[[3]]))) else as.formula(formula)
+  
+  rm.terms <- function(form, term) {
+    fterms <- terms(form)
+    fac <- attr(fterms, "factors")
+    idx <- which(as.logical(fac[term, ]))
+    new.fterms <- stats::drop.terms(fterms, dropx = idx, keep.response = TRUE)
+    return(as.formula(new.fterms))
+  }
+  
+  av <- all.vars(terms(fit)[[3]])
+  
+  cl <- if(inherits(fit, "lme")) setNames(sapply(av, function(i) class(fit$data[[i]])), av) else setNames(sapply(av, function(i) class(model.frame(fit)[[i]])), av)
+  
+  all.factor <- all(cl == "factor") || all(cl == "character") || all(cl == "character" | cl == "factor")
+  
+  if(length(av) == 1 & !all.factor) stop("No variable available for group comparison.", call. = FALSE)
+  
+  ems <- if(all.factor)  { eval(substitute(emmeans::emmeans(fit, f, infer = c(TRUE, TRUE), type = type, pbkrtest.limit = limit))) 
+    
+  } else {
+    
+    var <- if(is.null(var)) names(sort(cl[grep("integer|numeric", cl)])[1]) else var
+    
+    f <- rm.terms(f, var)
+    
+    eval(substitute(emmeans::emtrends(fit, f, var = var, infer = c(TRUE, TRUE), type = type, pbkrtest.limit = limit)))
+  } 
 
-if(plot) print(plot(ems, by = by, comparisons = TRUE, horizontal = horiz, adjust = adjust, ...))
-
-sigma <- sqrt(sum(as.numeric(c(attr(vc[[1]], "stddev"), attr(vc, "sc")))^2))
-edf <- min(as.data.frame(ems[[1]])$df, na.rm = TRUE)
-
-em <- as.data.frame(ems[[2]])
-ef <- as.data.frame(emmeans::eff_size(ems[[1]], sigma = sigma, edf = edf))[c(2,5:6)]
-
-out <- cbind(em, ef)
-names(out)[c(2,5:7, 9:11)] <- c("mean.dif", "lower", "upper", "t.value", "Cohen.d", "lower.d", "upper.d")
-
-out[2:11] <- lapply(out[2:11], round, digits)
-
-return(out)
-}                     
+  xlab <- if(!all.factor)  paste(var, "(slope)") else "Estimated Means"
+  
+  print(plot(ems, by = by, comparisons = TRUE, horizontal = horiz, adjust = adjust, xlab = xlab, ...))
+  
+  sigma <- if(inherits(fit, "lme")) sqrt(sum(as.numeric(vc[,"Variance"]))) else sqrt(sum(as.numeric(c(attr(vc[[1]], "stddev"), attr(vc, "sc")))^2))
+  edf <- min(as.data.frame(ems[[1]])$df, na.rm = TRUE)
+  em <- as.data.frame(ems[[2]])
+  
+  ef <- as.data.frame(emmeans::eff_size(ems[[1]], sigma = sigma, edf = edf))[c(2,5,6)]
+  
+  out <- cbind(em, ef)
+  names(out)[c(2,5:7, 9:11)] <- c(if(all.factor)"mean.dif"else paste0("slope.dif","(", var,")"), "lower", "upper", "t.value", "Cohen.d", "lower.d", "upper.d")
+  
+  out[2:11] <- lapply(out[2:11], round, digits)
+  
+  return(out)
+}        
                      
 #===========================# Datasets # ===================================================================================== 
    
