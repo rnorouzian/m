@@ -5052,9 +5052,9 @@ rm.allrowNA2 <- function(X) {
   
   if(inherits(X, "list")){
     
-    lapply(X, function(i) if(NROW(i) != 0) Filter(NROW, i[rowSums(is.na(i) | i == "") != ncol(i), ]) else Filter(NROW, i))
+    lapply(X, function(i) if(NROW(i) != 0) Filter(NROW, i[rowSums(is.na(i) | i == "") != ncol(i), , drop = FALSE]) else Filter(NROW, i))
     
-  } else { X[rowSums(is.na(X) | X == "") != ncol(X), ] }
+  } else { X[rowSums(is.na(X) | X == "") != ncol(X), , drop = FALSE] }
 }                                      
   
 #===============================================================================================================================
