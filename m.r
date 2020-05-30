@@ -6517,28 +6517,37 @@ setColNames <- function (object = nm, nm)
 
 #============================================================================================================================================                       
                        
-cor.average <- function(data = NULL, by, r = .5, ef.name = "dint", se.name = "SD"){  
+ave.effect <- function(data = NULL, by, r = .5, ef.name = "dint", se.name = "SD"){  
   
-  data <- trim(data)
+  data <- rm.colrowNA(trim(data))
+  check <- "study.name" %in% names(data)
+  if(!check) stop("Add a new column called 'study.name'.", call. = FALSE)
   
-  metain <- function(data = NULL, by, r = .5){ 
-    
     m <- split(data, data$study.name)
-    m <- Filter(NROW, rm.allrowNA2(m)) 
     
-    L <- if(missing(by)) m else { s <- substitute(by) ; h <- lapply(m, function(x) do.call("subset", list(x, s))) ;
-    res <- Filter(NROW, h) ; if(length(res) == 0) NULL else res}
+    L <- if(missing(by)) { 
+      
+      m  
     
-    ds <- Filter(Negate(is.null), lapply(seq_along(L), function(i) L[[i]][[trimws(ef.name)]]))
-    sds <- Filter(Negate(is.null), lapply(seq_along(L), function(i) L[[i]][[trimws(se.name)]]))
+    } else { 
     
-    setNames(mapply(option1, ds = ds, sds = sds, r = r, SIMPLIFY = FALSE), names(L))
-  }
-  
-  j <- eval(substitute(metain(data = data, by = by, r = r)))
+      s <- substitute(by) 
+      res <- Filter(NROW, lapply(m, function(x) do.call("subset", list(x, s)))) 
+      if(length(res) == 0) {
+        
+        message("Note: Moderator(s) not found; returning unmoderated averages.")
+        m 
+        
+        } else { res }
+    }
+    
+    ds <- lapply(seq_along(L), function(i) L[[i]][[trimws(ef.name)]])
+    sds <-lapply(seq_along(L), function(i) L[[i]][[trimws(se.name)]])
+    
+    j <- setNames(mapply(option1, ds = ds, sds = sds, r = r, SIMPLIFY = FALSE), names(L))
   
   setRowNames(setNames(do.call(rbind.data.frame, j), c("dint", "SD")), names(j))
-}                       
+}
 
 #=============================================================================================================================
                                           
