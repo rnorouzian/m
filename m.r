@@ -6787,68 +6787,7 @@ post.mixed <- function(fit, formula = NULL, plot = TRUE, by = NULL, var = NULL, 
   
   return(out)
 }        
-
-#=============================================================================================================================
                                   
-latent.reg <- function(fit, formula, group.id, std = FALSE,
-                       sing.check = TRUE, ridge.constant = 0, tol = 1e-12) 
-{
-  
-  R <- attr(lme4::VarCorr(fit)[[group.id]], "correlation")
-  vars <- colnames(R)
-  formula <- as.character(formula)
-  out_loc <- which(vars == formula[2])
-  pred.names <- trimws(strsplit(formula[3], "+", fixed = TRUE)[[1]])
-  pred_loc <- which(vars %in% pred.names)
-  R <- stats::cov2cor(R + ridge.constant * diag(nrow(R)))
-  if (tol < 1e-12) warning("Do not reduce tol, solution may not be numerically stable.")
-  if (sing.check) {
-    if (Matrix::det(R) < tol) {
-      stop("Singular covariance matrix, did 'lme4' converge?", call. = FALSE)
-    }
-  } else {
-    warning("Solution may not be numerically stable.", call. = FALSE)
-  }
-  res <- array(dim = length(pred_loc))
-  if (std) {
-    res <- base::solve(R[pred_loc, pred_loc], R[out_loc, pred_loc], tol = tol)
-  } else {
-    SDs <- diag(attr(lme4::VarCorr(fit)[[group.id]], "stddev"))
-    (C <- SDs %*% R %*% SDs)
-    res <- base::solve(C[pred_loc, pred_loc], C[out_loc, pred_loc], tol = tol)
-  }
-  names(res) <- if(length(pred.names) > 1) colnames(R[pred_loc, pred_loc]) else pred.names
-  return(res)
-}
-
-
-#=================================================================================================================================================
-
-
-latent.lmer <- function (fit, formula, group.id, std = TRUE, digits = 3, prog.bar = "none",
-                             sing.check = TRUE, ridge.constant = 1e-06, tol = 1e-12,
-                             seed = 123, nsim = 499, level = .95, parallel = c("no", "multicore", "snow")[2], ncpus = 7) {
-  
-  formals(latent.reg)[formalArgs(latent.reg)[-1L]] <- c(
-    formula, group.id, std, sing.check, ridge.constant, tol)
-  
-  boot.res <- lme4::bootMer(
-    fit, nsim = nsim, seed = seed, .progress = prog.bar,
-    parallel = parallel, ncpus = ncpus,
-    FUN = latent.reg)
-  
-  #if(inherits(boot.res, "try-error")) stop("Change 'parallel' and/or 'ncpus' values.")
-  
-  se.s <- apply(boot.res$t, 2, sd, na.rm = TRUE)
-  z.value <- abs((2 * boot.res$t0 - colMeans(boot.res$t, na.rm = TRUE)) / se.s)
-  
-  boot.p <- 2 * pnorm(-z.value)
-  
-  ci <- confint(boot.res, level = level, type = "norm")
-  
-  round(data.frame(est. = boot.res$t0, SE = se.s, z.value = z.value, p.value = boot.p,
-    lower = ci[[1]], upper = ci[[2]]), digits)
-}                                  
                                                                     
 #===========================# Datasets # ===================================================================================== 
    
