@@ -1870,12 +1870,10 @@ dint.plot <- function(..., main = NULL, ylab = "Effect Size (dint)", labels = NU
  dint <- function(data = NULL, by, impute = FALSE, n.sim = 1e4)
  {
    
-   names(data) <- trimws(names(data))
+   data <- rm.allrowNA(trim(data))
    check <- "study.name" %in% names(data)
    if(!check) stop("Add a new column named 'study.name'.", call. = FALSE) 
-   
-   data$study.name <- trimws(data$study.name)
-   data <- rm.allrowNA(data) 
+
    
    m <- split(data, data$study.name)         
    m <- Filter(NROW, rm.allrowNA2(m)) 
