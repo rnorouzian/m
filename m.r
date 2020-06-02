@@ -6750,59 +6750,109 @@ plot.cor <- function (corr, outline = FALSE, col = colorRampPalette(c(4, 2))(cho
 }                     
                      
 #=============================================================================================================================
-                     
-post.mixed <- function(fit, formula = NULL, plot = TRUE, by = NULL, var = NULL, horiz = TRUE, digits = 3, adjust = "tukey", type = "response", ...){
-  
-  vc <- VarCorr(fit)
-  limit <- nobs(fit)
-  
-  f <- if(is.null(formula)) as.formula(bquote(pairwise ~ .(terms(fit)[[3]]))) else as.formula(formula)
-  
-  rm.terms <- function(form, term) {
-    fterms <- terms(form)
-    fac <- attr(fterms, "factors")
-    idx <- which(as.logical(fac[term, ]))
-    new.fterms <- stats::drop.terms(fterms, dropx = idx, keep.response = TRUE)
-    return(as.formula(new.fterms))
-  }
-  
-  av <- all.vars(terms(fit)[[3]])
-  
-  cl <- if(inherits(fit, "lme")) setNames(sapply(av, function(i) class(fit$data[[i]])), av) else setNames(sapply(av, function(i) class(model.frame(fit)[[i]])), av)
-  
-  all.factor <- all(cl == "factor") || all(cl == "character") || all(cl == "character" | cl == "factor")
-  
-  if(length(av) == 1 & !all.factor) stop("No variable available for group comparison.", call. = FALSE)
-  
-  ems <- if(all.factor)  { eval(substitute(emmeans::emmeans(fit, f, infer = c(TRUE, TRUE), type = type, pbkrtest.limit = limit))) 
-    
-  } else {
-    
-    var <- if(is.null(var)) names(sort(cl[grep("integer|numeric", cl)])[1]) else var
-    
-    f <- rm.terms(f, var)
-    
-    eval(substitute(emmeans::emtrends(fit, f, var = var, infer = c(TRUE, TRUE), type = type, pbkrtest.limit = limit)))
-  } 
+           
+dint.sem <- function(n.c = 45, mpre.c = 10, sdpre.c = 1.5, mpos.c = 13, 
+                   sdpos.c = 1.3, n.t = 39, mpre.t = 11, sdpre.t = 1.3, 
+                   mpos.t = 18, sdpos.t = 1.2, correct = FALSE,
+                   r.c = .6, r.t = .6, plot = FALSE, ...){
 
-  xlab <- if(!all.factor)  paste(var, "(slope)") else "Estimated Means"
+cor.C <- cor.mat(r.c, 2)
+
+Cov.C <- lavaan::cor2cov(cor.C, sds = c(sdpre.c, sdpos.c), names = c("x_pre.C","x_post.C"))
+
+Mean.C <- c(mpre.c, mpos.c)
+
+ct.C <- if(correct) cfactor(n.c-1) else 1
+
+#--------- Effect size for Control group (everything ends in ".C"):
+
+model.C <- paste('
+
+eta_pre.C = ~ sd_pre.C*x_pre.C
+eta_post.C = ~ sd_post.C*x_post.C
+
+eta_pre.C ~~ r*eta_post.C
+
+x_pre.C ~~ 0*x_pre.C
+x_post.C ~~ 0*x_post.C
+
+x_pre.C ~ m_pre.C*1
+x_post.C ~ m_post.C*1
+
+SMD.dif.C := (m_post.C - m_pre.C) / sqrt(sd_pre.C^2+sd_post.C^2-2*sd_pre.C*sd_post.C*r) *', ct.C)
+
+
+#--------- Effect size for Treatment group (everything ends in ".T"):
+
+
+cor.T <- cor.mat(r.t, 2)
+
+Cov.T <- lavaan::cor2cov(cor.T, sds = c(sdpre.t, sdpos.t), names = c("x_pre.T","x_post.T"))
+
+Mean.T <- c(mpre.t, mpos.t)
+
+ct.T <- if(correct) cfactor(n.t-1) else 1
+
+model.T <- paste('
+eta_pre.T = ~ sd_pre.T*x_pre.T
+eta_post.T = ~ sd_post.T*x_post.T
+
+eta_pre.T ~~ r*eta_post.T
+
+x_pre.T ~~ 0*x_pre.T
+x_post.T ~~ 0*x_post.T
+
+x_pre.T ~ m_pre.T*1
+x_post.T ~ m_post.T*1
+
+SMD.dif.T := (m_post.T - m_pre.T) / sqrt(sd_pre.T^2+sd_post.T^2 -2*sd_pre.T*sd_post.T*r) *', ct.T)
+
+# / ( (sqrt(sd_pre.C^2+sd_post.C^2-2*sd_pre.C*sd_post.C*r) + sqrt(sd_pre.T^2+sd_post.T^2-2*sd_pre.T*sd_post.T*r)) / 2 )
+
+mod <- c(' group: Control ', model.C, ' group: Treatment ', model.T,
+         ' dint.sem := SMD.dif.T - SMD.dif.C ' )
+
+fit <- lavaan::sem(mod, std.lv = TRUE,
+           sample.cov = list(Control = Cov.C, Treatment = Cov.T),
+           sample.mean = list(Mean.C, Mean.T),
+           sample.nobs = list(n.c, n.t),
+           sample.cov.rescale = FALSE)
+
+est.er <- parameterEstimates(fit)[23:25, 6:8]   #[25, 7:8]
+
+#semPlot::semPaths(fit, edge.label.cex = 1.5, sizeLat = 9, sizeInt = 3, combineGroups = TRUE, ...)
+
+if(plot){
   
-  print(plot(ems, by = by, comparisons = TRUE, horizontal = horiz, adjust = adjust, xlab = xlab, ...))
-  
-  sigma <- if(inherits(fit, "lme")) sqrt(sum(as.numeric(vc[,"Variance"]))) else sqrt(sum(as.numeric(c(attr(vc[[1]], "stddev"), attr(vc, "sc")))^2))
-  edf <- min(as.data.frame(ems[[1]])$df, na.rm = TRUE)
-  em <- as.data.frame(ems[[2]])
-  
-  ef <- as.data.frame(emmeans::eff_size(ems[[1]], sigma = sigma, edf = edf))[c(2,5,6)]
-  
-  out <- cbind(em, ef)
-  names(out)[c(2,5:7, 9:11)] <- c(if(all.factor)"mean.dif"else paste0("slope.dif","(", var,")"), "lower", "upper", "t.value", "Cohen.d", "lower.d", "upper.d")
-  
-  out[2:11] <- lapply(out[2:11], round, digits)
-  
-  return(out)
-}        
-                                  
+library(semPlot)
+
+fit.C <- lavaan::sem(model.C, sample.cov = Cov.C, sample.mean = Mean.C,
+             sample.nobs= n.c, std.lv = TRUE,
+             sample.cov.rescale = FALSE)
+
+fit.T <- lavaan::sem(model.T, sample.cov = Cov.T, sample.mean = Mean.T,
+             sample.nobs= n.c, std.lv = TRUE,
+             sample.cov.rescale = FALSE)
+
+graphics.off()
+org.par <- par(no.readonly = TRUE)
+on.exit(par(org.par))
+par(mfrow = 2:1)
+
+semPlot::semPaths(fit.C, label.prop=.9, sizeInt = 4, sizeLat = 9, curvePivot = TRUE,
+                  equalizeManifests = FALSE, optimizeLatRes = TRUE, node.width = 1.5, 
+                  edge.width = 0.5, shapeMan = "rectangle", shapeLat = "ellipse", edge.label.cex = 1.8, 
+                  shapeInt = "triangle", sizeMan = 9, asize = 6, unCol = "red4", label.cex = 1.4, ...)
+
+semPlot::semPaths(fit.T, label.prop=.9, sizeInt = 4, sizeLat = 9, curvePivot = TRUE, 
+                  equalizeManifests = FALSE, optimizeLatRes = TRUE, node.width = 1.5, 
+                  edge.width = 0.5, shapeMan = "rectangle", shapeLat = "ellipse", edge.label.cex = 1.8,
+                  shapeInt = "triangle", sizeMan = 9, asize = 6, unCol = "blue4", label.cex = 1.4, ...)
+}
+
+return(est.er)
+
+}                                  
                                                                     
 #===========================# Datasets # ===================================================================================== 
    
@@ -6817,7 +6867,7 @@ c4 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/c4.csv")
 #================================================================================================================================================================
                                       
                                       
-need <- c("bayesmeta", "distr", "robumeta", "ellipse") # , "zoo" , "emmeans", "lme4"
+need <- c("bayesmeta", "distr", "robumeta", "ellipse", "zoo", "lavaan", "semPlot")
 have <- need %in% rownames(installed.packages())
 if(any(!have)){ install.packages( need[!have] ) }
  
@@ -6827,7 +6877,7 @@ suppressMessages({
     library("bayesmeta")
     library("robumeta")
     library('ellipse')
-    #library('emmeans')
-    #library('lme4')
-    #library("zoo")
+    library('lavaan')
+    library('semPlot')
+    library("zoo")
 })                                         
