@@ -5009,7 +5009,7 @@ meta.set <- function(data, file.name = NULL, na = ""){
     message(paste0("\nProblem in coding sheet detected. See error analysis below:\n"))
     ur <- try(test.sheet(D, metaset = TRUE), silent = TRUE)
     
-    if(inherits(ur, "try-error")) { stop("\nIncomplete data: check descrptive columns (ex. 'mpre')", call. = FALSE) 
+    if(inherits(ur, "try-error")) { stop("\nIncomplete data: check descrptive columns ('n', 'mpre' etc.)", call. = FALSE) 
       
       } else {
     
