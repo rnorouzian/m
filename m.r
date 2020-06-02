@@ -4957,54 +4957,76 @@ metal <- function(data = NULL, mod, mu.prior = c("mean" = NA, "sd" = NA), tau.pr
 
 #===============================================================================================================================
          
- data.set <- long.form <- function(data, file = NULL, na = ""){
-   
-   L <- dint(data)
-   
-   d <- do.call(rbind, 
-                Map(cbind, pp <- Filter(Negate(is.null), lapply(L, function(x) 
-                  do.call(rbind, x))), 
-                  id = seq_along(pp)))
-   
-   h <- cbind(study.name = sub("(.*)\\.(SHORT|DEL(1|2|3))(\\.+\\d.*)?", "\\1", rownames(d)), d)
-   rownames(h) <- NULL
-   
-   n <- split(h, h$study.name)  
-   hh <- setNames(lapply(n, NROW), names(n))
-   
-   data$study.name <- trimws(data$study.name)
-   
-   D <- rm.allrowNA(data)
-   
-   m <- split(D, D$study.name)
-   m <- Filter(NROW, rm.allrowNA2(m))
-   
-   ff <- setNames(lapply(seq_along(m), function(i) NROW(subset(m[[i]], !control))), names(m))
-   
-   eq <- identical(ff, hh)
-   
-   if(eq){
-     
-     message(paste0("OK: 'dints' successfully computed and reshaped into 'long form'."))
-     
-     ar <- formalArgs(d.prepos)[-(20:22)]
-     
-     mod.names <- names(D)[!names(D) %in% ar]
-     
-     mods <- subset(D[order(D$study.name), ], !control, select = mod.names)
-     
-     H <- roundi(cbind(h, mods))
-     
-     if(!is.null(file)) write.csv(H, paste0(file, ".csv"), row.names = FALSE, na = na)
-     
-     return(H)
-     
-   } else {
-     
-     message(paste0("Problem in coding sheet detected. See error analysis below:\n"))
-     test.sheet(D)
-   }
- }               
+meta.set <- function(data, file.name = NULL, na = ""){
+  
+  data <- rm.allrowNA(trim(data))
+  
+  L <- dint(data)
+  
+  d <- do.call(rbind, 
+               Map(cbind, pp <- Filter(Negate(is.null), lapply(L, function(x) 
+                 do.call(rbind, x))), 
+                 id = seq_along(pp)))
+  
+  h <- cbind(study.name = sub("(.*)\\.(SHORT|DEL(1|2|3))(\\.+\\d.*)?", "\\1", rownames(d)), d)
+  rownames(h) <- NULL
+  
+  n <- split(h, h$study.name)  
+  hh <- setNames(lapply(n, NROW), names(n))
+  
+  D <- data
+  
+  m <- split(D, D$study.name)
+  
+  ff <- setNames(lapply(seq_along(m), function(i) NROW(subset(m[[i]], !control))), names(m))
+  
+  eq <- identical(ff, hh)
+  
+  if(eq){
+    
+    message(paste0("'dints' successfully computed and reshaped into 'long form'."))
+    
+    ar <- formalArgs(d.prepos)[-(20:22)]
+    
+    mod.names <- names(D)[!names(D) %in% ar]
+    
+    mods <- subset(D[order(D$study.name), ], !control, select = mod.names)
+    
+    H <- roundi(cbind(h, mods))
+    
+    if(!is.null(file.name)) { 
+      file.name <- trimws(file.name)
+      nm <- paste0(file.name, ".csv")
+      ur <- try(write.csv(H, nm, row.names = FALSE, na = na), silent = TRUE)
+      if(inherits(ur, "try-error")) stop(paste0("\nClose the Excel file '", nm, "' and try again OR pick another file name."), call. = FALSE)
+      message(paste0("\nNote: Check folder '", basename(getwd()),"' for the Excel file '", nm, "'.\n"))
+      }
+    
+    return(H)
+    
+  } else {
+    
+    message(paste0("\nProblem in coding sheet detected. See error analysis below:\n"))
+    ur <- try(test.sheet(D, metaset = TRUE), silent = TRUE)
+    
+    if(inherits(ur, "try-error")) { stop("\nIncomplete data: check descrptive columns (ex. 'mpre')", call. = FALSE) 
+      
+      } else {
+    
+    message("\nSo, pre-post effect sizes can be calculated but not 'dints'... why?")    
+        
+    ur <- try(dint(D), silent = TRUE)
+    
+    if(inherits(ur, "try-error")) { stop("\nDue to incorrect/incomplete data: Check columns 'post', 'control', & 'outcome'.", call. = FALSE) 
+      
+      } else if(is.null(unlist(ur))) {
+      
+        message("Due probably to column 'post' having inconsistent values.")
+        
+    } else { message("\nDue to coding inconsistencies/errors (ex. part of a study coded or entered into this program but not all of it).")}
+       }
+    }
+}               
          
 #===============================================================================================================================
                                       
@@ -5073,25 +5095,25 @@ dinto <- function(data = NULL)
 
 #===============================================================================================================================
 
-test.sheet <- function(data){
+test.sheet <- function(data, metaset = FALSE){
   
   data <- rm.allrowNA(trim(data))
   
-  check <- "study.name" %in% trimws(names(data))
+  check <- "study.name" %in% names(data)
   if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
   
   L <- split(data, data$study.name)         
-
+  
   f <- function(number){
     
     ns <- names(L)[number]
     
     z <- try(dinto(L[[number]]), silent = TRUE)
     
-    if(inherits(z, "try-error")) message("Error: coding problem in: *", toString(dQuote(ns)), "* detected.") else message("OK: No coding problem detected.")
+    if(inherits(z, "try-error")) message("Error: pre-post coding problem in: *", toString(dQuote(ns)), "*") else message(if(metaset)"" else "Ok: ","No pre-post coding problem in ", toString(dQuote(ns)))
   }
   invisible(lapply(seq_along(L), function(i) f(i)))
-}    
+}     
  
 #===============================================================================================================================
                    
