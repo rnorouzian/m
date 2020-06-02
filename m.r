@@ -1875,9 +1875,7 @@ dint.plot <- function(..., main = NULL, ylab = "Effect Size (dint)", labels = NU
    if(!check) stop("Add a new column named 'study.name'.", call. = FALSE) 
 
    
-   m <- split(data, data$study.name)         
-   m <- Filter(NROW, rm.allrowNA2(m)) 
-   if(!(length(unique(data$study.name)) == length(m))) stop("Each 'study.name' must be distinct.", call. = FALSE)
+   m <- split(data, data$study.name)
    
    if(is.null(reget(m, control))) stop("Required 'control' group not found.", call. = FALSE)
 
