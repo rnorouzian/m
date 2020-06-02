@@ -5077,7 +5077,7 @@ rm.allrowNA2 <- function(X) {
   
 #===============================================================================================================================
            
-dinto <- function(data = NULL)
+d_prepo <- function(data = NULL)
 {
   
   if(is.null(reget(data, control))) stop("Required 'control' group not found.", call. = FALSE)
@@ -5108,7 +5108,7 @@ test.sheet <- function(data, metaset = FALSE){
     
     ns <- names(L)[number]
     
-    z <- try(dinto(L[[number]]), silent = TRUE)
+    z <- try(d_prepo(L[[number]]), silent = TRUE)
     
     if(inherits(z, "try-error")) message("Error: pre-post coding problem in: *", toString(dQuote(ns)), "*") else message(if(metaset)"" else "Ok: ","No pre-post coding problem in ", toString(dQuote(ns)))
   }
