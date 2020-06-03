@@ -5928,12 +5928,9 @@ res
                                                                    
 exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.level = 0, code = NULL, low = NULL, suggest = FALSE, plot = TRUE){
    
-   names(data) <- trimws(names(data))
+   data <- rm.colrowNA(trim(data))
    check <- "study.name" %in% names(data)
    if(!check) stop("Add a new column named 'study.name'.", call. = FALSE)
-   
-   data$study.name <- trimws(data$study.name)
-   data <- rm.colrowNA(data)
    
    if(length(unique(data$study.name)) < 2) stop("At least two coded studies required.", call. = FALSE)
    
