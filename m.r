@@ -5934,6 +5934,14 @@ exam.code <- function(data, exclude = NULL, rule = 1, lwd = 4, lend = 2, cat.lev
    
    if(length(unique(data$study.name)) < 2) stop("At least two coded studies required.", call. = FALSE)
    
+   message("
+Rule 1: An efficient coding sheet is one in which at least '2 studies' coded the same category of a moderator (ex. 2 studies with moderator 'X' is coded 'y').
+
+Rule 2: An efficient coding sheet is one in which at least '2 study groups' coded the same category of a moderator (ex. 2 groups with moderator 'X' is coded 'y').
+
+Rule 3: An efficient coding sheet is one in which there is no moderator whose categories occur less than ~4 times overall.
+") 
+    
    exclude <- trimws(exclude)  
    excl <- setdiff(exclude, "study.name")
    
