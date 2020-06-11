@@ -6862,7 +6862,63 @@ semPlot::semPaths(fit.T, label.prop=.9, sizeInt = 4, sizeLat = 9, curvePivot = T
 return(est.er)
 
 }                                  
-                                                                    
+   
+#============================================================================================================================                     
+                     
+samp.dist <- function(n, dist = NULL, param1 = NULL, param2 = NULL, times = 1e4, others = FALSE, xlab = NA, ylab = "Density", ...){
+  
+  message("Note: 'dist' can be one of: 'exp','nor','uni','poi','bin','gam','chi','tds'.")
+  
+  samples <- switch(dist,
+                    "exp" = replicate(times, rexp(n, param1)),
+                    "nor" = replicate(times, rnorm(n, param1, param2)),
+                    "uni" = replicate(times, runif(n, param1, param2)),
+                    "poi" = replicate(times, rpois(n, param1)),
+                    "bin" = replicate(times, rbinom(n, param1, param2)),
+                    "gam" = replicate(times, rgamma(n, param1, param2)),
+                    "chi" = replicate(times, rchisq(n, param1)),
+                    "tds" = replicate(times, rt(n, param1)))
+  
+  pop <- switch(dist,
+                    "exp" = rexp(1e4, param1),
+                    "nor" = rnorm(1e4, param1, param2),
+                    "uni" = runif(1e4, param1, param2),
+                    "poi" = rpois(1e4, param1),
+                    "bin" = rbinom(1e4, param1, param2),
+                    "gam" = rgamma(1e4, param1, param2),
+                    "chi" = rchisq(1e4, param1),
+                    "tds" = rt(1e4, param1))
+  
+  
+  all.sample.means <- colMeans(samples, na.rm = TRUE)   
+  
+  graphics.off()
+  org.par <- par(no.readonly = TRUE)
+  on.exit(par(org.par))
+  par(mfcol = c(2, 1), mar = c(2.5, 2.6, 1.8, .5), mgp = c(1.65, .4, 0))
+  
+  if(others){
+    
+    par(mfcol = c(2, 2), mar = c(3.5, 4, 3, 1), mgp = c(1.65, .4, 0))
+    all.sample.sums <- colSums(samples, na.rm = TRUE)
+    all.sample.vars <- apply(samples,2,var, na.rm = TRUE) 
+    pt.curve(all.sample.sums, main = "Sampling Distribution\nof
+  	the Sum", cex.main = .7, xlab = xlab, pch = ".", ylab = ylab, ...)
+    pt.curve(all.sample.vars, main = "Sampling Distribution\nof
+  	the Variance", cex.main = .7, xlab = xlab, pch = ".", ylab = ylab, ...) 
+  }
+  
+  pt.curve(pop, main = "Population", cex.main = .7, col = 4, ylab = ylab, xlab = xlab, ...)
+  se <- sd(pop, na.rm = TRUE)
+  m <- mean(pop, na.rm = TRUE)
+  abline(v = c(m, m-se, m+se), col = "magenta")
+  
+  pt.curve(all.sample.means,main = "Sampling Distribution\nof the Means", cex.main = .7, xlim = range(pop, na.rm = TRUE), pch = ".", xlab = xlab, ylab = ylab, ...)
+  se <- sd(all.sample.means, na.rm = TRUE)
+  m <- mean(all.sample.means, na.rm = TRUE)
+  abline(v = c(m, m-se, m+se), col = "magenta")
+}                     
+                     
 #===========================# Datasets # ===================================================================================== 
    
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
