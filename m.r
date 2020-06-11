@@ -6878,10 +6878,11 @@ return(est.er)
 }                                  
    
 #============================================================================================================================                     
+             
                      
-samp.dist <- function(n, dist = NULL, param1 = NULL, param2 = NULL, times = 1e4, others = FALSE, xlab = NA, ylab = "Density", ...){
+samp.dist <- function(n, dist = c('nor','exp','uni','poi','bin','gam','chi','tds', 'bet'), param1 = NULL, param2 = NULL, times = 1e4, others = FALSE, xlab = NA, ylab = "Density", obs.mean = NULL, ...){
   
-  message("Note: 'dist' can be one of: 'exp','nor','uni','poi','bin','gam','chi','tds'.")
+  dist <- match.arg(dist)
   
   samples <- switch(dist,
                     "exp" = replicate(times, rexp(n, param1)),
@@ -6891,7 +6892,8 @@ samp.dist <- function(n, dist = NULL, param1 = NULL, param2 = NULL, times = 1e4,
                     "bin" = replicate(times, rbinom(n, param1, param2)),
                     "gam" = replicate(times, rgamma(n, param1, param2)),
                     "chi" = replicate(times, rchisq(n, param1)),
-                    "tds" = replicate(times, rt(n, param1)))
+                    "tds" = replicate(times, rt(n, param1)),
+                    "bet" = replicate(times, rbetab(n, param1, param2)))
   
   pop <- switch(dist,
                     "exp" = rexp(1e4, param1),
@@ -6901,7 +6903,8 @@ samp.dist <- function(n, dist = NULL, param1 = NULL, param2 = NULL, times = 1e4,
                     "bin" = rbinom(1e4, param1, param2),
                     "gam" = rgamma(1e4, param1, param2),
                     "chi" = rchisq(1e4, param1),
-                    "tds" = rt(1e4, param1))
+                    "tds" = rt(1e4, param1),
+                    "bet" = rbetab(1e4, param1, param2))
   
   
   all.sample.means <- colMeans(samples, na.rm = TRUE)   
@@ -6909,11 +6912,11 @@ samp.dist <- function(n, dist = NULL, param1 = NULL, param2 = NULL, times = 1e4,
   graphics.off()
   org.par <- par(no.readonly = TRUE)
   on.exit(par(org.par))
-  par(mfcol = c(2, 1), mar = c(2.5, 2.6, 1.8, .5), mgp = c(1.65, .4, 0))
+  par(mfcol = c(3, 1), mar = c(2.5, 2.6, 1.8, .5), mgp = c(1.65, .4, 0))
   
   if(others){
     
-    par(mfcol = c(2, 2), mar = c(3.5, 4, 3, 1), mgp = c(1.65, .4, 0))
+    par(mfcol = c(3, 2), mar = c(3.5, 4, 3, 1), mgp = c(1.65, .4, 0))
     all.sample.sums <- colSums(samples, na.rm = TRUE)
     all.sample.vars <- apply(samples,2,var, na.rm = TRUE) 
     pt.curve(all.sample.sums, main = "Sampling Distribution\nof
@@ -6922,17 +6925,35 @@ samp.dist <- function(n, dist = NULL, param1 = NULL, param2 = NULL, times = 1e4,
   	the Variance", cex.main = .7, xlab = xlab, pch = ".", ylab = ylab, ...) 
   }
   
-  pt.curve(pop, main = "Population", cex.main = .7, col = 4, ylab = ylab, xlab = xlab, ...)
-  se <- sd(pop, na.rm = TRUE)
+  pt.curve(pop, main = "Population", cex.main = 1, col = 4, ylab = ylab, xlab = xlab, ...)
+  sd.pop <- sd(pop, na.rm = TRUE)
   m <- mean(pop, na.rm = TRUE)
-  abline(v = c(m, m-se, m+se), col = 3)
+  abline(v = c(m, m-sd.pop, m+sd.pop), col = 3, lty = c(2, 1,1))
   
-  pt.curve(all.sample.means,main = "Sampling Distribution\nof the Means", cex.main = .7, xlim = range(pop, na.rm = TRUE), pch = ".", xlab = xlab, ylab = ylab, ...)
+  pt.curve(all.sample.means,main = "Sampling Distribution of the Means (Normal)", cex.main = 1, xlim = range(pop, na.rm = TRUE), pch = ".", xlab = xlab, ylab = ylab, ...)
   se <- sd(all.sample.means, na.rm = TRUE)
   m <- mean(all.sample.means, na.rm = TRUE)
-  abline(v = c(m, m-se, m+se), col = 3)
+  if(!is.null(obs.mean)) {  
+  points(obs.mean, 0, pch = 23, bg = "cyan", col = 'magenta', cex = 2.5, xpd = NA)
+  obs.z <- (obs.mean-m) / se
+  }
+  
+  abline(v = c(m, m-se, m+se), col = 3, lty = c(2, 1,1))
+  
+  z <- (all.sample.means - m) / se
+  
+  pt.curve(z, main = "Sampling Distribution of 'Z' (Std. Normal)", cex.main = 1, pch = ".", xlab = xlab, ylab = ylab, col = 'purple', ...)
+  se.z <- sd(z, na.rm = TRUE)
+  m.z <- mean(z, na.rm = TRUE)
+  if(!is.null(obs.mean)) points(obs.z, 0, pch = 23, bg = "cyan", col = 'magenta', cex = 2.5, xpd = NA)
+  arrows(-1.96, .1, -3, .1, code = 2, length = .12, angle = 20)
+  arrows(1.96, .1, 3, .1, code = 2, length = .12, angle = 20)
+  abline(v = c(m.z, -1.96, 1.96), col = 3, lty = c(2, 1,1))
+  
+  return(c(sd.pop = sd.pop, se = se, clt.se = sd.pop / sqrt(n), obs.z = if(!is.null(obs.mean)) obs.z else NA))
 }                     
-                     
+      
+           
 #===========================# Datasets # ===================================================================================== 
    
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
