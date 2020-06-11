@@ -6911,12 +6911,12 @@ samp.dist <- function(n, dist = NULL, param1 = NULL, param2 = NULL, times = 1e4,
   pt.curve(pop, main = "Population", cex.main = .7, col = 4, ylab = ylab, xlab = xlab, ...)
   se <- sd(pop, na.rm = TRUE)
   m <- mean(pop, na.rm = TRUE)
-  abline(v = c(m, m-se, m+se), col = "magenta")
+  abline(v = c(m, m-se, m+se), col = 3)
   
   pt.curve(all.sample.means,main = "Sampling Distribution\nof the Means", cex.main = .7, xlim = range(pop, na.rm = TRUE), pch = ".", xlab = xlab, ylab = ylab, ...)
   se <- sd(all.sample.means, na.rm = TRUE)
   m <- mean(all.sample.means, na.rm = TRUE)
-  abline(v = c(m, m-se, m+se), col = "magenta")
+  abline(v = c(m, m-se, m+se), col = 3)
 }                     
                      
 #===========================# Datasets # ===================================================================================== 
