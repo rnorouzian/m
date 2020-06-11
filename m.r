@@ -6757,6 +6757,20 @@ plot.cor <- function (corr, outline = FALSE, col = colorRampPalette(c(4, 2))(cho
   }
   invisible()
 }                     
+
+#=============================================================================================================================
+                     
+rbetab <- function(n, mu.p, disp){
+  
+if(mu.p < 0 || mu.p > 1) { message("Warning: 'mu.p' is 'average probability' of a 'beta dist.' bound between '0' & '1'.") ;
+mu.p[mu.p < 0] <- 0 ;
+mu.p[mu.p > 1] <- 1 }
+    
+  shape1 <- mu.p * disp
+  shape2 <- (1 - mu.p) * disp
+  rbeta(n, shape1 = shape1, shape2 = shape2)
+}                     
+                     
                      
 #=============================================================================================================================
            
