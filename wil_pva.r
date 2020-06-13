@@ -6,3 +6,7 @@
 
 # Or:
 (p.value = 2*pnorm(-3.49))
+
+
+# Or by integration:
+(p.value = 2*integrate(dnorm, 3.49, Inf)[[1]])
