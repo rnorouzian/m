@@ -6368,7 +6368,7 @@ invisible(h)
  
 #================================================================================================================================================================                                                      
                                                                                                             
-pt.curve <- function(X, adjust = 1, compact = NULL, pch = 16, col = 2, cex = .7, ...) {
+pt.curve <- function(X, adjust = 1, compact = NULL, pch = 16, col = 2, cex = .7, seed = 0, ...) {
   
   n.target <- length(X)
   
@@ -6376,22 +6376,23 @@ pt.curve <- function(X, adjust = 1, compact = NULL, pch = 16, col = 2, cex = .7,
   
   n <- if(!is.null(compact)) { 
     
-   auc <- sum(d$y*median(diff(d$x)))/(diff(range(d$x))*max(d$y))
-  
-   compact*ceiling(n.target/auc)
-   
+    auc <- sum(d$y*median(diff(d$x)))/(diff(range(d$x))*max(d$y))
+    
+    compact*ceiling(n.target/auc)
+    
   } else { n.target }
   
-  pts <- data.frame(x = runif(n, min(d$x), max(d$x)), y = runif(n, 0, max(d$y)))
-  
+set.seed(seed)
+pts <- data.frame(x = runif(n, min(d$x), max(d$x)), y = runif(n, 0, max(d$y)))
+ 
   pts <- pts[pts$y < approx(d$x, d$y, xout = pts$x)$y, ]
-    
+  
   if(nrow(pts) == 0) stop("Increase the number of test takers OR use 'compact = NULL'.", call. = FALSE)
   
   pts <- pts[sample(seq_len(nrow(pts)), n, replace = TRUE), ]
   
   plot(pts, pch = pch, col = col, cex = cex, ...)
-}                                                    
+}                                        
 
 #================================================================================================================================================================                                                      
 
