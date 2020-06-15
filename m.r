@@ -6881,11 +6881,13 @@ return(est.er)
 #============================================================================================================================                     
              
                      
-samp.dist <- function(n, dist = c('nor','exp','uni','poi','bin','gam','chi','tds', 'bet'), param1 = NULL, param2 = NULL, times = 1e4, others = FALSE, xlab = NA, ylab = "Density", obs.mean = NULL, ...){
+samp.dist <- function(n, pop.dist = c('nor','exp','uni','poi','bin','gam','chi','tds', 'bet'), param1 = NULL, param2 = NULL, times = 1e4, others = FALSE, xlab = NA, ylab = "Density", obs.mean = NULL, rev.page = FALSE, seed.pop = 0, digits = 3, xaxt = "s", reset = FALSE, unknown = FALSE, obs.sd = NULL, ...){
   
-  dist <- match.arg(dist)
+  pop.dist <- match.arg(pop.dist)
   
-  samples <- switch(dist,
+  if(unknown & is.null(obs.sd)) stop("Provide 'obs.sd' to see the place of your observed test statistic.", call. = FALSE)
+  
+  samples <- switch(pop.dist,
                     "exp" = replicate(times, rexp(n, param1)),
                     "nor" = replicate(times, rnorm(n, param1, param2)),
                     "uni" = replicate(times, runif(n, param1, param2)),
@@ -6896,62 +6898,76 @@ samp.dist <- function(n, dist = c('nor','exp','uni','poi','bin','gam','chi','tds
                     "tds" = replicate(times, rt(n, param1)),
                     "bet" = replicate(times, rbetab(n, param1, param2)))
   
-  pop <- switch(dist,
-                    "exp" = rexp(1e4, param1),
-                    "nor" = rnorm(1e4, param1, param2),
-                    "uni" = runif(1e4, param1, param2),
-                    "poi" = rpois(1e4, param1),
-                    "bin" = rbinom(1e4, param1, param2),
-                    "gam" = rgamma(1e4, param1, param2),
-                    "chi" = rchisq(1e4, param1),
-                    "tds" = rt(1e4, param1),
-                    "bet" = rbetab(1e4, param1, param2))
+  set.seed(seed.pop)
+  pop <- switch(pop.dist,
+                "exp" = rexp(1e4, param1),
+                "nor" = rnorm(1e4, param1, param2),
+                "uni" = runif(1e4, param1, param2),
+                "poi" = rpois(1e4, param1),
+                "bin" = rbinom(1e4, param1, param2),
+                "gam" = rgamma(1e4, param1, param2),
+                "chi" = rchisq(1e4, param1),
+                "tds" = rt(1e4, param1),
+                "bet" = rbetab(1e4, param1, param2))
   
   
   all.sample.means <- colMeans(samples, na.rm = TRUE)   
+  all.sample.sd <- apply(samples, 2, sd, na.rm = TRUE)
   
+  if(reset){
   graphics.off()
   org.par <- par(no.readonly = TRUE)
   on.exit(par(org.par))
-  par(mfcol = c(3, 1), mar = c(2.5, 2.6, 1.8, .5), mgp = c(1.65, .4, 0))
-  
-  if(others){
-    
-    par(mfcol = c(3, 2), mar = c(3.5, 4, 3, 1), mgp = c(1.65, .4, 0))
-    all.sample.sums <- colSums(samples, na.rm = TRUE)
-    all.sample.vars <- apply(samples,2,var, na.rm = TRUE) 
-    pt.curve(all.sample.sums, main = "Sampling Distribution\nof
-  	the Sum", cex.main = .7, xlab = xlab, pch = ".", ylab = ylab, ...)
-    pt.curve(all.sample.vars, main = "Sampling Distribution\nof
-  	the Variance", cex.main = .7, xlab = xlab, pch = ".", ylab = ylab, ...) 
   }
   
-  pt.curve(pop, main = "Population", cex.main = 1, col = 4, ylab = ylab, xlab = xlab, ...)
+  h <- if(others) 5 else 3
+  dev <- if(!rev.page) n2mfrow(h) else rev(n2mfrow(h))
+  par(mfcol = dev, mar = c(2.5, 2.6, 1.8, .5), mgp = c(1.65, .4, 0))
+  
+  
+  pt.curve(pop, main = "Population", cex.main = 1, col = 4, ylab = ylab, xlab = xlab, pch = '.', xaxt = xaxt, ...)
   sd.pop <- sd(pop, na.rm = TRUE)
   m <- mean(pop, na.rm = TRUE)
   abline(v = c(m, m-sd.pop, m+sd.pop), col = 3, lty = c(2, 1,1))
+  at1 <- axTicks(1)
   
-  pt.curve(all.sample.means,main = "Sampling Distribution of the Means (Normal)", cex.main = 1, xlim = range(pop, na.rm = TRUE), pch = ".", xlab = xlab, ylab = ylab, ...)
+  pt.curve(all.sample.means,main = "Sampling Distribution of Means (Normal)", cex.main = 1, xlim = range(pop, na.rm = TRUE), xlab = xlab, ylab = ylab, pch = '.', xaxt = "n", ...)
+  at2 <- axTicks(1)
+  if(xaxt == "s") axis(1, at = union(at1, at2), ...)
+  
   se <- sd(all.sample.means, na.rm = TRUE)
   m <- mean(all.sample.means, na.rm = TRUE)
   if(!is.null(obs.mean)) {  
-  points(obs.mean, 0, pch = 23, bg = "cyan", col = 'magenta', cex = 2.5, xpd = NA)
-  obs.z <- (obs.mean-m) / se
+    points(obs.mean, 0, pch = 23, bg = "cyan", col = 'magenta', cex = 2, xpd = NA)
+    obs.z <-  if(!unknown) (obs.mean-m) / (sd.pop/sqrt(n)) else (obs.mean-m) / (obs.sd/sqrt(n))
   }
   
   abline(v = c(m, m-se, m+se), col = 3, lty = c(2, 1,1))
   
-  z <- (all.sample.means - m) / se
+  z <- if(!unknown)(all.sample.means - m) / (sd.pop/sqrt(n)) else (all.sample.means - m) / (all.sample.sd/sqrt(n))
   
-  pt.curve(z, main = "Sampling Distribution of 'Z' (Std. Normal)", cex.main = 1, pch = ".", xlab = xlab, ylab = ylab, col = 'purple', ...)
+  pt.curve(z, main = paste("Sampling Distribution of",if(unknown) "'t'" else "'z'","(Std. Normal)"), cex.main = 1, xlab = xlab, ylab = ylab, col = 'purple', pch = '.', xaxt = xaxt, xlim = if(!is.null(obs.mean)) range(z, obs.z, na.rm = TRUE) else range(z, na.rm = TRUE), ...)
   se.z <- sd(z, na.rm = TRUE)
   m.z <- mean(z, na.rm = TRUE)
-  if(!is.null(obs.mean)) points(obs.z, 0, pch = 23, bg = "cyan", col = 'magenta', cex = 2.5, xpd = NA)
-  arrows(-1.96, .1, -3, .1, code = 2, length = .12, angle = 20)
-  arrows(1.96, .1, 3, .1, code = 2, length = .12, angle = 20)
-  abline(v = c(m.z, -1.96, 1.96), col = 3, lty = c(2, 1,1))
+  if(!is.null(obs.mean)) points(obs.z, 0, pch = 23, bg = "cyan", col = 'magenta', cex = 2, xpd = NA)
+  qs <- quantile(z, names = F, probs = c(.025, .975), na.rm = TRUE)
+  arrows(qs[1], .1, -3, .1, code = 2, length = .12, angle = 20)
+  arrows(qs[2], .1, 3, .1, code = 2, length = .12, angle = 20)
+  abline(v = c(m.z, qs), col = 3, lty = c(2, 1,1))
   
-  return(c(sd.pop = sd.pop, se = se, clt.se = sd.pop / sqrt(n), obs.z = if(!is.null(obs.mean)) obs.z else NA))
+  if(others){
+    
+    all.sample.sums <- colSums(samples, na.rm = TRUE)
+    #all.sample.vars <- apply(samples,2,var, na.rm = TRUE) 
+    pt.curve(all.sample.sums, main = "Sampling Distribution of Sum", cex.main = 1, xlab = xlab, pch = ".", ylab = ylab, xaxt = xaxt, ...)
+    pt.curve(all.sample.sd, main = "Sampling Distribution of Sd", cex.main = 1, xlab = xlab, pch = ".", ylab = ylab, xaxt = xaxt, ...) 
+    #m.sd <- mean(all.sample.sd) ; med.sd <- median(all.sample.sd)
+    abline(v = mean(all.sample.sd, na.rm = TRUE), col = 3)
+  }
+  
+  obj <- round(c(sd.pop = sd.pop, se = se, clt.se = sd.pop / sqrt(n), obs.z = if(!is.null(obs.mean)) obs.z else NA), digits)
+  names(obj)[4] <- if(unknown) "obs.t" else "obs.z"
+  setNames(obj, names(obj))
 }                     
       
            
