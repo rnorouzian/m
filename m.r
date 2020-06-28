@@ -6106,6 +6106,13 @@ egger.data <- function(data = NULL, by, r = .5, dependent = FALSE, dep.model = "
   }
   else {
     
+    
+    if(!missing(by)) { 
+      
+      s <- substitute(by) 
+      data <- subset(data, eval(s))
+    }
+    
     sds <- data[[se.name]]
     X <- cbind(1, sds)
     
