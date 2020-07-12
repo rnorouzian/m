@@ -4764,7 +4764,7 @@ is.unique <- function(X, which){
 #===============================================================================================================================
 
                                    
-interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = TRUE, drop = NULL, plot = TRUE, lwd = 5, lend = 1, show.sa = TRUE, group.level = NULL, study.level = NULL, file.name = NULL, reset = TRUE, rev.page = FALSE, cex.sa = .9)
+interrate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95, useNA = "ifany", na.rm = FALSE, digits = 3, common = FALSE, all = TRUE, drop = NULL, plot = TRUE, lwd = 5, lend = 1, show.sa = TRUE, group.level = NULL, study.level = NULL, file.name = NULL, reset = TRUE, rev.page = FALSE, cex.sa = .9)
 {
   
   r <- list(...) 
@@ -4794,7 +4794,8 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   r <- unname(r)
   
-  if(n.df == 1) tbl <- table(names(r[[1]])[!names(r[[1]]) %in% c("study.name", "group.name")])
+  sub.name <- trimws(sub.name)
+  if(n.df == 1) tbl <- table(names(r[[1]])[!names(r[[1]]) %in% c("study.name", sub.name)])
   
   com.names <- if(n.df >= 2) { 
     
@@ -4826,7 +4827,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
     
     r <- do.call(cbind, r)
     
-    tbl <- table(names(r)[!names(r) %in% c("study.name", "group.name")]) 
+    tbl <- table(names(r)[!names(r) %in% c("study.name", sub.name)]) 
     
   } else { r <- r[[1]]
   
@@ -4853,7 +4854,7 @@ interrate <- function(..., nsim = 1e3, level = .95, useNA = "ifany", na.rm = FAL
   
   if(length(st.level) != 0) L[st.level] <- lapply(L[st.level], function(x) x[ave(seq_along(x[[1]]), r$study.name, FUN = seq_along) == 1, ]) 
   
-  L <- drop.inner.list(L, c("study.name", "group.name"))
+  L <- drop.inner.list(L, c("study.name", sub.name))
   
   if(na.rm) L <- lapply(L, na.omit)
   
