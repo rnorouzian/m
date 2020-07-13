@@ -4799,6 +4799,10 @@ interrate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95, use
   
   com.names <- if(n.df >= 2) { 
     
+    ok <- is.constant(sapply(r, nrow))
+    
+    if(!ok) stop("The coding sheets don't have the same number of rows.", call. = FALSE)
+    
     if(common) { Reduce(intersect, lapply(r, names)) 
       
     } else {
@@ -4842,13 +4846,14 @@ interrate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95, use
     tbl[tbl >= 2]
   }
   
-  st.level <- c(names(Filter(base::all, aggregate(.~study.name, r, is.constant, na.action = na.pass)[-1])), if(is.null(study.level)) study.level else trimws(study.level))
+  i1 <- colnames(r) != 'study.name'
+  st.level <- names(which(sapply(split.default(r[i1], names(r)[i1]), function(x) all(!colSums(!aggregate(.~ study.name, transform(x, study.name = r$study.name), FUN = is.constant)[-1])))))
   
   st.level <- st.level[st.level %in% dot.names]
   
   exclude <- trimws(group.level)
   
-  st.level <- st.level[!st.level %in% exclude]
+  st.level <- st.level[!st.level %in% c(exclude,"study.name", sub.name)]
   
   L <- split.default(r[names(r) %in% dot.names], names(r)[names(r) %in% dot.names])
   
