@@ -6382,11 +6382,12 @@ invisible(h)
  
 #================================================================================================================================================================                                                      
                                                                                                             
-pt.curve <- function(X, adjust = 1, compact = NULL, pch = 16, col = 2, cex = .7, seed = 0, ...) {
+pt.curve <- function(X, adjust = 1, compact = NULL, pch = 16, col = 2, cex = .7, seed = 0, reset = TRUE, add = FALSE, na.rm = TRUE, ...) {
   
+  if(na.rm) X <- na.omit(X)  
   n.target <- length(X)
   
-  d <- density(X, adjust = adjust, n = n.target, na.rm = TRUE)
+  d <- density(X, adjust = adjust, n = n.target)
   
   n <- if(!is.null(compact)) { 
     
@@ -6396,17 +6397,26 @@ pt.curve <- function(X, adjust = 1, compact = NULL, pch = 16, col = 2, cex = .7,
     
   } else { n.target }
   
-set.seed(seed)
-pts <- data.frame(x = runif(n, min(d$x), max(d$x)), y = runif(n, 0, max(d$y)))
- 
+  set.seed(seed)
+  pts <- data.frame(x = runif(n, min(d$x), max(d$x)), y = runif(n, 0, max(d$y)))
+  
   pts <- pts[pts$y < approx(d$x, d$y, xout = pts$x)$y, ]
   
-  if(nrow(pts) == 0) stop("Increase the number of test takers OR use 'compact = NULL'.", call. = FALSE)
+  if(nrow(pts) == 0) stop("Increase the size of sample 'X' OR use 'compact = NULL'.", call. = FALSE)
   
   pts <- pts[sample(seq_len(nrow(pts)), n, replace = TRUE), ]
   
+  if(!add){
+  
+  if(reset) graphics.off()    
   plot(pts, pch = pch, col = col, cex = cex, ...)
-}                                        
+    
+  } else {
+    
+  points(pts, pch = pch, col = col, cex = cex, ...)
+    
+  }
+}             
 
 #================================================================================================================================================================                                                      
 
