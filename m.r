@@ -786,7 +786,7 @@ funnel.bayesmeta <- function(x,
   # points(x$theta[5,], -x$sigma, pch=21, col="gray60", bg= "gray60", cex=1.2)
   #}
   
-  if(study.name)text(x$y, -x$sigma, x$labels, cex = .65, font = 2, pos = 3)
+  if(study.name)text(x$y, -x$sigma, x$labels, cex = .65, font = 2, pos = 3, xpd = NA)
   
   if (FE && legend)
     legend("topleft", c("RE model", "FE model"),
