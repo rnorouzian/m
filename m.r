@@ -720,7 +720,7 @@ convolve <- function(dens1, dens2,
   
 funnel.bayesmeta <- function(x,
                              main = deparse(substitute(x)),
-                             xlab = "Effect Size (dint)",
+                             xlab = "Effect Size (dint)", xlim = NULL,
                              ylab = "Standard Error (SE)", study.name = TRUE,
                              FE = FALSE, legend = FALSE, shrink = FALSE, show.mu = TRUE, pt.cex = 1, mu.cex = .8, mu.pos = 2, ...)
 {
@@ -754,7 +754,10 @@ funnel.bayesmeta <- function(x,
   FEcol="red3"
   REcol="blue3"
   
-  plot(range(intRE), -yrange, type="n",
+  xl <- range(intRE)
+  xlim <- if(is.null(xlim)) range(c(xl, range(x$y, finite = TRUE)), finite = TRUE) else xlim
+  
+  plot(xl, -yrange, type="n", xlim = xlim,
        ylab=ylab, xlab=xlab, main=main, axes = FALSE, ...)
   
   polygon(c(intRE[,1], rev(intRE[,2])), c(-sevec, rev(-sevec)), col="grey90", border=NA)
