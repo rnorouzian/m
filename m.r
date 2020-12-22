@@ -7025,6 +7025,7 @@ samp.dist <- function(n, pop.dist = c('nor','exp','uni','poi','bin','gam','chi',
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
 table2 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr2.csv", row.names = 1)          
 table3 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/X.csv", row.names = 1)
+table5 <- read.csv('https://raw.githubusercontent.com/hkil/m/master/t5.csv', row.names = 1)                 
 c1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/c1.csv")
 c2 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/c2.csv")
 c3 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/c3.csv")
