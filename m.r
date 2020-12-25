@@ -7147,7 +7147,7 @@ c4 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/c4.csv")
 #================================================================================================================================================================
                                       
                                       
-need <- c("bayesmeta", "distr", "robumeta", "ellipse", "zoo", "lavaan", "semPlot")
+need <- c("bayesmeta", "distr", "robumeta", "ellipse", "zoo", "lavaan", "semPlot", "tidyverse")
 have <- need %in% rownames(installed.packages())
 if(any(!have)){ install.packages( need[!have] ) }
  
@@ -7156,6 +7156,7 @@ if(any(!have)){ install.packages( need[!have] ) }
 suppressWarnings(                    
 suppressMessages({ 
    # library("distr")
+    library("tidyverse")
     library("bayesmeta")
     library("robumeta")
    # library('ellipse')
