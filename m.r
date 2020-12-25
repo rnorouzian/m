@@ -7020,7 +7020,22 @@ samp.dist <- function(n, pop.dist = c('nor','exp','uni','poi','bin','gam','chi',
   setNames(obj, names(obj))
 }                     
       
-           
+#=============================================================================================================================
+                 
+meta_bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)}, mu.prior = mu.norm(-6, 6), r = .5, ef.name = "dint", se.name = "SD"){
+  
+  j <- eval(substitute(ave.effect(data = data, by = by, r = r, ef.name = ef.name, se.name = se.name)))
+  
+  res <- bayesmeta(                y = j[[1]],
+                                   sigma = j[[2]],
+                                   labels = rownames(j), 
+                                   mu.prior = mu.prior,
+                                   tau.prior = tau.prior)
+  res$call <- match.call(expand.dots = FALSE)
+  
+  return(res)
+}                 
+                 
 #===========================# Datasets # ===================================================================================== 
    
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
