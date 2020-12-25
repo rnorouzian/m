@@ -6049,8 +6049,8 @@ outlier <- function(data, n = 5){
   up <- maxs(data$dint, len)
   lo <- mins(data$dint, len)
   
-  one <- data.frame(t(sapply(len, function(i) {h <- subset(data, dint == eval(up[i])); data.frame(row = as.numeric(rownames(h)), h)})))[,c(3,1,4)]
-  two <- data.frame(t(sapply(len, function(i) {h <- subset(data, dint == eval(lo[i])); data.frame(row = as.numeric(rownames(h)), h)})))[,c(3,1,4)]
+  one <- data.frame(t(sapply(len, function(i) {h <- subset(data, dint == eval(up[i])); data.frame(row = as.numeric(rownames(h)), h)})))[,c(2,1,3)]
+  two <- data.frame(t(sapply(len, function(i) {h <- subset(data, dint == eval(lo[i])); data.frame(row = as.numeric(rownames(h)), h)})))[,c(2,1,3)]
   cbind(one, two)
   
 }                                      
