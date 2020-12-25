@@ -6049,8 +6049,8 @@ len <- seq_len(n)
 up <- maxs(data$dint, len)
 lo <- mins(data$dint, len)
 
-one <- data.frame(t(sapply(len, function(i) subset(data, dint == eval(up[i])))))[,1:2]
-two <- data.frame(t(sapply(len, function(i) subset(data, dint == eval(lo[i])))))[,1:2]
+one <- data.frame(t(sapply(len, function(i) subset(data, dint == eval(up[i])))))[,2:3]
+two <- data.frame(t(sapply(len, function(i) subset(data, dint == eval(lo[i])))))[,2:3]
 cbind(one, two)
 }                                      
 
