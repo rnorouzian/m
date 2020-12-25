@@ -7152,12 +7152,14 @@ have <- need %in% rownames(installed.packages())
 if(any(!have)){ install.packages( need[!have] ) }
  
 #options(warn = -1)
+                    
+suppressWarnings(                    
 suppressMessages({ 
-    library("distr")
+   # library("distr")
     library("bayesmeta")
     library("robumeta")
-    library('ellipse')
-    library('lavaan')
-    library('semPlot')
-    library("zoo")
-})                                         
+   # library('ellipse')
+    #library('lavaan')
+   # library('semPlot')
+   # library("zoo")
+}))                                         
