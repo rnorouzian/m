@@ -5506,7 +5506,7 @@ mu.norm <- find.norm <- function(low, high, cover = .99, digits = 6){
                 
 #========================================================================================
                 
-meta.stats <- function(..., stat = "median"){
+meta.stats <- function(..., stat = "median", digits = 4){
   
   m <- list(...)
   cl <- class(...)
@@ -5519,11 +5519,15 @@ meta.stats <- function(..., stat = "median"){
     
     if(inherits(fit, "bayesmeta")){
       
-      c(K = fit$k, I2 = fit$I2(fit$summary[stat,1]), tau = fit$summary[stat,1], BF01.mu = fit$bayesfactor[1,2], BF01.tau = fit$bayesfactor[1,1])
+      oo <- round(c(K = fit$k, mu = fit$summary["mean","mu"],low = fit$summary["95% lower","mu"], up = fit$summary["95% upper","mu"], I2 = fit$I2(fit$summary[stat,1]), tau = fit$summary[stat,1], BF01.mu = fit$bayesfactor[1,2], BF01.tau = fit$bayesfactor[1,1]),digits)
+      
+      c(oo, perc.mu = dint.norm(oo[2]))
       
     } else if(inherits(fit, "robu")){
       
-      c(K = fit$N, I2 = as.vector(fit$mod_info$I.2), tau = sqrt(as.vector(fit$mod_info$tau.sq)))
+      oo <- round(c(K = fit$N, mu = fit$reg_table$b.r[[1]], low = fit$reg_table$CI.L[[1]], up = fit$reg_table$CI.U[[1]], I2 = as.vector(fit$mod_info$I.2), tau = sqrt(as.vector(fit$mod_info$tau.sq))), digits)
+      
+      c(oo, perc.mu = dint.norm(oo[2]))
       
     } else {
       
