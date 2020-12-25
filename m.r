@@ -6042,16 +6042,17 @@ maxs <- function(x, n = 2){
                                       
 outlier <- function(data, n = 5){
   
-data$study.name <- as.vector(data$study.name)  
-
-len <- seq_len(n)  
-
-up <- maxs(data$dint, len)
-lo <- mins(data$dint, len)
-
-one <- data.frame(t(sapply(len, function(i) subset(data, dint == eval(up[i])))))[,2:3]
-two <- data.frame(t(sapply(len, function(i) subset(data, dint == eval(lo[i])))))[,2:3]
-cbind(one, two)
+  data$study.name <- as.vector(data$study.name)  
+  
+  len <- seq_len(n)  
+  
+  up <- maxs(data$dint, len)
+  lo <- mins(data$dint, len)
+  
+  one <- data.frame(t(sapply(len, function(i) {h <- subset(data, dint == eval(up[i])); data.frame(row = as.numeric(rownames(h)), h)})))[,c(3,1,4)]
+  two <- data.frame(t(sapply(len, function(i) {h <- subset(data, dint == eval(lo[i])); data.frame(row = as.numeric(rownames(h)), h)})))[,c(3,1,4)]
+  cbind(one, two)
+  
 }                                      
 
                            
