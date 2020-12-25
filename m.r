@@ -1823,14 +1823,18 @@ dint.plot2 <- function(..., main = NULL, ylab = "Effect Size (dint)", labels = N
    
 #===============================================================================================================================                                                    
                                                     
-dint.plot <- function(..., main = NULL, ylab = "Effect Size (dint)", labels = NULL, percent = FALSE, lwd = 1){
+dint.plot <- function(..., main = NULL, ylab = "Effect Size (dint)", labels = NULL, percent = FALSE, lwd = 1
+                     , reset = TRUE){
   
   m <- Filter(NROW, lapply(list(...), function(x) x[!is.na(x)]))
   L <- length(m)
   n <- substitute(...())
+
+if(reset){
   graphics.off()
   org.par <- par(no.readonly = TRUE)
   on.exit(par(org.par))
+}                          
   
   
   if(L > 1L) { par(mfrow = n2mfrow(L)) ; set.margin() ; if(percent) par(mar = c(1.5, 2.6, 1.8, 1.6)) }
