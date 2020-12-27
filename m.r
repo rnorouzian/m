@@ -7139,8 +7139,86 @@ metal.dint2 <- function(data = NULL, by, over = time, mu.prior = mu.norm(-6, 6),
     
     setNames(z, paste(over, chep))
   }
-}                 
-                 
+}     
+                    
+#=============================================================================================================================
+                    
+dint.plot3 <- function(..., main = NA, ylab = "Effect Size (dint)", labels = NULL, file = "X",
+                      percent = FALSE, lwd = 1, reset = TRUE, cex.txt = .9, cex.pt = 6.3){
+  
+  
+  m <- Filter(NROW, lapply(list(...), function(x) x[!is.na(x)]))
+  L <- length(m)
+  n <- substitute(...())
+  
+  if(reset){
+    graphics.off()
+    org.par <- par(no.readonly = TRUE)
+    on.exit(par(org.par))
+  }                          
+  
+  
+  if(L > 1L) { par(mfrow = n2mfrow(L)) ; set.margin() ; if(percent) par(mar = c(1.5, 2.6, 1.8, 1.6)) }
+  
+  G <- function(fit, main, labels){  
+    
+    L <- length(fit)  
+    
+    bs <- all(sapply(fit, inherits, "bayesmeta"))
+    
+    if(bs){
+      
+      mu <- sapply(1:L, function(i) fit[[i]]$summary["mean","mu"])
+      lo <- sapply(1:L, function(i) fit[[i]]$summary["95% lower","mu"])
+      hi <- sapply(1:L, function(i) fit[[i]]$summary["95% upper","mu"])
+      k <- sapply(1:L, function(i) fit[[i]]$k)
+      
+    } else {
+      
+      mu <- sapply(1:L, function(i) fit[[i]]$reg_table$b.r[[1]])
+      lo <- sapply(1:L, function(i) fit[[i]]$reg_table$CI.L[[1]])            
+      hi <- sapply(1:L, function(i) fit[[i]]$reg_table$CI.U[[1]])
+      k <- sapply(1:L, function(i) fit[[i]]$N)
+      dfs <- sapply(1:L, function(i) fit[[i]]$reg_table$dfs[[1]] < 4)
+    }
+    
+    x <- 0:(L-1)
+    
+    plot(x, mu, type = "l", xlim = range(x)+c(-.05, .05), ylim = range(lo, hi), ylab = ylab, lwd = lwd, lty = 2, lend = 1, font.lab = 2,
+         xaxt = "n", xlab = NA, panel.last = axis(1, at = x, labels = labels), main = main, las = 1, cex.axis = .9, padj = .3)
+    
+    invisible(lapply(seq_len(L), function(i) if(!is.na(mu[i])) lines(c(i-1, i-1), c(lo[i], hi[i]), lwd = 4, lend = 1, col = if(bs) 2 else if(!bs & dfs[i]) 8 else 4)))
+    
+    axis(3, at = x, labels = paste0("k=", k), cex.axis = .65, font = 2, xpd = NA, las = 3, mgp = c(1,.6,0))
+    
+    points(x, mu, pch = 22, cex = cex.pt, bg = "cyan", col = "magenta", xpd = NA)
+    
+    text(x, mu, round(mu, 3), cex = cex.txt, font = 2, xpd = NA)
+    
+    text(x, lo, round(lo, 3), cex = cex.txt, font = 2, xpd = NA, pos = 1)
+    
+    text(x, hi, round(hi, 3), cex = cex.txt, font = 2, xpd = NA, pos = 3)
+    
+    if(percent){
+      
+      text(x*1.04, c(lo, mu, hi),
+           paste0("[", dint.norm(c(lo, mu, hi)),"]"), cex = .7, font = 2, xpd = NA, pos = 4, col = "magenta")
+    }
+    mu
+  }
+  
+ invisible(lapply(seq_len(L), function(i) G(m[[i]], main = if(is.null(main)) n[[i]] else if(is.na(main)) NA else main[i], labels = if(is.null(labels)) names(m[[i]]) else labels[[i]])))
+  
+
+  out <- data.frame(lapply(meta.stats(...), unlist))
+  out2 <- cbind(code = rownames(out), out)[-c(6,9)]
+  
+  file <- paste0(file, ".doc")
+  tab_df(out2,
+         file=file)
+}                     
+                    
+                                   
 #===========================# Datasets # ===================================================================================== 
    
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
@@ -7155,20 +7233,16 @@ c4 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/c4.csv")
 #================================================================================================================================================================
                                       
                                       
-need <- c("bayesmeta", "distr", "robumeta", "ellipse", "zoo", "lavaan", "semPlot", "tidyverse")
-have <- need %in% rownames(installed.packages())
-if(any(!have)){ install.packages( need[!have] ) }
+need <- c("bayesmeta", "distr", "robumeta", "ellipse", "zoo", "lavaan", "semPlot", "tidyverse", "sjPlot")
+not.have <- need[!(need %in% installed.packages()[,"Package"])]
+if(length(not.have)) install.packages(not.have)
  
 #options(warn = -1)
                     
-suppressWarnings(                    
+suppressWarnings(                                         
 suppressMessages({ 
-   # library("distr")
-    library("tidyverse")
-    library("bayesmeta")
-    library("robumeta")
-   # library('ellipse')
-    #library('lavaan')
-   # library('semPlot')
-   # library("zoo")
-}))                                         
+  
+for(i in need){
+  library(i, character.only = TRUE)
+}
+}))                                        
