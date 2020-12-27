@@ -7143,7 +7143,7 @@ metal.dint2 <- function(data = NULL, by, over = time, mu.prior = mu.norm(-6, 6),
                     
 #=============================================================================================================================
                     
-dint.plot3 <- function(..., main = NA, ylab = "Effect Size (dint)", labels = NULL, file = "X",
+dint.plot3 <- function(..., main = NA, ylab = "Effect Size (dint)", labels = NULL, file = NULL,
                       percent = FALSE, lwd = 1, reset = TRUE, cex.txt = .9, cex.pt = 6.3){
   
   
@@ -7211,11 +7211,12 @@ dint.plot3 <- function(..., main = NA, ylab = "Effect Size (dint)", labels = NUL
   
 
   out <- data.frame(lapply(meta.stats(...), unlist))
-  out2 <- cbind(code = rownames(out), out)[-c(6,9)]
+  ( out2 <- cbind(code = rownames(out), out)[-c(6,9)] )
   
+  if(!is.null(file)){   
   file <- paste0(file, ".doc")
   tab_df(out2,
-         file=file)
+         file=file) }
 }                     
                     
                                    
