@@ -7295,7 +7295,7 @@ dint.plot3 <- function(..., main = NA, ylab = "Effect Size (dint)", labels = NUL
     file <- paste0(file, ".doc")
     tab_df(out2,
            file=file) }
-  out2
+  out2[-1]
 }                                            
                                             
 #===========================# Datasets # ===================================================================================== 
