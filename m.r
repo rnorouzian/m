@@ -3,7 +3,7 @@
 Break = "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n"
 
 notice = "    \"metaling\", A suite of R functions for Modern Meta-Analysis in Second Language Research.
-    Copyright (C) 2019-present  Reza Norouzian, rnorouzian@gmail.com"
+    Copyright (C) 2019-present  Reza Norouzian, rnorouzian@gmail.com\n"
 
 message(Break, notice, Break)
 
