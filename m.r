@@ -7284,7 +7284,37 @@ dint.plot3 <- function(..., main = NA, ylab = "Effect Size (dint)", labels = NUL
            file=file) }
   out2[-1]
 }                                            
-                                            
+
+#=============================================================================================================================
+                                   
+                                   
+meta_bayes_dif <- function(list_fit){
+
+if(!all(sapply(list_fit, inherits, "bayesmeta"))) stop("Non-bayesmeta model detected.", call. = FALSE)
+  
+comboMatrix <- t(combn(length(list_fit),2))
+
+conList <- lapply(1:nrow(comboMatrix),function(a){
+  con <-    convolve(dens1 = list_fit[[comboMatrix[a,1]]]$dposterior,
+                     dens2 = function(x){list_fit[[comboMatrix[a,2]]]$dposterior(-x)},
+                     cdf1 = list_fit[[comboMatrix[a,1]]]$pposterior,
+                     cdf2 = function(x){1 - list_fit[[comboMatrix[a,2]]]$pposterior(-x)})
+  con$quantile(c(0.025, 0.975))
+})
+
+bnms <- names(list_fit)
+
+names(conList) <- unlist(lapply(1:nrow(comboMatrix),function(x){
+  paste(bnms[comboMatrix[x,1]],"vs",bnms[comboMatrix[x,2]])
+}))
+
+res <- data.frame(t(sapply(conList, c)))
+names(res) <- c("lower", "upper")
+
+transform(res, diff. = lower > 0 | upper < 0)
+}                                   
+                                   
+                                   
 #===========================# Datasets # ===================================================================================== 
    
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
