@@ -7276,7 +7276,7 @@ dint.plot3 <- function(..., main = NA, ylab = "Effect Size (dint)", labels = NUL
   
   
   out <- data.frame(lapply(meta.stats(...), unlist))
-  ( out2 <- cbind(code = rownames(out), out)[-c(6,9)] )
+  ( out2 <- cbind(code = rownames(out), out)[-c(6)] )
   
   if(!is.null(file)){   
     file <- paste0(file, ".doc")
