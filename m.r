@@ -7290,6 +7290,8 @@ dint.plot3 <- function(..., main = NA, ylab = "Effect Size (dint)", labels = NUL
                                    
 meta_bayes_dif <- function(list_fit){
 
+list_fit <- list_fit[!is.na(list_fit)]    
+    
 if(!all(sapply(list_fit, inherits, "bayesmeta"))) stop("Non-bayesmeta model detected.", call. = FALSE)
   
 comboMatrix <- t(combn(length(list_fit),2))
