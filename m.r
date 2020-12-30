@@ -5338,17 +5338,17 @@ forest.bayes <- function(x, zoom, xlab = "effect size", refline = x$summary["med
   
   abline(h = max(f$rows)+1, lwd = 1, col = 0, xpd = NA)
   
-  addpoly(x$summary["median","mu"], ci.lb=x$summary["95% lower","mu"], ci.ub=x$summary["95% upper","mu"],
-          rows = -k-3, mlab= "mean effect", level=95, cex=cex, xpd = NA, col = "cyan", border = "magenta", font = 2, ...)
+  addpoly.default(x$summary["median","mu"], ci.lb=x$summary["95% lower","mu"], ci.ub=x$summary["95% upper","mu"],
+          rows = -k-3, mlab= expression(bold("mean effect ("*mu*")")), level=95, cex=cex, xpd = NA, col = "cyan", border = "magenta", font = 2, ...)
   
-  addpoly(x$summary["median","theta"], ci.lb=x$summary["95% lower","theta"], ci.ub=x$summary["95% upper","theta"],
-          rows = -k-4.5, mlab= "prediction", level=95, cex=cex, xpd = NA, col = 8, font = 2, ...)
+  addpoly.default(x$summary["median","theta"], ci.lb=x$summary["95% lower","theta"], ci.ub=x$summary["95% upper","theta"],
+          rows = -k-4.5, mlab= expression(bold("prediction ("*mu*")")), level=95, cex=cex, xpd = NA, col = 8, font = 2, ...)
 }  
                       
                       
 #========================================================================================
 
-forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex = NULL, level = .95, col = NULL, col.by.cluster = FALSE,  refit = FALSE, order.by = FALSE, wsize = 1, space = TRUE, slab = TRUE, summary = TRUE, reset = TRUE, ...){
+forest.dint <- function(x, zoom, xlab = "Effect Size (dint)", refline = NULL, cex = NULL, level = .95, col = NULL, col.by.cluster = FALSE,  refit = FALSE, order.by = FALSE, wsize = 1, space = TRUE, slab = TRUE, summary = TRUE, reset = TRUE, ...){
   
   
   par.mgp <- par("mgp")
@@ -5423,7 +5423,7 @@ funnel.rob <- function(x, zoom, xlab = "effect size (dint)", ylab = "SD", reflin
             
 #========================================================================================
 
-funnel.dint <- function(x, zoom, xlab = "effect size (dint)", ylab = "SD", refline = x$reg_table$b.r[[1]], 
+funnel.dint <- function(x, zoom, xlab = "Effect Size (dint)", ylab = "SD", refline = x$reg_table$b.r[[1]], 
                         cex = 1, level = .95, col = "magenta", main = deparse(substitute(x)),
                         back = 8, shade = 0, hlines = NA, 
                         pch = 21, bg = "cyan", study.name = TRUE,
