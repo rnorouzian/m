@@ -5280,7 +5280,7 @@ forest.rob <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex
                       
 #========================================================================================                      
                       
-forest.bayes <- function(x, xlab = "effect size", refline = x$summary["median","mu"], cex = NULL, ...){
+forest.bayes1 <- function(x, xlab = "effect size", refline = x$summary["median","mu"], cex = NULL, ...){
 
   f <- forest.default(x = x$y, sei = x$sigma,
                           showweight = FALSE,  
@@ -5302,12 +5302,49 @@ forest.bayes <- function(x, xlab = "effect size", refline = x$summary["median","
   addpoly(x$summary["median","theta"], ci.lb=x$summary["95% lower","theta"], ci.ub=x$summary["95% upper","theta"],
                    rows = -x$k-4.5, mlab= "prediction", level=95, cex=cex, xpd = NA, col = 8, font = 2, ...)
 }  
+    
+                      
+#========================================================================================
+
+                      
+forest.bayes <- function(x, zoom, xlab = "effect size", refline = x$summary["median","mu"], cex = NULL, order = FALSE, ...){
+  
+  
+  mis <- missing(zoom)
+  d <- data.frame(dint = x$y, sei = x$sigma, labels = x$labels)
+  s <- substitute(zoom)
+  if(!mis) d <- subset(d, eval(s))
+  
+  d <- if(order) d[base::order(d$dint, decreasing = TRUE), ] else d
+  k <- nrow(d)
+  
+  f <- forest.default(x = d$dint, sei = d$sei,
+                      showweight = FALSE,  
+                      ylim = c(-k-4, 1),
+                      level = 95,         
+                      refline = refline,
+                      xlab = xlab,
+                      slab = d$labels,
+                      rows = seq(-2, -k - 1, by = -1),
+                      cex = cex, ...)
+  
+  if(is.null(cex)) cex <- f$cex
+  
+  abline(h = max(f$rows)+1, lwd = 1, col = 0, xpd = NA)
+  
+  addpoly(x$summary["median","mu"], ci.lb=x$summary["95% lower","mu"], ci.ub=x$summary["95% upper","mu"],
+          rows = -k-3, mlab= "mean effect", level=95, cex=cex, xpd = NA, col = "cyan", border = "magenta", font = 2, ...)
+  
+  addpoly(x$summary["median","theta"], ci.lb=x$summary["95% lower","theta"], ci.ub=x$summary["95% upper","theta"],
+          rows = -k-4.5, mlab= "prediction", level=95, cex=cex, xpd = NA, col = 8, font = 2, ...)
+}  
+                      
                       
 #========================================================================================
 
 forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, cex = NULL, level = .95, col = NULL, col.by.cluster = FALSE,  refit = FALSE, order.by = FALSE, wsize = 1, space = TRUE, slab = TRUE, summary = TRUE, reset = TRUE, ...){
-
-    
+  
+  
   par.mgp <- par("mgp")
   par(mgp = c(1.8, .3, 0))  
   on.exit(par(mgp = par.mgp))
@@ -5316,7 +5353,7 @@ forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, ce
     par.mar <- par("mar")
     par(mar = c(2.7, 3, 0, 1))
     if(reset){
-    on.exit(par(mar = par.mar))
+      on.exit(par(mar = par.mar))
     }
   }
   
@@ -5328,9 +5365,9 @@ forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, ce
     
     if(is.null(refline)) refline <- x$summary["median","mu"]
     
-    forest.bayes(x = x, xlab = xlab, refline = refline, cex = cex, ...)
+    eval(substitute(forest.bayes(x = x, zoom = zoom, xlab = xlab, refline = refline, order.by = order.by, cex = cex, ...)))
   }
-}          
+}   
                       
 #========================================================================================
                 
