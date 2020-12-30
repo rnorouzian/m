@@ -5307,7 +5307,7 @@ forest.bayes1 <- function(x, xlab = "effect size", refline = x$summary["median",
 #========================================================================================
 
                       
-forest.bayes <- function(x, zoom, xlab = "effect size", refline = x$summary["median","mu"], cex = NULL, order = FALSE, ...){
+forest.bayes <- function(x, zoom, xlab = "effect size", refline = x$summary["median","mu"], cex = NULL, order.by = FALSE, refit = FALSE, ...){
   
   
   mis <- missing(zoom)
@@ -5315,7 +5315,13 @@ forest.bayes <- function(x, zoom, xlab = "effect size", refline = x$summary["med
   s <- substitute(zoom)
   if(!mis) d <- subset(d, eval(s))
   
-  d <- if(order) d[base::order(d$dint, decreasing = TRUE), ] else d
+  if(!mis & refit) { 
+    
+    x <- bayesmeta::bayesmeta(y = d$dint, sigma = d$sei, labels = d$labels)
+    if(is.null(refline)) refline <- x$summary["median","mu"]
+  }
+    
+  d <- if(order.by) d[order(d$dint, decreasing = TRUE), ] else d
   k <- nrow(d)
   
   f <- forest.default(x = d$dint, sei = d$sei,
@@ -5365,7 +5371,7 @@ forest.dint <- function(x, zoom, xlab = "effect size (dint)", refline = NULL, ce
     
     if(is.null(refline)) refline <- x$summary["median","mu"]
     
-    eval(substitute(forest.bayes(x = x, zoom = zoom, xlab = xlab, refline = refline, order.by = order.by, cex = cex, ...)))
+    eval(substitute(forest.bayes(x = x, zoom = zoom, xlab = xlab, refline = refline, order.by = order.by, cex = cex, refit = refit, ...)))
   }
 }   
                       
