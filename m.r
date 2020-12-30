@@ -5437,7 +5437,7 @@ funnel.dint <- function(x, zoom, xlab = "Effect Size (dint)", ylab = "SD", refli
                                                        back = back, shade = shade, hlines = hlines, 
                                                        pch = pch, bg = bg, refit = refit, ...)))
     
-  } else { funnel(x = x, main = main, study.name = study.name, FE = FE, 
+  } else { funnel.bayesmeta(x = x, main = main, study.name = study.name, FE = FE, 
                   legend = legend, shrink = shrink, show.mu = show.mu, ...) 
   }
 }
