@@ -7360,6 +7360,22 @@ names(res) <- c("lower", "upper")
 transform(res, diff. = lower > 0 | upper < 0)
 }                                   
                                    
+#=============================================================================================================================
+       
+                                   
+trim_fill <- function(x, side = NULL, xlab = "Effect Size (dint)", mgp = c(2, .5, 0), legend = FALSE, main = NA, col.main = 1, ...){
+
+if(!inherits(x, "bayesmeta")) stop("Non-bayesmeta model detected.", call. = FALSE)  
+  
+aa <- metafor::rma.uni(x$y, sei = x$sigma, slab = x$labels)
+taf <- trimfill.rma.uni(aa, side = side)
+ok <- isFALSE(any(taf$fill))
+
+metafor::funnel.rma(taf, xlab = xlab, mgp = mgp, main = if(ok) "No Missing \nStudies Found" else main, col.main = if(ok) 2 else col.main, ...)
+
+if(legend) graphics::legend("topright", c("Real Studies", "Filled Studies"), pch=21, pt.bg = 1:0)
+}                                   
+                                   
                                    
 #===========================# Datasets # ===================================================================================== 
    
