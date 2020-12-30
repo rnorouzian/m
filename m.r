@@ -7078,13 +7078,61 @@ meta_bayes <- function(data = NULL, by, tau.prior = function(x){dhalfnormal(x)},
 #=============================================================================================================================                 
                  
 metal.dint2 <- function(data = NULL, by, over = time, mu.prior = mu.norm(-6, 6), tau.prior = function(x){dhalfnormal(x)}, 
-                       r = .5, ef.name = "dint", se.name = "SD", method = c("robust", "bayes")){
+         r = .5, ef.name = "dint", se.name = "SD", method = c("robust", "bayes")){
   
   over <- deparse(substitute(over))
   
   method <- match.arg(method)
   
   chep <- sort(unique(na.omit(data[[over]])))
+  
+  
+  f1 <- function(data, zy, r = .5){
+    
+    m <- split(data, data$study.name)
+    
+    L <- if(missing(zy)) { 
+      
+      m  
+      
+    } else { 
+      
+      s <- substitute(zy) 
+      res <- Filter(NROW, lapply(m, function(x) do.call("subset", list(x, s)))) 
+      if(length(res) == 0) {
+        
+        message("Note: Moderator(s) not found; returning unmoderated averages.")
+        m 
+        
+      } else { res }
+    }
+    
+    ds <- lapply(seq_along(L), function(i) L[[i]][[trimws(ef.name)]])
+    sds <-lapply(seq_along(L), function(i) L[[i]][[trimws(se.name)]])
+    
+    setNames(mapply(option1, ds = ds, sds = sds, r = r, SIMPLIFY = FALSE), names(L))
+    
+  }
+  
+  
+  f2 <- function(j, tau.prior, mu.prior){  
+    
+    ds <- sapply(seq_along(j), function(i) j[[i]][1])
+    sds <- sapply(seq_along(j), function(i) j[[i]][2])
+    
+    test <- length(ds) >= 2
+    
+    if(!test) return(NA)
+    
+    res <- bayesmeta(        y = ds,
+                             sigma = sds,
+                             labels = names(j), 
+                             tau.prior = tau.prior,
+                             mu.prior = mu.prior)
+    res$call <- match.call(expand.dots = FALSE)
+    
+    return(res)
+  }  
   
   G <- if(missing(by)) { lapply(chep, function(y) bquote(.(as.name(noquote(over))) == .(y))) 
     
@@ -7108,53 +7156,6 @@ metal.dint2 <- function(data = NULL, by, over = time, mu.prior = mu.norm(-6, 6),
     
   {
     
-    f1 <- function(data, zy, r = .5){
-  
-    m <- split(data, data$study.name)
-    
-    L <- if(missing(zy)) { 
-      
-      m  
-      
-    } else { 
-      
-      s <- substitute(zy) 
-      res <- Filter(NROW, lapply(m, function(x) do.call("subset", list(x, s)))) 
-      if(length(res) == 0) {
-        
-        message("Note: Moderator(s) not found; returning unmoderated averages.")
-        m 
-        
-      } else { res }
-    }
-    
-    ds <- lapply(seq_along(L), function(i) L[[i]][[trimws(ef.name)]])
-    sds <-lapply(seq_along(L), function(i) L[[i]][[trimws(se.name)]])
-    
-    setNames(mapply(option1, ds = ds, sds = sds, r = r, SIMPLIFY = FALSE), names(L))
-      
-    }
-    
-    
-    f2 <- function(j, tau.prior, mu.prior){  
-      
-      ds <- sapply(seq_along(j), function(i) j[[i]][1])
-      sds <- sapply(seq_along(j), function(i) j[[i]][2])
-      
-      test <- length(ds) >= 2
-      
-      if(!test) return(NA)
-      
-      res <- bayesmeta(        y = ds,
-                               sigma = sds,
-                               labels = names(j), 
-                               tau.prior = tau.prior,
-                               mu.prior = mu.prior)
-      res$call <- match.call(expand.dots = FALSE)
-      
-      return(res)
-    }  
-    
     go <- length(G)
     
     k <- vector("list", go)
@@ -7169,7 +7170,7 @@ metal.dint2 <- function(data = NULL, by, over = time, mu.prior = mu.norm(-6, 6),
     
     setNames(z, paste(over, chep))
   }
-}     
+}    
                     
 #=============================================================================================================================
                     
