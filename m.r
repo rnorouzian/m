@@ -7379,19 +7379,20 @@ if(legend) graphics::legend("topright", c("Real Studies", "Filled Studies"), pch
 #=============================================================================================================================
                     
 veva_hedge <- function(x, steps = c(0.025, 1), mods = NULL, weights = NULL, 
-                       fe = FALSE, table = FALSE, pval = NULL){
-
-if(!inherits(x, "bayesmeta")) stop("Non-bayesmeta model detected.", call. = FALSE) 
+                       fe = FALSE, table = FALSE, pval = NULL, digits = 4){
   
-print.weightfunct <- weightr:::print.weightfunct
-trace(print.weightfunct, exit = quote(.W <<- data.frame(df, lrchisq, pvalue)))
-
-x <- weightfunct(x$y, x$sigma^2, steps = steps, mods = if(!is.null(mods)) as.formula(mods) else mods,
-                 weights = weights, fe = fe, table = table, pval = pval)
-
-names(.W) <- c("Df", "X^2", "p.value")
-rownames(.W) <- "Likelihood Ratio Test:"
-return(.W)
+  if(!inherits(x, "bayesmeta")) stop("Non-bayesmeta model detected.", call. = FALSE) 
+  
+  x <- weightfunct(x$y, x$sigma^2, steps = steps, mods = if(!is.null(mods)) as.formula(mods) else mods,
+                   weights = weights, fe = fe, table = table, pval = pval)
+  
+  df <- length(x[[2]]$par) - length(x[[1]]$par)
+  lrchisq <- 2 * (abs(x[[1]]$value - x[[2]]$value))
+  pvalue <- 1 - pchisq(lrchisq, df)
+  
+  .W <- round(data.frame(df, lrchisq, pvalue, row.names = "Likelihood Ratio Test:"), digits)
+  names(.W) <- c("Df", "X^2", "p.value")
+  return(.W)
 }                    
                                   
 #===========================# Datasets # ===================================================================================== 
