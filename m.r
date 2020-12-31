@@ -7376,7 +7376,24 @@ metafor::funnel.rma(taf, xlab = xlab, mgp = mgp, main = if(ok) "No Missing \nStu
 if(legend) graphics::legend("topright", c("Real Studies", "Filled Studies"), pch=21, pt.bg = 1:0)
 }                                   
                                    
-                                   
+#=============================================================================================================================
+                    
+veva_hedge <- function(x, steps = c(0.025, 1), mods = NULL, weights = NULL, 
+                       fe = FALSE, table = FALSE, pval = NULL){
+
+if(!inherits(x, "bayesmeta")) stop("Non-bayesmeta model detected.", call. = FALSE) 
+  
+print.weightfunct <- weightr:::print.weightfunct
+trace(print.weightfunct, exit = quote(.W <<- data.frame(df, lrchisq, pvalue)))
+
+x <- weightfunct(x$y, x$sigma^2, steps = steps, mods = if(!is.null(mods)) as.formula(mods) else mods,
+                 weights = weights, fe = fe, table = table, pval = pval)
+
+names(.W) <- c("Df", "X^2", "p.value")
+rownames(.W) <- "Likelihood Ratio Test:"
+return(.W)
+}                    
+                                  
 #===========================# Datasets # ===================================================================================== 
    
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
