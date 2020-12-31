@@ -7394,7 +7394,28 @@ veva_hedge <- function(x, steps = c(0.025, 1), mods = NULL, weights = NULL,
   names(.W) <- c("Df", "X^2", "p.value")
   return(.W)
 }                    
-                                  
+
+#=============================================================================================================================
+                   
+
+z_outlier <- function(fit, by){
+    
+    if(!inherits(fit, "bayesmeta")) stop("Non-bayesmeta model detected.", call. = FALSE) 
+    
+    s <- substitute(by)
+    
+    ss <- lapply(meta.stats(fit)[-9], as.numeric)
+    
+    z <- (fit$y - ss$mu)/ss$tau
+    
+    d <- data.frame(study.name = fit$labels, z = z)
+    
+    if(!missing(by)) d <- subset(d, eval(s))
+    
+    if(nrow(d) == 0) return(NA) else d
+  }
+                   
+                   
 #===========================# Datasets # ===================================================================================== 
    
 table1 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/irr1.csv", row.names = 1)
