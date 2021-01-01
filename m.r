@@ -7373,7 +7373,7 @@ ok <- isFALSE(any(taf$fill))
 
 metafor::funnel.rma(taf, xlab = xlab, mgp = mgp, main = if(ok) "No Missing \nStudies Found" else main, col.main = if(ok) 2 else col.main, ...)
 
-if(legend) graphics::legend("topright", c("Real Studies", "Filled Studies"), pch=21, pt.bg = 1:0)
+if(legend) graphics::legend("topright", c("Actual Studies", "Filled Studies"), pch=21, pt.bg = 1:0)
 }                                   
                                    
 #=============================================================================================================================
