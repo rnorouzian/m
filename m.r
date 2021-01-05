@@ -5682,7 +5682,7 @@ best.model <- function(mod.names, data, n.best = 50, small = FALSE, model = c("C
    
    f <- unlist(lapply(seq_along(mod.names), function(n) combn(mod.names, n, FUN = function(i) paste0("dint~", paste0(i, collapse = "+")))))
    
-   res <- sapply(f, function(j) as.double(robu(formula(j), data = data, study = study.name, var = SD^2, small = small, model = model, rho = rho)$mod_info$tau.sq))
+   res <- sapply(f, function(j) as.double(robu2(formula(j), data = data, study = study.name, var = SD^2, small = small, model = model, rho = rho)$mod_info$tau.sq))
    
    len <- length(res)
    
