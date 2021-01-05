@@ -419,7 +419,7 @@ dit4 <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1e5, rev.sign = FALSE){
   
 #===============================================================================================================================
     
-dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1, rev.sign = FALSE){
+dit5 <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1, rev.sign = FALSE){
   
   a <- dppc
   b <- dppt
@@ -438,6 +438,26 @@ dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1, rev.sign = FALSE){
   
   return(c(dint = din, SD = SD))
 })       
+    
+#===============================================================================================================================    
+    
+dit <- Vectorize(function(dppc, dppt, nc, nt, n.sim = 1, rev.sign = FALSE){
+  
+  a <- dppc
+  b <- dppt
+  
+  din <- b - a 
+  
+  test <- if(!rev.sign || rev.sign & b < 0 & a < 0 & abs(b) < abs(a)) FALSE else TRUE
+  
+  vc <- 1/nc + (1 - ( (nc-3) / ((nc-1)*cfactor(nc-1)^2) )) * dppc^2
+  vt <- 1/nt + (1 - ( (nt-3) / ((nt-1)*cfactor(nt-1)^2) )) * dppt^2
+  
+  SD <- sqrt(vt + vc)
+  
+  din <- if(test) -din else din
+  return(c(dint = din, SD = SD))
+})            
     
 #===============================================================================================================================
              
