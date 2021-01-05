@@ -7448,7 +7448,7 @@ robu2 <- function(formula, data, studynum, var.eff.size, userweights,
   
   coef.na <- is.na(coef(tmp))
   
-  dropped <- colnames(model.matrix(tmp)[,coef.na])
+  dropped <- colnames(model.matrix(tmp)[,coef.na, drop = FALSE])
   
   if(any(coef.na)) message("\n", toString(dQuote(dropped), width = 50), " dropped due to lack of data.\n")
   
