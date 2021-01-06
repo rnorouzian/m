@@ -260,6 +260,9 @@ meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
   
   r <- list(...) 
   
+  type <- trimws(type)
+  type <- match.arg(type)
+  
   if(!all(sapply(r, inherits, c("data.frame", "matrix")))) stop("Coding-sheet(s) must be 'Excel CSV' files, 'data.frame' or 'matrix'.", call. = FALSE)
   
   n.df <- length(r)
@@ -354,7 +357,6 @@ meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
   
   if(na.rm) L <- lapply(L, na.omit)
   
-  type <- trimws(type)
   f <- if(type == "s") int else int2
   out <- lapply(L, f, nsim = nsim, level = level, digits = digits, useNA = useNA, raw = TRUE)
   
