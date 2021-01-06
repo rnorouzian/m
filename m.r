@@ -7362,9 +7362,9 @@ comboMatrix <- t(combn(length(list_fit),2))
 
 conList <- lapply(1:nrow(comboMatrix),function(a){
   con <-    convolve(dens1 = list_fit[[comboMatrix[a,1]]]$dposterior,
-                     dens2 = function(x){list_fit[[comboMatrix[a,2]]]$dposterior(-x)},
+                     dens2 = function(x){list_fit[[comboMatrix[a,2]]]$dposterior(mu = -x)},
                      cdf1 = list_fit[[comboMatrix[a,1]]]$pposterior,
-                     cdf2 = function(x){1 - list_fit[[comboMatrix[a,2]]]$pposterior(-x)})
+                     cdf2 = function(x){1 - list_fit[[comboMatrix[a,2]]]$pposterior(mu = -x)})
   con$quantile(c(0.025, 0.975))
 })
 
