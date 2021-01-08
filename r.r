@@ -84,7 +84,7 @@ full.clean <- function(X, omit, all = TRUE, omit.auto.suffix = TRUE)
   
   X <- if(inherits(X, "list") & omit.auto.suffix){ lapply(X, function(x) trim(setNames(x, sub("\\.\\d+$", "", names(x))))) 
     
-  } else if(inherits(X, "data.frame") & omit.auto.suffix) { trim(setNames(X, sub("\\.\\d+$", "", names(X)))) } else { trim(X) }
+  } else if(inherits(X, "data.frame") & omit.auto.suffix) { trim(setNames(X, sub("\\.\\d+$", "", names(X)))) } else { X }
   
   if(all){ X } else { 
     
