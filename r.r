@@ -402,30 +402,6 @@ meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
 
 #================================================================================================================================================================
 
-
-plan.item <- function(margin = .2, S.index = NA){
-  
-  margin[margin > .99] <- .99  
-  margin[margin < .01] <- .01
-  
-  data.frame(n.item = ceiling(1/margin^2), margin = paste0("+-", margin), S.index = S.index, lower = if(!is.na(S.index)) S.index - margin else NA, upper = if(!is.na(S.index)) S.index + margin else NA)
-}
-
-#================================================================================================================================================================
-
-plan.coder <- function(se2irr = .2, S.index = NA){
-  
-  se2irr[se2irr > .99] <- .99  
-  se2irr[se2irr < .01] <- .01 
-  
-  n <- ceiling(2/se2irr)
-  se <- if(!is.na(S.index)) se2irr*S.index else NA
-  
-  data.frame(n.coder = n, se2irr = se2irr, S.index = S.index, lower = if(!is.na(S.index)) S.index - 2*se else NA, upper = if(!is.na(S.index)) S.index + 2*se else NA, conf.lev = .95)
-}
-
-#================================================================================================================================================================
-
 irr.diag <- function(X, useNA = "ifany"){
   
   a <- detail2(X, useNA = useNA)
