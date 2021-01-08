@@ -82,15 +82,15 @@ full.clean <- function(X, omit, all = TRUE, omit.auto.suffix = TRUE)
   
   X <- rm.colrowNA(X)
   
-  X <- if(inherits(X, "list") & omit.auto.suffix){ lapply(X, function(x) setNames(x, sub("\\.\\d+$", "", names(x)))) 
+  X <- if(inherits(X, "list") & omit.auto.suffix){ lapply(X, function(x) trim(setNames(x, sub("\\.\\d+$", "", names(x))))) 
     
-  } else if(inherits(X, "data.frame") & omit.auto.suffix) { setNames(X, sub("\\.\\d+$", "", names(X))) } else { X }
+  } else if(inherits(X, "data.frame") & omit.auto.suffix) { trim(setNames(X, sub("\\.\\d+$", "", names(X)))) } else { trim(X) }
   
   if(all){ X } else { 
     
     drop.col(X, vec = omit)
   }
-}              
+}                
 
 #===============================================================================================================================
 
@@ -273,8 +273,6 @@ meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
   
   r <- full.clean(r, ar, all)
   
-  r <- lapply(r, trim)
-  
   check <- all(sapply(r, function(i) "study.name" %in% names(i)))
   
   if(!check) stop("Add a new column named 'study.name' to the coding sheet(s).", call. = FALSE)
@@ -416,12 +414,14 @@ find.irr <- function(X, what, sub.name = "group.name"){
   
   if(!inherits(X, "data.frame")) stop("Data must be an Excel CSV file or a 'data.frame'.", call. = FALSE)
   
+  X <- full.clean(X)
+  
   s <- as.list(substitute(what))  
   
   res <- Filter(NROW, X[rowSums(X[grep(as.character(s[[2]]), names(X))] == s[[3]], na.rm = TRUE) > 0,][c("study.name", sub.name)])
   
   if(length(res) == 0) NULL else res
-}           
+}        
 
 #===========================# Datasets # ===================================================================================== 
 
