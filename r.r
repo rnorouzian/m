@@ -99,8 +99,8 @@ detail2 <- function(X, useNA = "ifany"){
   nr <- nrow(X)
   nc <- ncol(X)
   tab <- table(row(X), unlist(X), useNA = useNA)
-  pj <- apply(tab, 2, sum)/(nr * nc)
-  pjk <- (apply(tab^2, 2, sum) - nr * nc * pj)/(nr * nc * (nc - 1) * pj)
+  pj <- colSums(tab)/(nr * nc)
+  pjk <- (colSums(tab^2) - nr * nc * pj)/(nr * nc * (nc - 1) * pj)
   K <- (pjk - pj)/(1 - pj)
   h <- names(K)
   h[is.na(h)] <- "NA"
