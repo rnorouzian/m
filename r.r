@@ -405,7 +405,7 @@ irr.diag <- function(X, useNA = "ifany"){
   a <- detail2(X, useNA = useNA)
   b <- detail(X, useNA = useNA)
   
-  round(data.frame(KAPPA = a, SA = b), 3)
+  round(data.frame(Fleiss_KAPPA_cat. = a, SA = b), 3)
 }
 
 #==========================================================================================================================================
