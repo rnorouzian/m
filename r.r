@@ -295,24 +295,12 @@ meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
     
     if(!ok) stop("The coding sheets don't have the same number of rows.", call. = FALSE)
     
-    if(common) { Reduce(intersect, lapply(r, names)) 
-      
-    } else {
-      
       vec <- names(unlist(r, recursive = FALSE))
       unique(vec[duplicated(vec)])
-    }
     
   } else { 
     
-    if(common) { 
-      
-      names(which(tbl == max(tbl)))
-      
-    } else {
-      
       names(which(tbl >= 2))
-    }
   }
   
   dot.names <- if(all) com.names else com.names[!com.names %in% ar]
@@ -329,14 +317,8 @@ meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
   
   }
   
-  n.coder <- if(common) { 
-    
-    tbl[tbl == max(tbl)] 
-    
-  } else {
-    
-    tbl[tbl >= 2]
-  }
+  n.coder <- tbl[tbl >= 2]
+  
   
   i1 <- colnames(r) != 'study.name'
   st.level <- names(which(sapply(split.default(r[i1], names(r)[i1]), function(x) all(!colSums(!aggregate(.~ study.name, transform(x, study.name = r$study.name), FUN = is.constant)[-1])))))
@@ -384,17 +366,20 @@ meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
   res <- data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) if(any(i < 1)) names(i)[which.min(i)] else "--"), 
                             n.coder = n.coder, study.level = ifelse(study.level, "Yes", "No"))))
   
+  output <- data.frame(lapply(res, unlist))
+  
+  if(common) output <- output[output$n.coder == max(output$n.coder),]
+  
   file.name <- trimws(file.name)
   
   if(length(file.name) != 0){
-    output <- data.frame(lapply(res, unlist))
     nm <- paste0(file.name, ".csv")
     ur <- try(write.csv(output, nm), silent = TRUE)
     if(inherits(ur, "try-error")) stop(paste0("\nClose the Excel file '", nm, "' and try again OR pick another file name."), call. = FALSE)
     message(paste0("\nNote: Check folder '", basename(getwd()),"' for the Excel file '", nm, "'.\n"))
   }
   
-  return(res)
+  return(output)
 }
 
 
