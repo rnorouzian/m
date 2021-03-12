@@ -7783,7 +7783,7 @@ c4 <- read.csv("https://raw.githubusercontent.com/rnorouzian/m/master/c4.csv")
 #================================================================================================================================================================
                                       
                                       
-need <- c("bayesmeta", "distr", "robumeta", "ellipse", "zoo", "lavaan", "semPlot", "tidyverse", "weightr") # "sjPlot",
+need <- c("bayesmeta", "distr", "robumeta", "ellipse", "zoo", "lavaan", "semPlot", "tidyverse", "weightr") # "sjPlot", "ggeffects"
 not.have <- need[!(need %in% installed.packages()[,"Package"])]
 if(length(not.have)) install.packages(not.have)
  
