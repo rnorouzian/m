@@ -5008,8 +5008,9 @@ meta.set <- function(data, file.name = NULL, na = ""){
   
   data <- rm.allrowNA(trim(data))
   
-  L <- dint(data)
-  
+  # L <- dint(data)
+  L <- suppressWarnings(dint(data))
+    
   d <- do.call(rbind, 
                Map(cbind, pp <- Filter(Negate(is.null), lapply(L, function(x) 
                  do.call(rbind, x))), 
