@@ -263,7 +263,7 @@ meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
   type <- trimws(type)
   type <- match.arg(type)
   
-  if(!all(sapply(r, inherits, c("data.frame", "matrix")))) stop("Coding-sheet(s) must be 'Excel CSV' files, 'data.frame' or 'matrix'.", call. = FALSE)
+  if(!all(sapply(r, inherits, c("data.frame", "matrix")))) stop("Coding sheet(s) must be 'Excel CSV' files, 'data.frame' or 'matrix'.", call. = FALSE)
   
   n.df <- length(r)
   
