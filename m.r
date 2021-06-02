@@ -7353,7 +7353,7 @@ dint.plot3 <- function(..., main = NA, ylab = "Effect Size (dint)", labels = NUL
 #=============================================================================================================================
                                    
                                    
-meta_bayes_dif <- function(list_fit){
+meta_bayes_dif <- function(list_fit, labels = NULL){
   
   list_fit <- list_fit[!is.na(list_fit)]    
   
@@ -7369,7 +7369,7 @@ meta_bayes_dif <- function(list_fit){
     con$quantile(c(0.025, 0.975))
   })
   
-  bnms <- names(list_fit)
+  bnms <- if(is.null(labels)) names(list_fit) else labels
   
   names(conList) <- unlist(lapply(1:nrow(comboMatrix),function(x){
     paste(bnms[comboMatrix[x,1]],"vs",bnms[comboMatrix[x,2]])
