@@ -7274,7 +7274,7 @@ dint.plot3 <- function(..., main = NA, ylab = "Effect Size (dint)", labels = NUL
 #=======
      
 dint.plot3 <- function(..., main = NA, ylab = "Effect Size (dint)", labels = NULL, file = NULL,
-                       percent = FALSE, lwd = 1, reset = TRUE, cex.txt = .9, cex.pt = 6.3){
+                       percent = FALSE, lwd = 1, reset = TRUE, cex.txt = .9, cex.pt = 6.3, lab.out = NULL){
   
   
   m <- Filter(NROW, lapply(list(...), function(x) x[!is.na(x)]))
@@ -7342,7 +7342,8 @@ dint.plot3 <- function(..., main = NA, ylab = "Effect Size (dint)", labels = NUL
   
   out <- data.frame(lapply(meta.stats(...), unlist))
   ( out2 <- cbind(code = rownames(out), out) )
-  
+  if(!is.null(lab.out)) rownames(out2) <- lab.out
+      
   if(!is.null(file)){   
     file <- paste0(file, ".doc")
     tab_df(out2,
