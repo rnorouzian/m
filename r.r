@@ -1,6 +1,6 @@
 Break = "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n"
 
-notice = "\"meta_rate\", An R program for inter-rater reliability in L2 Meta-Analyses.
+notice = "\"meta_rate\", An R program for interrater reliability in L2 Meta-Analyses.
  Copyright (C) 2019-present  Reza Norouzian, rnorouzian@gmail.com\n"
 
 message(Break, notice, Break)
