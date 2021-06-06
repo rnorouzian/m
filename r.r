@@ -8,7 +8,7 @@ message(Break, notice, Break)
 
 Break = "\n*********************************************************************************\n"
 
-cite <- "To cite this package use:\n\nNorouzian,R.(in press). Inter-rater reliability in second language meta-analyses:\nThe case of categorical moderators. Studies in Second Language Acquisition."
+cite <- "To cite this package use:\n\nNorouzian,R.(in press). Interrater reliability in second language meta-analyses:\nThe case of categorical moderators. Studies in Second Language Acquisition."
 
 cat(Break, cite, Break)
 
