@@ -8,7 +8,7 @@ message(Break, notice, Break)
 
 Break = "\n*********************************************************************************\n"
 
-cite <- "To cite this package use:\n\nNorouzian,R.(in press). Interrater reliability in second language meta-analyses:\nThe case of categorical moderators. Studies in Second Language Acquisition."
+cite <- "To cite this package use:\n\nNorouzian,R.(2021). Interrater reliability in second language meta-analyses:\nThe case of categorical moderators. Studies in Second Language Acquisition, 43,896-915."
 
 cat(Break, cite, Break)
 
@@ -319,9 +319,9 @@ meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
   
   n.coder <- tbl[tbl >= 2]
   
-  
   i1 <- colnames(r) != 'study.name'
-  st.level <- names(which(sapply(split.default(r[i1], names(r)[i1]), function(x) all(!colSums(!aggregate(.~ study.name, transform(x, study.name = r$study.name), FUN = is.constant)[-1])))))
+  st.level <- names(which(sapply(split.default(r[i1], names(r)[i1]), function(x) 
+   base::all(!colSums(!aggregate(.~ study.name, transform(x, study.name = r$study.name), FUN = is.constant)[-1])))))
   
   st.level <- st.level[st.level %in% dot.names]
   
