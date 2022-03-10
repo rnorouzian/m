@@ -2071,7 +2071,7 @@ plot(predictorEffects(m1)[2],
 ems &lt;- emmeans(m1, pairwise ~ time*item_type,infer = c(FALSE, TRUE), type = &quot;response&quot;)[[2]] %&gt;%
   as.data.frame() %&gt;% roundi(digits = 3)
 
-pre_test_gap &lt;- ems[c(4,18),]
+pre_test_gap &lt;- ems[c(4,17),]
 
 
 kbl(pre_test_gap, caption = &quot;Performance Gap at Pre-testing Occasion by Item Type&quot;) %&gt;% 
@@ -2130,25 +2130,25 @@ Inf
 </tr>
 <tr>
 <td style="text-align:left;">
-18
+17
 </td>
 <td style="text-align:left;">
-(Baseline multiple-choice_vocabulary) / (Post-test production_vocabulary)
+(Baseline multiple-choice_vocabulary) / Baseline production_vocabulary
 </td>
 <td style="text-align:left;">
-2.177
+6.419
 </td>
 <td style="text-align:left;">
-1.861
+5.444
 </td>
 <td style="text-align:left;">
 Inf
 </td>
 <td style="text-align:left;">
-0.910
+2.192
 </td>
 <td style="text-align:left;">
-0.985
+0.356
 </td>
 </tr>
 </tbody>
