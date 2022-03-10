@@ -2157,9 +2157,12 @@ Inf
 <p>Given this wide pre-study gap, the learning gains for each language skill (grammar and vocabulary) were computed in two steps. First, the change in test-takers’ performance across the two testing occasions for each item type was obtained. Second, a planned statistical comparison between the two gains for each item type was conducted.</p>
 <pre class="r"><code># Two Planned contrasts
 
-# 1- ((Baseline multiple-choice_grammar) - (Post-test multiple-choice_grammar)) - (Baseline production_grammar - (Post-test production_grammar))
+a &lt;- &quot;((Post-test production_grammar) - Baseline production_grammar) 
+-((Post-test multiple-choice_grammar) - (Baseline multiple-choice_grammar))&quot; 
 
-# 2- ((Baseline multiple-choice_vocabulary) - (Post-test multiple-choice_vocabulary)) - (Baseline production_vocabulary - (Post-test production_vocabulary))
+
+b &lt;- &quot;((Post-test multiple-choice_vocabulary) - (Baseline multiple-choice_vocabulary)) 
+ - ((Post-test production_vocabulary) - Baseline production_vocabulary)&quot;
 
 EMM &lt;- emmeans(m1, ~ item_type * time, infer=c(FALSE,FALSE))
 
@@ -2168,11 +2171,9 @@ CON &lt;- list(c1 = c(1, 0, -1, 0, -1, 0, 1, 0),
 
 pc &lt;- roundi(as.data.frame(contrast(regrid(EMM), CON)),3)[-4]
 
-pc$contrast &lt;- c(&quot;((Baseline multiple-choice_grammar) - (Post-test multiple-choice_grammar)) - (Baseline production_grammar - (Post-test production_grammar))&quot;,
+pc$contrast &lt;- c(a,b) 
 
-&quot;((Baseline multiple-choice_vocabulary) - (Post-test multiple-choice_vocabulary)) - (Baseline production_vocabulary - (Post-test production_vocabulary)))&quot;)
-
-kbl(pc, caption = &quot;Planned Contrasts (Item Type Sensetivity to Learning Gains)&quot;) %&gt;% 
+kbl(pc, caption = &quot;Planned Contrasts (Item Type Sensetivity to Learning Gains)&quot;)  %&gt;%
  kable_classic(full_width = F)</code></pre>
 <table class=" lightable-classic" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
@@ -2200,7 +2201,7 @@ p.value
 <tbody>
 <tr>
 <td style="text-align:left;">
-((Baseline multiple-choice_grammar) - (Post-test multiple-choice_grammar)) - (Baseline production_grammar - (Post-test production_grammar))
+((Post-test production_grammar) - Baseline production_grammar) -((Post-test multiple-choice_grammar) - (Baseline multiple-choice_grammar))
 </td>
 <td style="text-align:left;">
 0.106
@@ -2217,7 +2218,7 @@ p.value
 </tr>
 <tr>
 <td style="text-align:left;">
-((Baseline multiple-choice_vocabulary) - (Post-test multiple-choice_vocabulary)) - (Baseline production_vocabulary - (Post-test production_vocabulary)))
+((Post-test multiple-choice_vocabulary) - (Baseline multiple-choice_vocabulary)) - ((Post-test production_vocabulary) - Baseline production_vocabulary)
 </td>
 <td style="text-align:left;">
 0.100
@@ -2234,7 +2235,7 @@ p.value
 </tr>
 </tbody>
 </table>
-<p>Both of these planned comparisons showed that the learning gains from the newly added production type items relative to those from their multiple-choice peers is significantly higher for the Duolingo users targeted in this single-group study.</p>
+<p>Both of these planned comparisons showed that the learning gains from the newly added production type items relative to those from their multiple-choice peers is not significantly higher for the Duolingo users targeted in this single-group study.</p>
 </div>
 <div id="recommendations" class="section level1">
 <h1><span class="header-section-number">3</span> Recommendations</h1>
