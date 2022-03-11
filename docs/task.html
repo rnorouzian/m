@@ -11,7 +11,6 @@
 
 <meta name="author" content="Reza Norouzian" />
 
-<meta name="date" content="2022-03-11" />
 
 <title>Duolingo Report Task</title>
 
@@ -1778,7 +1777,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Duolingo Report Task</h1>
 <h4 class="author">Reza Norouzian</h4>
-<h4 class="date">03/11/2022</h4>
+<h4 class="date">`03/10/2022</h4>
 
 </div>
 
@@ -1885,6 +1884,7 @@ m2 &lt;- glmer(form2, family = binomial, data = dat,
 <pre class="r"><code># Output on the odds ratio scale
 out &lt;- tidy(m1,exponentiate=TRUE)
 
+#rm_effects &lt;- roundi(filter(out, effect != &quot;fixed&quot;)[-c(1:2,5:7)] %&gt;% as.data.frame(),3)
 
 reg_tab &lt;- roundi(filter(out, effect == &quot;fixed&quot;)[-(1:2)] %&gt;% as.data.frame(),3) %&gt;%
 mutate(term = clean_reg(m1, names(fixef(m1))))
@@ -2054,7 +2054,6 @@ production_vocabulary:Post-test
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>rm_effect_sd &lt;- roundi(filter(out, effect != &quot;fixed&quot;)[-c(1:2,5:7)] %&gt;% as.data.frame(),3)</code></pre>
 <p>To improve interpretability, Figure 2 provides the prediction for our four types of items. For comparative purposes, it is customary to work with the log odds of correct response than its probability.</p>
 <pre class="r"><code># Predicted probabilities
 plot(predictorEffects(m1)[2], 
@@ -2236,8 +2235,8 @@ p.value
 </tr>
 </tbody>
 </table>
-<p>Based on these planned comparisons the learning gains from the newly added grammar production type items relative to those from their multiple-choice peers is significantly higher for the Duolingo users targeted in this single-group study.</p>
-<p>However, no such similar gains are observed for the newly added vocabulary production type items relative to those from their multiple-choice peers.</p>
+<p>Based on these planned comparisons the learning gains on the newly added grammar production type items relative to those on their multiple-choice peers is significantly higher for the Duolingo users targeted in this single-group study.</p>
+<p>However, no such gains are observed for the newly added vocabulary production type items relative to those for their multiple-choice peers as a result of completing the Duolingo unit.</p>
 </div>
 <div id="exploring-construct-validity" class="section level1">
 <h1><span class="header-section-number">3</span> Exploring construct validity</h1>
