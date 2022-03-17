@@ -1833,7 +1833,8 @@ clean_reg &lt;- function(fm, nm) {
 roundi &lt;- function(x, digits = 7){
   
   if(!inherits(x, c(&quot;data.frame&quot;,&quot;tibble&quot;,&quot;matrix&quot;))) stop(&quot;&#39;x&#39; must be a &#39;data.frame&#39;.&quot;, call. = FALSE)
-  
+  if(inherits(x,&quot;matrix&quot;)) x &lt;- as.data.frame(x)
+     
   num &lt;- sapply(x, is.numeric)
   
   x[num] &lt;- lapply(x[num], function(i) formatC(round(i, digits), digits, format = &quot;f&quot;))
@@ -2072,7 +2073,7 @@ plot(predictorEffects(m1)[2],
 ems &lt;- emmeans(m1, pairwise ~ time*item_type,infer = c(FALSE, TRUE), type = &quot;link&quot;, adjust = &quot;none&quot;)[[2]] %&gt;%
   as.data.frame() %&gt;% roundi(digits = 3)
 
-pre_test_gap &lt;- ems[c(4,17),]
+pre_test_gap &lt;- ems[c(4,17),-4]
 
 
 kbl(pre_test_gap, caption = &quot;Performance Gap at Pre-testing Occasion by Item Type (log odd scale)&quot;) %&gt;% 
@@ -2093,9 +2094,6 @@ estimate
 </th>
 <th style="text-align:left;">
 SE
-</th>
-<th style="text-align:left;">
-df
 </th>
 <th style="text-align:left;">
 z.ratio
@@ -2120,9 +2118,6 @@ p.value
 0.096
 </td>
 <td style="text-align:left;">
-Inf
-</td>
-<td style="text-align:left;">
 4.818
 </td>
 <td style="text-align:left;">
@@ -2143,9 +2138,6 @@ Inf
 0.848
 </td>
 <td style="text-align:left;">
-Inf
-</td>
-<td style="text-align:left;">
 2.193
 </td>
 <td style="text-align:left;">
@@ -2158,12 +2150,12 @@ Inf
 <p>Given this wide pre-study gap, the learning gains for each language subskill (grammar and vocabulary) were computed in two steps. First, the change in test-takers’ performance across the two testing occasions for each item type was obtained. Second, a planned statistical comparison between the two gains for each item type was conducted.</p>
 <pre class="r"><code># Two Planned contrasts
 
-a &lt;- &quot;((Post-test production_grammar) - Baseline production_grammar) 
-- ((Post-test multiple-choice_grammar) - (Baseline multiple-choice_grammar))&quot; 
+a &lt;- &quot;(Post-test production_grammar - Baseline production_grammar) 
+- (Post-test multiple-choice_grammar - Baseline multiple-choice_grammar)&quot; 
 
 
-b &lt;- &quot;((Post-test multiple-choice_vocabulary) - (Baseline multiple-choice_vocabulary)) 
- - ((Post-test production_vocabulary) - Baseline production_vocabulary)&quot;
+b &lt;- &quot;(Post-test production_vocabulary - Baseline production_vocabulary) 
+- (Post-test multiple-choice_vocabulary - Baseline multiple-choice_vocabulary)&quot;
 
 EMM &lt;- emmeans(m1, ~ item_type * time, infer=c(FALSE,FALSE))
 
@@ -2202,7 +2194,7 @@ p.value
 <tbody>
 <tr>
 <td style="text-align:left;">
-((Post-test production_grammar) - Baseline production_grammar) - ((Post-test multiple-choice_grammar) - (Baseline multiple-choice_grammar))
+(Post-test production_grammar - Baseline production_grammar) - (Post-test multiple-choice_grammar - Baseline multiple-choice_grammar)
 </td>
 <td style="text-align:left;">
 0.420
@@ -2219,7 +2211,7 @@ p.value
 </tr>
 <tr>
 <td style="text-align:left;">
-((Post-test multiple-choice_vocabulary) - (Baseline multiple-choice_vocabulary)) - ((Post-test production_vocabulary) - Baseline production_vocabulary)
+(Post-test production_vocabulary - Baseline production_vocabulary) - (Post-test multiple-choice_vocabulary - Baseline multiple-choice_vocabulary)
 </td>
 <td style="text-align:left;">
 0.049
@@ -2245,7 +2237,7 @@ p.value
 <p>I briefly explored the correlational structure of the underlying constructs of the present quizzes using a simplified, multilevel <strong>Multi-Trait, Multi-Method (MTMM)</strong> approach. This correlational structure is displayed below. I will explore three types of construct validity.</p>
 <pre class="r"><code>G &lt;- VarCorr(m1)
 
-gg &lt;- roundi(as.data.frame(attr(G$user_id, &quot;correlation&quot;)),3)
+gg &lt;- roundi(attr(G$user_id, &quot;correlation&quot;),3)
 
 rownames(gg) &lt;- colnames(gg) &lt;- clean_reg(m1, rownames(gg))
 
@@ -2342,7 +2334,8 @@ production_vocabulary
 </table>
 <div id="convergent-validity-mono-trait-hetro-method" class="section level2">
 <h2><span class="header-section-number">3.1</span> Convergent validity (Mono-Trait, Hetro-Method)</h2>
-<p>As can be seen, the same language constructs (grammar or vocabulary) tested via production vs. multiple choice are moderately correlated. For instance, assessment of grammar via multiple-choice vs. assessing it via production items are moderately correlated (<span class="math inline">\(r_{convergent 1}= .378\)</span>). However, the correlation between the assessment of vocabulary via multiple-choice vs. that via production items is fairly low (<span class="math inline">\(r_{ convergent 2}= .226\)</span>). The higher the magnitude of these convergent correlations, the higher the degree of convergent construct validity for the quizzes.</p>
+<p>As can be seen, the same language constructs (grammar or vocabulary) tested via production vs. multiple choice are moderately correlated. For instance, assessment of grammar via multiple-choice vs. assessing it via production items are moderately correlated (<span class="math inline">\(r_{convergent 1}= .378\)</span>). However, the correlation between the assessment of vocabulary via multiple-choice vs. that via production items is fairly low (<span class="math inline">\(r_{ convergent 2}= .226\)</span>).</p>
+<p>The higher the magnitude of these convergent correlations, the higher the degree of convergent construct validity for the quizzes.</p>
 </div>
 <div id="divergent-validity-hetro-trait-mono-method" class="section level2">
 <h2><span class="header-section-number">3.2</span> Divergent validity (Hetro-Trait, Mono-Method)</h2>
