@@ -184,9 +184,9 @@ irr <- int <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6,
   
   return(round(c(Raw_Agreement = p_, Fleiss_KAPPA = KAPPA, 
                  Sindex = s, 
-                 lower = s.boot.ci[[1]], 
-                 upper = s.boot.ci[[2]], 
-                 conf.level = level), digits))
+                 Lower = s.boot.ci[[1]], 
+                 Upper = s.boot.ci[[2]], 
+                 Conf_Level = level), digits))
 }                                      
 
 
@@ -295,12 +295,12 @@ meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
     
     if(!ok) stop("The coding sheets don't have the same number of rows.", call. = FALSE)
     
-      vec <- names(unlist(r, recursive = FALSE))
-      unique(vec[duplicated(vec)])
+    vec <- names(unlist(r, recursive = FALSE))
+    unique(vec[duplicated(vec)])
     
   } else { 
     
-      names(which(tbl >= 2))
+    names(which(tbl >= 2))
   }
   
   dot.names <- if(all) com.names else com.names[!com.names %in% ar]
@@ -321,7 +321,7 @@ meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
   
   i1 <- colnames(r) != 'study.name'
   st.level <- names(which(sapply(split.default(r[i1], names(r)[i1]), function(x) 
-   base::all(!colSums(!aggregate(.~ study.name, transform(x, study.name = r$study.name), FUN = is.constant)[-1])))))
+    base::all(!colSums(!aggregate(.~ study.name, transform(x, study.name = r$study.name), FUN = is.constant)[-1])))))
   
   st.level <- st.level[st.level %in% dot.names]
   
@@ -363,13 +363,13 @@ meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
     invisible(mapply(splot, y = A, main = names(A), lwd = lwd, lend = lend, show.sa = show.sa, digits = digits, cex.sa = cex.sa))
   }
   
-  res <- data.frame(t(rbind(d, row.comprd = sapply(L, nrow), min.cat = sapply(A, function(i) if(any(i < 1)) names(i)[which.min(i)] else "--"), 
-                            n.coder = n.coder, study.level = ifelse(study.level, "Yes", "No"))))
+  res <- data.frame(t(rbind(d, Rows_Compared = sapply(L, nrow), Min_Cat = sapply(A, function(i) if(any(i < 1)) names(i)[which.min(i)] else "--"), 
+                            N_Coder = n.coder, Study_Level = ifelse(study.level, "Yes", "No"))))
   
   output <- data.frame(lapply(res, unlist))
   output <- data.frame(Moderator = rownames(output), output, row.names = NULL)
-                                                                              
-  if(common) output <- output[output$n.coder == max(output$n.coder),]
+  
+  if(common) output <- output[output$N_Coder == max(output$N_Coder),]
   
   file.name <- trimws(file.name)
   
@@ -382,7 +382,6 @@ meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
   
   return(output)
 }
-
 
 #================================================================================================================================================================
 
