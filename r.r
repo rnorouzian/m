@@ -367,7 +367,8 @@ meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
                             n.coder = n.coder, study.level = ifelse(study.level, "Yes", "No"))))
   
   output <- data.frame(lapply(res, unlist))
-  
+  output <- data.frame(Moderator = rownames(output), output, row.names = NULL)
+                                                                              
   if(common) output <- output[output$n.coder == max(output$n.coder),]
   
   file.name <- trimws(file.name)
