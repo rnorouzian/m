@@ -169,7 +169,7 @@ irr <- int <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6,
   tot <- sum(X)
   pij <- X2/(sumrow * (sumrow - 1))
   pi <- rowSums(pij)
-  p <- mean(pi)
+  p_ <- p <- mean(pi)
   pj <- sumcol/tot
   pj2 <- pj^2
   pe <- sum(pj2)
@@ -182,7 +182,7 @@ irr <- int <- function (X, nsim = 1e3, useNA = "ifany", level = .95, digits = 6,
   p <- (1 - level) / 2
   s.boot.ci <- quantile(s.boot, probs = c(p, 1-p), na.rm = TRUE)
   
-  return(round(c(Fleiss_KAPPA = KAPPA, 
+  return(round(c(Raw_Agreement = p_, Fleiss_KAPPA = KAPPA, 
                  Sindex = s, 
                  lower = s.boot.ci[[1]], 
                  upper = s.boot.ci[[2]], 
