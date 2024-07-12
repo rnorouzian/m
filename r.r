@@ -136,7 +136,7 @@ set.margin <- function()
 
 
 splot <- function(y, main, lwd = 5, lend = 2, show.sa = FALSE, digits = 3, cex.sa = .9,
-                  xlab){
+                  xlab, col_lo, col_hi){
   
   ll <- length(y)
   
@@ -144,7 +144,7 @@ splot <- function(y, main, lwd = 5, lend = 2, show.sa = FALSE, digits = 3, cex.s
   
   plot(x, y, type = "h", main = main, xlim = c(.95, 1.02*max(x)), ylim = 0:1,
        ylab = "SA%", xaxt = "n", xlab = xlab, lend = lend, lwd = lwd,
-       col = colorRampPalette(c("blue", "red"))(ll), font.lab = 2, 
+       col = colorRampPalette(c(col_lo, col_hi))(ll), font.lab = 2, 
        panel.first = abline(h = 0, col = 8), las = 1, cex.axis = .9)
   
   if(show.sa) text(x[y != 0]-.015, .4, round(y[y != 0], digits), pos = 2, xpd = NA, srt = 90, font = 2, cex = cex.sa)
@@ -257,7 +257,7 @@ meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
                       plot = TRUE, lwd = 5, lend = 1, show.sa = TRUE, 
                       sub.level = NULL, study.level = NULL, file.name = NULL,
                       reset = TRUE, rev.page = FALSE, cex.sa = .9, main = NULL, 
-                      xlab = NULL)
+                      xlab = NULL, col_lo = "blue", col_hi = "red")
 {
   
   r <- list(...) 
@@ -362,7 +362,10 @@ meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
     dev <- if(!rev.page) n2mfrow(n) else rev(n2mfrow(n))
     if(n > 1L) { par(mfrow = dev) ; set.margin() }
     
-    invisible(mapply(splot, y = A, main = if(is.null(main)) names(A) else main, xlab = if(is.null(xlab)) "Category" else xlab, lwd = lwd, lend = lend, show.sa = show.sa, digits = digits, cex.sa = cex.sa))
+    invisible(mapply(splot, y = A, main = if(is.null(main)) names(A) else main, 
+                     xlab = if(is.null(xlab)) "Category" else xlab, lwd = lwd, 
+                     lend = lend, show.sa = show.sa, digits = digits, 
+                     cex.sa = cex.sa, col_lo = col_lo, col_hi = col_hi))
   }
   
   res <- data.frame(t(rbind(d, Rows_Compared = sapply(L, nrow), Min_Cat = sapply(A, function(i) if(any(i < 1)) names(i)[which.min(i)] else "--"), 
