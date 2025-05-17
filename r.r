@@ -251,7 +251,7 @@ drop.inner.list <- function(L, what, omit.auto.suffix = TRUE) {
 
 #===============================================================================================================================
 
-meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
+meta_irr <- meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
                       useNA = "ifany", type = c("s", "ac"), na.rm = FALSE, 
                       digits = 3, common = FALSE, all = TRUE, drop = NULL,
                       plot = TRUE, lwd = 5, lend = 1, show.sa = TRUE, 
