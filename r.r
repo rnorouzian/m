@@ -376,14 +376,15 @@ meta_irr <- meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, leve
   
   if(common) output <- output[output$N_Coder == max(output$N_Coder),]
   
-  file.name <- trimws(file.name)
-  
-  if(length(file.name) != 0){
+
+   if (length(file.name) != 0) {
+    file.name <- trimws(file.name)
     nm <- paste0(file.name, ".csv")
-    ur <- try(write.csv(output, nm), silent = TRUE)
-    if(inherits(ur, "try-error")) stop(paste0("\nClose the Excel file '", nm, "' and try again OR pick another file name."), call. = FALSE)
-    message(paste0("\nNote: Check folder '", basename(getwd()),"' for the Excel file '", nm, "'.\n"))
-  }
+    if (inherits(try(write.csv(output, nm), silent = TRUE), "try-error"))
+      stop(sprintf("\nClose the Excel file '%s' and try again OR pick another file name.", nm), call. = FALSE)
+    message(sprintf("\nNote: Check folder '%s' at: %s for the Excel file '%s'.\n",
+                    basename(getwd()), getwd(), nm))
+  }                                                                                
   
   return(output)
 }
@@ -423,3 +424,4 @@ c1 <- read.csv("https://raw.githubusercontent.com/hkil/m/master/c1.csv")
 c2 <- read.csv("https://raw.githubusercontent.com/hkil/m/master/c2.csv")
 c3 <- read.csv("https://raw.githubusercontent.com/hkil/m/master/c3.csv")
 c4 <- read.csv("https://raw.githubusercontent.com/hkil/m/master/c4.csv")           
+
