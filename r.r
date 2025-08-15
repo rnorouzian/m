@@ -30,7 +30,7 @@ d.prepos <- function(d = NA, study.name = NA, group.name = NA, n = NA, mdif = NA
 
 #========================================================================================
 
-rm.allrowNA <- function(X) { 
+rm.allrowNA_ <- function(X) { 
   
   if(inherits(X, "list")){
     
@@ -41,7 +41,7 @@ rm.allrowNA <- function(X) {
 
 #===============================================================================================================================
 
-rm.allcolNA <- function(X) { 
+rm.allcolNA_ <- function(X) { 
   
   if(inherits(X, "list")){
     
@@ -52,10 +52,10 @@ rm.allcolNA <- function(X) {
 
 #===============================================================================================================================
 
-rm.colrowNA <- function(X){
+rm.colrowNA_ <- function(X){
   
-  r <- rm.allrowNA(X)
-  rm.allcolNA(r)  
+  r <- rm.allrowNA_(X)
+  rm.allcolNA_(r)  
   
 }                                      
 
@@ -80,7 +80,7 @@ drop.col <- function(dat, vec){
 full.clean <- function(X, omit, all = TRUE, omit.auto.suffix = TRUE)
 {
   
-  X <- rm.colrowNA(X)
+  X <- rm.colrowNA_(X)
   
   X <- if(inherits(X, "list") & omit.auto.suffix){ lapply(X, function(x) trim(setNames(x, sub("\\.\\d+$", "", names(x))))) 
     
@@ -252,12 +252,12 @@ drop.inner.list <- function(L, what, omit.auto.suffix = TRUE) {
 #===============================================================================================================================
 
 meta_irr <- meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, level = .95,
-                      useNA = "ifany", type = c("s", "ac"), na.rm = FALSE, 
-                      digits = 3, common = FALSE, all = TRUE, drop = NULL,
-                      plot = TRUE, lwd = 5, lend = 1, show.sa = TRUE, 
-                      sub.level = NULL, study.level = NULL, file.name = NULL,
-                      reset = TRUE, rev.page = FALSE, cex.sa = .9, main = NULL, 
-                      xlab = NULL, col_lo = "blue", col_hi = "red")
+                                  useNA = "ifany", type = c("s", "ac"), na.rm = FALSE, 
+                                  digits = 3, common = FALSE, all = TRUE, drop = NULL,
+                                  plot = TRUE, lwd = 5, lend = 1, show.sa = TRUE, 
+                                  sub.level = NULL, study.level = NULL, file.name = NULL,
+                                  reset = TRUE, rev.page = FALSE, cex.sa = .9, main = NULL, 
+                                  xlab = NULL, col_lo = "blue", col_hi = "red")
 {
   
   r <- list(...) 
@@ -376,8 +376,8 @@ meta_irr <- meta_rate <- function(..., sub.name = "group.name", nsim = 1e3, leve
   
   if(common) output <- output[output$N_Coder == max(output$N_Coder),]
   
-
-   if (length(file.name) != 0) {
+  
+  if (length(file.name) != 0) {
     file.name <- trimws(file.name)
     nm <- paste0(file.name, ".csv")
     if (inherits(try(write.csv(output, nm), silent = TRUE), "try-error"))
@@ -424,4 +424,5 @@ c1 <- read.csv("https://raw.githubusercontent.com/hkil/m/master/c1.csv")
 c2 <- read.csv("https://raw.githubusercontent.com/hkil/m/master/c2.csv")
 c3 <- read.csv("https://raw.githubusercontent.com/hkil/m/master/c3.csv")
 c4 <- read.csv("https://raw.githubusercontent.com/hkil/m/master/c4.csv")           
+
 
