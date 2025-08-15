@@ -10,7 +10,7 @@ Break = "\n*********************************************************************
 
 cite <- "To cite this package use:\n\nNorouzian,R.(2021). Interrater reliability in second language meta-analyses:\nThe case of categorical moderators. Studies in Second Language Acquisition, 43,896-915."
 
-cat(Break, cite, Break)
+message(Break, cite, Break)
 
 #=============================================================================================================================
 
@@ -424,5 +424,6 @@ c1 <- read.csv("https://raw.githubusercontent.com/hkil/m/master/c1.csv")
 c2 <- read.csv("https://raw.githubusercontent.com/hkil/m/master/c2.csv")
 c3 <- read.csv("https://raw.githubusercontent.com/hkil/m/master/c3.csv")
 c4 <- read.csv("https://raw.githubusercontent.com/hkil/m/master/c4.csv")           
+
 
 
